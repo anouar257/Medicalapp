@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  @apply min-h-screen bg-slate-50 text-slate-900 antialiased dark:bg-[#0F172A] dark:text-slate-100;
+}
+
+.cdk-drag-preview {
+  box-sizing: border-box;
+  opacity: 0.92;
+  z-index: 1000;
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+}
+
+.scrollbar-calendar {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(148 163 184 / 0.65) rgb(241 245 249 / 0.9);
+}
+
+.dark .scrollbar-calendar {
+  scrollbar-color: rgb(71 85 105 / 0.8) rgb(30 41 59 / 0.6);
+}
+
+.scrollbar-calendar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.scrollbar-calendar::-webkit-scrollbar-track {
+  background: rgb(241 245 249 / 0.95);
+  border-radius: 9999px;
+}
+
+.dark .scrollbar-calendar::-webkit-scrollbar-track {
+  background: rgb(30 41 59 / 0.85);
+}
+
+.scrollbar-calendar::-webkit-scrollbar-thumb {
+  background: rgb(148 163 184 / 0.55);
+  border-radius: 9999px;
+}
+
+.dark .scrollbar-calendar::-webkit-scrollbar-thumb {
+  background: rgb(71 85 105 / 0.75);
+}
+
+.scrollbar-calendar::-webkit-scrollbar-thumb:hover {
+  background: rgb(100 116 139 / 0.65);
+}
+
+.dark .scrollbar-calendar::-webkit-scrollbar-thumb:hover {
+  background: rgb(100 116 139 / 0.85);
+}

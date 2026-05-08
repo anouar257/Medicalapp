@@ -1,0 +1,27 @@
+server:
+  port: ${SERVER_PORT:8081}
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 4MB
+      max-request-size: 5MB
+  datasource:
+    url: jdbc:postgresql://localhost:5432/agenda_medical
+    username: postgres
+    password: odoo
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+# Répertoire persistant pour les portraits uploadés (créé automatiquement).
+agenda:
+  doctor-photos:
+    directory: ${AGENDA_DOCTOR_PHOTOS_DIR:${user.home}/.agenda/doctor-photos}
+

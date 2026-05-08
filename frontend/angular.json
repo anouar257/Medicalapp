@@ -74,7 +74,13 @@
                   "maximumError": "8kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.production.ts"
+                }
+              ]
             },
             "development": {
               "optimization": false,
@@ -86,6 +92,10 @@
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "port": 4200,
+            "proxyConfig": "proxy.conf.json"
+          },
           "configurations": {
             "production": {
               "buildTarget": "agenda-app:build:production"
@@ -101,5 +111,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": "b12632ca-0cf8-42c4-88f7-fd2b59f00793"
   }
 }
