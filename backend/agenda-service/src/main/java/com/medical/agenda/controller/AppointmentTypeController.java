@@ -1,48 +1,42 @@
 package com.medical.agenda.controller;
 
-import com.medical.agenda.dto.AppointmentTypeDTO;
-import com.medical.agenda.service.AppointmentTypeService;
+import com.medical.agenda.dto.AppointmentTypePublicDTO;
+import com.medical.agenda.entity.AppointmentType;
+import com.medical.agenda.repository.AppointmentTypeRepository;
 import java.util.List;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/appointment-types")
 public class AppointmentTypeController {
 
-  private final AppointmentTypeService service;
+  private final AppointmentTypeRepository repository;
 
-  public AppointmentTypeController(AppointmentTypeService service) {
-    this.service = service;
+  public AppointmentTypeController(AppointmentTypeRepository repository) {
+    this.repository = repository;
   }
 
+  /** Types de visite actifs — utilisés par le parcours patient (durée par défaut, code). */
   @GetMapping
-  public List<AppointmentTypeDTO> list() {
-    return service.findAll();
+  @PreAuthorize("hasAnyRole('PATIENT','ASSISTANT','PRATICIEN','ADMIN')")
+  public List<AppointmentTypePublicDTO> listActive() {
+    return repository.findByActiveTrueOrderByDisplayOrderAsc().stream()
+        .map(AppointmentTypeController::toPublic)
+        .toList();
   }
 
-  @PostMapping
-  @ResponseStatus(HttpStatus.CREATED)
-  public AppointmentTypeDTO create(@RequestBody AppointmentTypeDTO body) {
-    return service.create(body);
-  }
-
-  @PutMapping("/{id}")
-  public AppointmentTypeDTO update(@PathVariable Long id, @RequestBody AppointmentTypeDTO body) {
-    return service.update(id, body);
-  }
-
-  @DeleteMapping("/{id}")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void delete(@PathVariable Long id) {
-    service.delete(id);
+  private static AppointmentTypePublicDTO toPublic(AppointmentType t) {
+    AppointmentTypePublicDTO d = new AppointmentTypePublicDTO();
+    d.setId(t.getId());
+    d.setCode(t.getCode());
+    d.setLabel(t.getLabel());
+    d.setColorCode(t.getColorCode());
+    d.setDefaultDurationMinutes(t.getDefaultDurationMinutes());
+    d.setDisplayOrder(t.getDisplayOrder());
+    d.setActive(t.isActive());
+    return d;
   }
 }

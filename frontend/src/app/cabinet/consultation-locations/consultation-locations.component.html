@@ -1,0 +1,172 @@
+
+    <div class="page">
+      <header class="page-header">
+        <div>
+          <h1>Lieux de consultation</h1>
+          <p class="subtitle">Gérez vos cabinets de consultation et leurs horaires</p>
+        </div>
+        <button class="btn-primary" (click)="newLocation()">+ Ajouter un lieu</button>
+      </header>
+
+      @if (errorMessage) { <div class="alert error">{{ errorMessage }}</div> }
+      @if (successMessage) { <div class="alert success">{{ successMessage }}</div> }
+
+      @if (locations.length === 0 && !editing) {
+        <div class="empty">
+          <h3>Aucun lieu enregistré</h3>
+          <p>Commencez par ajouter votre cabinet principal.</p>
+          <button class="btn-primary" (click)="newLocation()">+ Ajouter un lieu</button>
+        </div>
+      }
+
+      @for (loc of locations; track loc.id) {
+        <article class="card">
+          <header class="card-header">
+            <div>
+              <h3>{{ loc.nomEtablissement }}</h3>
+              <p class="muted">{{ loc.adresse }} · {{ loc.codePostal }} {{ loc.ville }}</p>
+            </div>
+            <div class="actions">
+              <button class="btn-ghost" (click)="edit(loc)">Modifier</button>
+              <button class="btn-danger" (click)="remove(loc)">Supprimer</button>
+            </div>
+          </header>
+
+          <div class="badges">
+            @if (loc.ascenseur) { <span class="badge">🛗 Ascenseur</span> }
+            @if (loc.entreeAccessible) { <span class="badge">♿ Entrée PMR</span> }
+            <span class="badge">🅿️ {{ parkingLabel(loc.parking) }}</span>
+            @if (loc.etage) { <span class="badge">🏢 Étage {{ loc.etage }}</span> }
+            @if (loc.contactUrgenceType) { <span class="badge">🚨 {{ urgenceLabel(loc.contactUrgenceType) }}</span> }
+          </div>
+
+          @if (loc.horaires.length) {
+            <div class="horaires">
+              <strong>Horaires</strong>
+              <ul>
+                @for (h of loc.horaires; track h.id) {
+                  <li>{{ jourLabel(h.jour) }} : {{ h.heureDebut }} – {{ h.heureFin }} @if (h.continu) { <em>(continu)</em> }</li>
+                }
+              </ul>
+            </div>
+          }
+        </article>
+      }
+
+      @if (editing) {
+        <div class="modal-backdrop" (click)="cancelEdit()">
+          <div class="modal" (click)="$event.stopPropagation()">
+            <header class="modal-header">
+              <h2>{{ editing.id ? 'Modifier le lieu' : 'Nouveau lieu de consultation' }}</h2>
+              <button class="close-btn" (click)="cancelEdit()">×</button>
+            </header>
+
+            <div class="modal-body">
+              <div class="row">
+                <div class="form-group">
+                  <label>Nom de l'établissement *</label>
+                  <input type="text" [(ngModel)]="editing.nomEtablissement"/>
+                </div>
+                <div class="form-group">
+                  <label>Téléphone du bureau</label>
+                  <input type="tel" [(ngModel)]="editing.telephoneBureau"/>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Adresse *</label>
+                <input type="text" [(ngModel)]="editing.adresse"/>
+              </div>
+
+              <div class="row">
+                <div class="form-group">
+                  <label>Ville</label>
+                  <input type="text" [(ngModel)]="editing.ville"/>
+                </div>
+                <div class="form-group">
+                  <label>Code postal</label>
+                  <input type="text" [(ngModel)]="editing.codePostal"/>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="form-group">
+                  <label>Étage</label>
+                  <input type="text" [(ngModel)]="editing.etage" placeholder="RDC, 2, ..."/>
+                </div>
+                <div class="form-group">
+                  <label>Fax</label>
+                  <input type="tel" [(ngModel)]="editing.fax"/>
+                </div>
+              </div>
+
+              <h3>Accessibilité</h3>
+              <div class="checks-row">
+                <label class="check-inline">
+                  <input type="checkbox" [(ngModel)]="editing.ascenseur"/> Ascenseur
+                </label>
+                <label class="check-inline">
+                  <input type="checkbox" [(ngModel)]="editing.entreeAccessible"/> Entrée accessible (PMR)
+                </label>
+              </div>
+
+              <div class="form-group">
+                <label>Parking</label>
+                <select [(ngModel)]="editing.parking">
+                  <option value="AUCUN">Aucun</option>
+                  <option value="GRATUIT">Gratuit</option>
+                  <option value="PAYANT">Payant</option>
+                </select>
+              </div>
+
+              <h3>Contact d'urgence</h3>
+              <div class="row">
+                <div class="form-group">
+                  <label>Type de contact</label>
+                  <select [(ngModel)]="editing.contactUrgenceType">
+                    <option [ngValue]="null">— Aucun —</option>
+                    <option value="SECRETARIAT">Secrétariat</option>
+                    <option value="SOS_MEDECINS">SOS Médecins</option>
+                    <option value="NUMERO_PERSONNEL">Numéro personnel</option>
+                    <option value="NUMERO_DIRECT">Numéro direct du praticien</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Téléphone d'urgence</label>
+                  <input type="tel" [(ngModel)]="editing.telephoneUrgence"/>
+                </div>
+              </div>
+
+              <h3>Horaires d'ouverture</h3>
+              <p class="muted">Une plage par ligne. Pour matin + après-midi avec pause, créez 2 plages le même jour. Cochez « continu » pour une amplitude continue.</p>
+              <div class="horaires-edit">
+                @for (h of editing.horaires; track $index; let i = $index) {
+                  <div class="horaire-row">
+                    <select [(ngModel)]="h.jour" [name]="'jour'+i">
+                      @for (j of jours; track j) { <option [value]="j">{{ jourLabel(j) }}</option> }
+                    </select>
+                    <input type="time" [(ngModel)]="h.heureDebut" [name]="'hd'+i"/>
+                    <input type="time" [(ngModel)]="h.heureFin" [name]="'hf'+i"/>
+                    <label class="check-inline">
+                      <input type="checkbox" [(ngModel)]="h.continu" [name]="'cnt'+i"/> Continu
+                    </label>
+                    <button class="btn-ghost btn-sm" (click)="removeHoraire(i)">✕</button>
+                  </div>
+                }
+              </div>
+              <button class="btn-secondary" (click)="addHoraire()">+ Ajouter une plage</button>
+
+              @if (editingError) { <div class="alert error" style="margin-top:1rem;">{{ editingError }}</div> }
+            </div>
+
+            <footer class="modal-footer">
+              <button class="btn-ghost" (click)="cancelEdit()">Annuler</button>
+              <button class="btn-primary" (click)="save()" [disabled]="saving">
+                {{ saving ? 'Enregistrement…' : 'Enregistrer' }}
+              </button>
+            </footer>
+          </div>
+        </div>
+      }
+    </div>
+  

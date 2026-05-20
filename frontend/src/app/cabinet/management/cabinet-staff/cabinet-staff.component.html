@@ -1,0 +1,226 @@
+<div class="max-w-5xl mx-auto px-4 sm:px-6 py-10 space-y-8">
+  <div
+    class="relative overflow-hidden rounded-3xl border border-white/10 bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl shadow-2xl p-8 md:p-10"
+  >
+    <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-transparent to-sky-500/10 pointer-events-none"></div>
+    <div class="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div>
+        <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+          {{ prefs.translate('cabinet.users.title') }}
+        </h1>
+        <p class="mt-2 text-slate-600 dark:text-slate-300 max-w-2xl">
+          {{ prefs.translate('cabinet.users.subtitle') }}
+        </p>
+      </div>
+      <button
+        type="button"
+        (click)="openCreate()"
+        [disabled]="loading"
+        class="inline-flex items-center justify-center rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold px-5 py-3 shadow-lg shadow-blue-600/25 transition shrink-0"
+      >
+        {{ prefs.translate('cabinet.users.addAssistant') }}
+      </button>
+    </div>
+  </div>
+
+  @if (listError) {
+    <div
+      class="rounded-2xl border border-red-200 dark:border-red-900/50 bg-red-50/90 dark:bg-red-950/40 text-red-800 dark:text-red-200 px-4 py-3 text-sm font-medium"
+    >
+      {{ listError }}
+    </div>
+  }
+  @if (successMessage) {
+    <div
+      class="rounded-2xl border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/90 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-100 px-4 py-3 text-sm font-medium"
+    >
+      {{ successMessage }}
+    </div>
+  }
+
+  <section
+    class="rounded-3xl border border-slate-200/80 dark:border-slate-700/80 bg-white/80 dark:bg-slate-900/50 backdrop-blur-xl shadow-xl p-6 md:p-8"
+  >
+    <h2 class="text-lg font-bold text-slate-900 dark:text-white mb-4">
+      {{ prefs.translate('cabinet.users.listTitle') }}
+    </h2>
+
+    @if (loading) {
+      <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">{{ prefs.translate('cabinet.staff.tableLoading') }}</p>
+      <div class="space-y-3" aria-busy="true">
+        @for (s of [1, 2, 3, 4, 5]; track s) {
+          <div class="flex gap-4 animate-pulse">
+            <div class="h-4 flex-1 rounded-lg bg-slate-200/80 dark:bg-slate-700/80"></div>
+            <div class="h-4 flex-1 rounded-lg bg-slate-200/80 dark:bg-slate-700/80"></div>
+            <div class="h-4 w-24 rounded-lg bg-slate-200/80 dark:bg-slate-700/80"></div>
+          </div>
+        }
+      </div>
+    } @else if (assistants.length === 0) {
+      <div
+        class="text-center py-14 px-4 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30"
+      >
+        <p class="text-lg font-semibold text-slate-800 dark:text-slate-100">
+          {{ prefs.translate('cabinet.users.empty') }}
+        </p>
+        <p class="mt-2 text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+          {{ prefs.translate('cabinet.users.emptyHint') }}
+        </p>
+      </div>
+    } @else {
+      <div class="overflow-x-auto rounded-2xl border border-slate-100 dark:border-slate-800">
+        <table class="min-w-full text-sm">
+          <thead class="bg-slate-50/90 dark:bg-slate-800/80 text-left text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <tr>
+              <th class="px-4 py-3">{{ prefs.translate('cabinet.users.colName') }}</th>
+              <th class="px-4 py-3">{{ prefs.translate('cabinet.users.colEmail') }}</th>
+              <th class="px-4 py-3">{{ prefs.translate('cabinet.users.colStatus') }}</th>
+              @if (canManageAssistants) {
+                <th class="px-4 py-3 text-right"></th>
+              }
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+            @for (u of assistants; track u.id) {
+              <tr class="bg-white/60 dark:bg-slate-900/40">
+                <td class="px-4 py-3 font-semibold text-slate-900 dark:text-white">
+                  {{ u.prenom }} {{ u.nom }}
+                </td>
+                <td class="px-4 py-3 text-slate-600 dark:text-slate-300">{{ u.email }}</td>
+                <td class="px-4 py-3">
+                  @if (u.actif) {
+                    <span
+                      class="inline-flex px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200"
+                    >
+                      {{ prefs.translate('cabinet.users.statusActive') }}
+                    </span>
+                  } @else {
+                    <span
+                      class="inline-flex px-2.5 py-1 rounded-full text-xs font-bold bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200"
+                    >
+                      {{ prefs.translate('cabinet.users.statusInactive') }}
+                    </span>
+                  }
+                </td>
+                @if (canManageAssistants) {
+                  <td class="px-4 py-3 text-right">
+                    @if (u.actif) {
+                      <button
+                        type="button"
+                        (click)="deactivate(u)"
+                        class="text-xs font-bold text-red-600 hover:underline"
+                      >
+                        {{ prefs.translate('cabinet.users.deactivate') }}
+                      </button>
+                    } @else {
+                      <button
+                        type="button"
+                        (click)="reactivate(u)"
+                        class="text-xs font-bold text-emerald-600 hover:underline"
+                      >
+                        {{ prefs.translate('cabinet.users.reactivate') }}
+                      </button>
+                    }
+                  </td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+
+  @if (showCreate) {
+    <div
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
+      (click)="closeCreate()"
+    >
+      <div
+        class="w-full max-w-lg rounded-3xl border border-white/10 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-2xl overflow-hidden"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white">
+            {{ prefs.translate('cabinet.users.addAssistant') }}
+          </h3>
+          <button
+            type="button"
+            (click)="closeCreate()"
+            class="text-slate-400 hover:text-slate-700 dark:hover:text-white text-2xl leading-none"
+            aria-label="close"
+          >
+            ×
+          </button>
+        </div>
+        <div class="p-6 space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">{{
+                prefs.translate('cabinet.users.firstName')
+              }}</label>
+              <input
+                class="w-full rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-950 px-3 py-2 text-slate-900 dark:text-white"
+                [(ngModel)]="form.prenom"
+                name="prenom"
+              />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">{{
+                prefs.translate('cabinet.users.lastName')
+              }}</label>
+              <input
+                class="w-full rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-950 px-3 py-2 text-slate-900 dark:text-white"
+                [(ngModel)]="form.nom"
+                name="nom"
+              />
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">{{
+              prefs.translate('cabinet.users.email')
+            }}</label>
+            <input
+              type="email"
+              class="w-full rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-950 px-3 py-2 text-slate-900 dark:text-white"
+              [(ngModel)]="form.email"
+              name="email"
+            />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">{{
+              prefs.translate('cabinet.users.password')
+            }}</label>
+            <input
+              type="password"
+              class="w-full rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-950 px-3 py-2 text-slate-900 dark:text-white"
+              [(ngModel)]="form.motDePasse"
+              name="motDePasse"
+            />
+            <p class="mt-1 text-xs text-slate-500">{{ prefs.translate('cabinet.users.passwordHint') }}</p>
+          </div>
+          @if (createError) {
+            <div class="text-sm text-red-600 dark:text-red-400 font-medium">{{ createError }}</div>
+          }
+        </div>
+        <div class="px-6 py-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-2 bg-slate-50/80 dark:bg-slate-800/50">
+          <button
+            type="button"
+            (click)="closeCreate()"
+            class="rounded-xl border border-slate-200 dark:border-slate-600 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200"
+          >
+            {{ prefs.translate('patient.booking.back') }}
+          </button>
+          <button
+            type="button"
+            (click)="submitCreate()"
+            [disabled]="creating"
+            class="rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-60 text-white px-4 py-2 text-sm font-bold"
+          >
+            {{ creating ? prefs.translate('cabinet.users.submitting') : prefs.translate('cabinet.users.submit') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

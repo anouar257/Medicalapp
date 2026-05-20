@@ -36,6 +36,35 @@ public class Doctor {
   @Column(name = "specialty", length = 160)
   private String specialty;
 
+  /** Code spécialité référentiel (ex. CHIRURGIE_DENTAIRE) — synchro practitioner. */
+  @Column(name = "specialty_code", length = 64)
+  private String specialtyCode;
+
+  /** Cabinet (practitioner-service) pour isoler les demandes RDV web par organisation. */
+  @Column(name = "organization_id")
+  private Long organizationId;
+
+  /**
+   * Identifiant du {@code PractitionerProfile} dans le practitioner-service.
+   *
+   * <p>Quand le practitioner-service synchronise un praticien (création ou mise à jour),
+   * il envoie cet ID externe. L'agenda-service crée ou met à jour le {@link Doctor}
+   * correspondant. Permet de garder l'agenda <em>léger</em> (cache d'affichage) sans
+   * jointures inter-services à chaque requête.
+   *
+   * <p>Reste {@code null} pour les médecins créés directement dans l'agenda (legacy ou admin).
+   */
+  @Column(name = "external_practitioner_id", unique = true)
+  private Long externalPractitionerId;
+
+  public Long getExternalPractitionerId() {
+    return externalPractitionerId;
+  }
+
+  public void setExternalPractitionerId(Long externalPractitionerId) {
+    this.externalPractitionerId = externalPractitionerId;
+  }
+
   public Long getId() {
     return id;
   }
@@ -74,5 +103,21 @@ public class Doctor {
 
   public void setSpecialty(String specialty) {
     this.specialty = specialty;
+  }
+
+  public String getSpecialtyCode() {
+    return specialtyCode;
+  }
+
+  public void setSpecialtyCode(String specialtyCode) {
+    this.specialtyCode = specialtyCode;
+  }
+
+  public Long getOrganizationId() {
+    return organizationId;
+  }
+
+  public void setOrganizationId(Long organizationId) {
+    this.organizationId = organizationId;
   }
 }

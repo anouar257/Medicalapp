@@ -13,6 +13,31 @@ public class DoctorDTO {
   /** Spécialité médicale affichée (recherche, fiches). */
   private String specialty;
 
+  /** Code spécialité référentiel (synchro practitioner). */
+  private String specialtyCode;
+
+  /** Lien vers {@code PractitionerProfile.id} si le médecin agenda provient de la synchro pro. */
+  private Long externalPractitionerId;
+
+  /** Cabinet (practitioner-service) — synchro pour filtrage demandes RDV. */
+  private Long organizationId;
+
+  public Long getExternalPractitionerId() {
+    return externalPractitionerId;
+  }
+
+  public void setExternalPractitionerId(Long externalPractitionerId) {
+    this.externalPractitionerId = externalPractitionerId;
+  }
+
+  public Long getOrganizationId() {
+    return organizationId;
+  }
+
+  public void setOrganizationId(Long organizationId) {
+    this.organizationId = organizationId;
+  }
+
   public Long getId() {
     return id;
   }
@@ -59,5 +84,13 @@ public class DoctorDTO {
 
   public void setSpecialty(String specialty) {
     this.specialty = specialty;
+  }
+
+  public String getSpecialtyCode() {
+    return specialtyCode;
+  }
+
+  public void setSpecialtyCode(String specialtyCode) {
+    this.specialtyCode = specialtyCode;
   }
 }

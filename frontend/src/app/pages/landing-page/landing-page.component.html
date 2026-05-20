@@ -1,0 +1,409 @@
+
+    <div class="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-colors duration-300">
+      
+      <!-- 1. Barre de Navigation Supérieure -->
+      <header class="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800 transition-colors">
+        <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-3">
+          
+          <!-- Logo -->
+          <a href="#" class="flex items-center gap-2">
+            <span class="text-3xl">🩺</span>
+            <span class="font-bold text-xl tracking-tight">MedConnect</span>
+          </a>
+
+          <!-- Contrôles d'Accessibilité & Langue -->
+          <div class="flex items-center gap-2 sm:gap-4">
+            
+            <!-- 🌍 Multilangue Moderne -->
+            <div class="relative group">
+              <button class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-sm font-bold">
+                @if (prefs.language() === 'fr') { <span>🇫🇷 FR</span> }
+                @else if (prefs.language() === 'en') { <span>🇬🇧 EN</span> }
+                @else { <span>🇲🇦 ع</span> }
+                <svg class="w-4 h-4 text-slate-400 group-hover:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+              
+              <!-- Dropdown -->
+              <div class="absolute right-0 mt-1 w-32 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-100 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform origin-top-right scale-95 group-hover:scale-100 z-[60]">
+                <div class="p-1">
+                  <button (click)="prefs.setLanguage('fr')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-2 text-sm">
+                    <span>🇫🇷</span> Français
+                  </button>
+                  <button (click)="prefs.setLanguage('en')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-2 text-sm">
+                    <span>🇬🇧</span> English
+                  </button>
+                  <button (click)="prefs.setLanguage('ar')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-2 text-sm">
+                    <span>🇲🇦</span> العربية
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 🔍 Zoom -->
+            <div class="hidden sm:flex items-center bg-slate-100 dark:bg-slate-800 rounded-full p-1">
+              <button (click)="setZoom('faible')" [class.bg-white]="prefs.zoomLevel() === 'faible'" [class.dark:bg-slate-600]="prefs.zoomLevel() === 'faible'" [class.shadow-sm]="prefs.zoomLevel() === 'faible'" class="px-2 py-1 text-xs rounded-full transition-all" title="Zoom Faible">A</button>
+              <button (click)="setZoom('moyen')" [class.bg-white]="prefs.zoomLevel() === 'moyen'" [class.dark:bg-slate-600]="prefs.zoomLevel() === 'moyen'" [class.shadow-sm]="prefs.zoomLevel() === 'moyen'" class="px-2 py-1 text-sm rounded-full transition-all" title="Zoom Moyen">A</button>
+              <button (click)="setZoom('fort')" [class.bg-white]="prefs.zoomLevel() === 'fort'" [class.dark:bg-slate-600]="prefs.zoomLevel() === 'fort'" [class.shadow-sm]="prefs.zoomLevel() === 'fort'" class="px-2 py-1 text-base rounded-full transition-all" title="Zoom Fort">A</button>
+            </div>
+
+            <!-- 🌙 Dark Mode -->
+            <button 
+              (click)="theme.toggle()" 
+              class="hover:bg-slate-100 dark:hover:bg-slate-800 p-2 rounded-full transition-colors flex items-center justify-center"
+              title="Mode Sombre/Clair"
+            >
+              @if (theme.isDark()) {
+                <svg class="w-5 h-5 text-amber-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+              } @else {
+                <svg class="w-5 h-5 text-slate-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+              }
+            </button>
+
+            <!-- 🔐 Boutons de Connexion -->
+            <div class="hidden md:flex gap-3 ml-2">
+              <a routerLink="/auth/login" class="px-4 py-2 text-sm font-semibold text-blue-600 border border-blue-600 dark:border-blue-500 dark:text-blue-400 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/30 transition">
+                {{ translate('Espace Patient') }}
+              </a>
+              <a routerLink="/auth/login-pro" class="px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-full hover:bg-blue-700 shadow-md shadow-blue-500/20 transition transform hover:-translate-y-0.5">
+                {{ translate('Espace Pro') }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <!-- 2. Hero Section : Le Moteur de Recherche -->
+        <section class="relative pt-24 pb-32 flex flex-col items-center justify-center text-center overflow-hidden px-4">
+          
+          <!-- Background decoration -->
+          <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-[400px] bg-blue-400/20 dark:bg-blue-600/10 blur-[100px] rounded-full pointer-events-none"></div>
+
+          <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight fade-in relative z-10">
+            {{ translate('Trouvez votre médecin') }} <br class="hidden sm:block" />
+            <span class="text-blue-600 dark:text-blue-400">{{ translate('Prenez rendez-vous en ligne.') }}</span>
+          </h1>
+          <p class="mt-6 text-lg text-slate-600 dark:text-slate-400 fade-in max-w-2xl">
+            {{ translate('Simple, rapide et sécurisé. Votre santé à portée de clic.') }}
+          </p>
+
+          <!-- 🔍 Moteur de recherche avancé -->
+          <div class="mt-12 bg-white/95 dark:bg-slate-800/95 p-2 sm:rounded-full rounded-2xl shadow-2xl shadow-blue-500/10 dark:shadow-none flex flex-col sm:flex-row items-center w-full max-w-4xl border border-slate-100 dark:border-slate-700 relative z-40 fade-in">
+            
+            <div class="flex-1 px-4 py-3 sm:py-2 border-b sm:border-b-0 sm:border-r border-slate-100 dark:border-slate-700 flex items-center gap-3 w-full">
+              <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+              <input
+                type="text"
+                [value]="practitionerName"
+                (input)="onPractitionerNameInput($event)"
+                (focus)="openSearchPanel()"
+                [placeholder]="translate('Nom du praticien...')"
+                class="w-full bg-transparent border-none focus:outline-none dark:text-white placeholder-slate-400 font-medium"
+              />
+            </div>
+
+            <div class="flex-1 px-4 py-3 sm:py-2 border-b sm:border-b-0 sm:border-r border-slate-100 dark:border-slate-700 flex items-center gap-3 w-full relative">
+              <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+              <div class="w-full relative">
+                <button type="button" (click)="isSpecialtyDropdownOpen = !isSpecialtyDropdownOpen" class="w-full text-left bg-transparent border-none focus:outline-none dark:text-white text-slate-700 dark:text-slate-200 cursor-pointer flex items-center justify-between gap-2 font-medium">
+                  <span class="truncate pr-2">{{ selectedSpecialtyLabel || translate('Spécialité') }}</span>
+                  <svg class="w-4 h-4 text-slate-400 shrink-0 transition-transform duration-300" [class.rotate-180]="isSpecialtyDropdownOpen" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                
+                <!-- Custom Dropdown Menu -->
+                <div [class.opacity-100]="isSpecialtyDropdownOpen" [class.visible]="isSpecialtyDropdownOpen" [class.opacity-0]="!isSpecialtyDropdownOpen" [class.invisible]="!isSpecialtyDropdownOpen"
+                     class="absolute left-0 top-[calc(100%+1.5rem)] w-full min-w-[240px] bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 transition-all duration-300 z-50 max-h-60 overflow-y-auto scrollbar-hide scale-95 origin-top"
+                     [class.scale-100]="isSpecialtyDropdownOpen">
+                  <div class="p-2">
+                    <button type="button" (click)="selectSpecialty(null)" class="w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-sm text-slate-400 italic">
+                      {{ prefs.translate('patient.booking.specialtyAll') }}
+                    </button>
+                    @for (spec of specialtyCatalog; track spec.id) {
+                      <button type="button" (click)="selectSpecialty(spec)" class="w-full text-left px-4 py-3 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-all text-sm font-bold">
+                        {{ spec.libelle }}
+                      </button>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex-1 px-4 py-3 sm:py-2 flex items-center gap-3 w-full">
+              <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+              <input
+                type="text"
+                [value]="city"
+                (input)="onCityInput($event)"
+                (focus)="openSearchPanel()"
+                [placeholder]="translate('Où ? (Ville)')"
+                class="w-full bg-transparent border-none focus:outline-none dark:text-white placeholder-slate-400 font-medium"
+              />
+            </div>
+
+            <button (click)="triggerSearch()" class="bg-blue-600 hover:bg-blue-700 text-white rounded-xl sm:rounded-full px-8 py-3 font-bold transition transform hover:scale-105 flex items-center justify-center gap-2 w-full sm:w-auto mt-2 sm:mt-0 shadow-lg shadow-blue-600/20">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+              <span>{{ translate('Rechercher') }}</span>
+            </button>
+          </div>
+
+          <!-- 🔎 Résultats de la recherche (Dropdown Flottant) -->
+          @if (showSearchResults && (practitionerName.trim() || city.trim() || specialtyFilterText.trim())) {
+            <div class="absolute top-[calc(100%+1rem)] left-0 w-full max-w-4xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-700 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] dark:shadow-none p-2 z-[60] overflow-hidden fade-in max-h-[400px] overflow-y-auto scrollbar-hide">
+              @if (isSearching) {
+                <div class="p-4 space-y-4">
+                  @for (sk of [1, 2]; track sk) {
+                    <div class="flex animate-pulse items-center gap-4 p-4 rounded-2xl bg-slate-100/50 dark:bg-slate-800/50">
+                      <div class="w-12 h-12 rounded-full bg-slate-200 dark:bg-slate-700 shrink-0"></div>
+                      <div class="flex-1 space-y-2">
+                        <div class="h-4 w-1/3 rounded bg-slate-200 dark:bg-slate-700"></div>
+                        <div class="h-3 w-1/4 rounded bg-slate-200 dark:bg-slate-700"></div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              } @else {
+                @if (combinedResults$ | async; as results) {
+                  @if (results.length > 0) {
+                    <div class="p-2 space-y-2">
+                      @for (r of results; track r.key) {
+                        <div class="group flex items-center justify-between gap-4 rounded-2xl p-4 transition-all duration-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 border border-transparent hover:border-blue-100 dark:hover:border-blue-800">
+                          <div class="flex items-center gap-4 min-w-0">
+                            <div class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-lg shrink-0">
+                              {{ r.nom.charAt(0) }}
+                            </div>
+                            <div class="min-w-0 text-left">
+                              <div class="font-bold text-slate-800 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                                {{ r.nom }}
+                              </div>
+                              <div class="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                                <span class="truncate">{{ r.specialty }}</span>
+                                @if (r.ville) {
+                                  <span class="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
+                                  <span class="truncate">{{ r.ville }}</span>
+                                }
+                              </div>
+                            </div>
+                          </div>
+                          <a
+                            routerLink="/auth/login"
+                            [queryParams]="bookingLoginQuery(r)"
+                            class="shrink-0 inline-flex items-center justify-center rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 transition shadow-lg shadow-blue-600/20 active:scale-95"
+                          >
+                            {{ translate('Prendre RDV') }}
+                          </a>
+                        </div>
+                      }
+                    </div>
+                  } @else {
+                    <div class="text-center py-12">
+                      <div class="mx-auto w-16 h-16 rounded-2xl bg-slate-50 dark:bg-slate-800 text-3xl flex items-center justify-center mb-4">
+                        🔍
+                      </div>
+                      <p class="font-bold text-slate-800 dark:text-white">
+                        {{ translate('Aucun praticien trouvé.') }}
+                      </p>
+                      <p class="text-sm text-slate-500 mt-1">
+                        {{ translate('Essayez avec d\'autres critères.') }}
+                      </p>
+                    </div>
+                  }
+                }
+              }
+            </div>
+          }
+
+          <!-- Mobile login buttons -->
+          <div class="mt-8 flex flex-col w-full gap-3 md:hidden fade-in relative z-10">
+            <a routerLink="/auth/login" class="w-full py-3 text-center font-semibold text-blue-600 border border-blue-600 dark:border-blue-500 rounded-xl">Espace Patient</a>
+            <a routerLink="/auth/login-pro" class="w-full py-3 text-center font-semibold text-white bg-blue-600 rounded-xl">Espace Pro</a>
+          </div>
+        </section>
+
+        <!-- 3. Le Carrousel Dynamique (Modern Glass Stack) -->
+        <section class="py-24 bg-white dark:bg-slate-900 relative overflow-hidden">
+          <!-- Decorative Background Elements -->
+          <div class="absolute top-0 left-1/4 w-64 h-64 bg-blue-400/10 blur-[100px] rounded-full"></div>
+          <div class="absolute bottom-0 right-1/4 w-64 h-64 bg-indigo-400/10 blur-[100px] rounded-full"></div>
+
+          <div class="max-w-7xl mx-auto px-4 relative">
+            <div class="text-center mb-16">
+              <h3 class="text-blue-600 dark:text-blue-400 font-black text-sm uppercase tracking-[0.3em] mb-3">
+                {{ translate('Actualités & Prévention') }}
+              </h3>
+              <div class="h-1 w-12 bg-blue-600 mx-auto rounded-full"></div>
+            </div>
+            
+            <div class="relative h-[380px] flex items-center justify-center">
+              <!-- Carousel Items Container -->
+              <div class="flex items-center justify-center w-full relative">
+                
+                @for (item of [
+                  { id: 0, tag: 'PRÉVENTION', title: 'Campagne de vaccination', text: 'Protégez-vous et vos proches dès maintenant.', color: 'from-blue-600 to-blue-400', icon: '💉' },
+                  { id: 1, tag: 'NOUVEAU', title: 'Centre Médical Lumière', text: 'Ouverture de notre nouveau centre de radiologie.', color: 'from-indigo-600 to-purple-500', icon: '🏥' },
+                  { id: 2, tag: 'INFO', title: 'Mise à jour App', text: 'Découvrez votre nouvel espace patient optimisé.', color: 'from-emerald-600 to-teal-500', icon: '📱' }
+                ]; track item.id) {
+                  
+                  <div class="absolute transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]"
+                       [style.transform]="getStackTransform(item.id)"
+                       [style.z-index]="getStackZIndex(item.id)"
+                       [style.opacity]="getStackOpacity(item.id)">
+                    
+                    <div class="w-[380px] h-[260px] rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden group cursor-pointer"
+                         [ngClass]="item.id === currentCarouselIndex ? 'bg-gradient-to-br ' + item.color + ' text-white' : 'bg-white dark:bg-slate-800 text-slate-800 dark:text-white border border-slate-100 dark:border-slate-700'">
+                      
+                      <!-- Abstract Decoration -->
+                      <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
+                      
+                      <div class="flex flex-col h-full justify-between relative z-10">
+                        <div>
+                          <div class="flex justify-between items-start">
+                            <span class="px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter shadow-sm"
+                                  [ngClass]="item.id === currentCarouselIndex ? 'bg-white/20 text-white' : 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'">
+                              {{ translate(item.tag) }}
+                            </span>
+                            <span class="text-3xl filter drop-shadow-md">{{ item.icon }}</span>
+                          </div>
+                          <h4 class="text-2xl font-black mt-6 leading-none tracking-tight">
+                            {{ translate(item.title) }}
+                          </h4>
+                        </div>
+                        
+                        <p class="text-sm opacity-80 font-medium leading-relaxed max-w-[80%]">
+                          {{ translate(item.text) }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Dots Navigation refined -->
+            <div class="flex justify-center gap-4 mt-8">
+              @for (i of [0, 1, 2]; track i) {
+                <button (click)="setCarouselIndex(i)" 
+                        class="group relative h-4 w-4 flex items-center justify-center focus:outline-none">
+                  <div class="h-1.5 rounded-full transition-all duration-500"
+                       [class.bg-blue-600]="currentCarouselIndex === i"
+                       [class.w-8]="currentCarouselIndex === i"
+                       [class.bg-slate-300]="currentCarouselIndex !== i"
+                       [class.dark:bg-slate-700]="currentCarouselIndex !== i"
+                       [class.w-3]="currentCarouselIndex !== i"></div>
+                </button>
+              }
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. Section Conversion Praticien (B2B) -->
+        <section class="py-20 relative overflow-hidden bg-slate-900">
+          <div class="absolute inset-0 opacity-20">
+            <div class="absolute top-0 right-0 w-96 h-96 bg-blue-500 blur-[120px] rounded-full"></div>
+            <div class="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500 blur-[120px] rounded-full"></div>
+          </div>
+          
+          <div class="max-w-7xl mx-auto px-4 relative z-10 text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-bold mb-6">
+              <span class="relative flex h-2 w-2">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+              </span>
+              {{ translate('Vous êtes professionnel ?') }}
+            </div>
+            <h2 class="text-3xl md:text-5xl font-extrabold text-white mb-6 leading-tight">
+              {{ translate('Réduisez vos appels') }}
+            </h2>
+            <p class="text-slate-400 text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
+              {{ translate('Vous êtes professionnel de santé ? Équipez votre cabinet avec notre solution.') }}
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <a routerLink="/auth/register-cabinet" class="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-xl shadow-blue-500/20 transition transform hover:-translate-y-1">
+                {{ translate('Inscrire mon cabinet') }}
+              </a>
+              <a href="#" class="px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-2xl border border-slate-700 transition">
+                {{ translate('Découvrir la solution') }}
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. Section "Comment ça marche ?" -->
+        <section class="py-24 bg-slate-50 dark:bg-slate-950">
+          <div class="max-w-7xl mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-16">{{ translate('Comment utiliser MedConnect ?') }}</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+              
+              <div class="p-8 rounded-3xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md transition">
+                <div class="w-16 h-16 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mx-auto text-2xl mb-6">🔍</div>
+                <h3 class="font-bold text-lg mb-3">{{ translate('1. Recherchez') }}</h3>
+                <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{{ translate('Trouvez un praticien par nom ou spécialité près de chez vous en quelques clics.') }}</p>
+              </div>
+
+              <div class="p-8 rounded-3xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md transition">
+                <div class="w-16 h-16 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mx-auto text-2xl mb-6">📅</div>
+                <h3 class="font-bold text-lg mb-3">{{ translate('2. Choisissez') }}</h3>
+                <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{{ translate('Consultez les disponibilités en temps réel et choisissez le créneau qui vous convient.') }}</p>
+              </div>
+
+              <div class="p-8 rounded-3xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md transition">
+                <div class="w-16 h-16 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mx-auto text-2xl mb-6">✅</div>
+                <h3 class="font-bold text-lg mb-3">{{ translate('3. Réservez') }}</h3>
+                <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{{ translate('Confirmez votre RDV en toute sécurité et recevez vos rappels automatiques.') }}</p>
+              </div>
+
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- 5. Pied de page (Footer) -->
+      <footer class="bg-slate-900 text-slate-300 py-16 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+          
+          <div>
+            <div class="flex items-center gap-2 mb-6">
+              <span class="text-2xl">🩺</span>
+              <span class="font-bold text-xl text-white">MedConnect</span>
+            </div>
+            <p class="text-sm text-slate-400 leading-relaxed">{{ translate('La plateforme de prise de rendez-vous médicaux de nouvelle génération.') }}</p>
+          </div>
+
+          <div>
+            <h4 class="text-white font-bold mb-6 uppercase text-xs tracking-wider">{{ translate('À propos') }}</h4>
+            <ul class="space-y-3 text-sm text-slate-400">
+              <li><a href="#" class="hover:text-white transition">{{ translate('Qui sommes-nous ?') }}</a></li>
+              <li>
+                <a href="#" class="hover:text-white transition flex items-center gap-2">
+                  {{ translate('Recrutement') }} 
+                  <span class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded uppercase font-bold">{{ translate('On embauche') }}</span>
+                </a>
+              </li>
+              <li><a href="#" class="hover:text-white transition">{{ translate('Presse') }}</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="text-white font-bold mb-6 uppercase text-xs tracking-wider">{{ translate('Légal & Aide') }}</h4>
+            <ul class="space-y-3 text-sm text-slate-400">
+              <li><a href="#" class="hover:text-white transition">{{ translate('Aide et Contact') }}</a></li>
+              <li><a href="#" class="hover:text-white transition">{{ translate('Note d\'engagement') }}</a></li>
+              <li><a href="#" class="hover:text-white transition">{{ translate('Confidentialité & RGPD') }}</a></li>
+              <li><a href="#" class="hover:text-white transition">{{ translate('Conditions Générales (CGU)') }}</a></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="text-white font-bold mb-6 uppercase text-xs tracking-wider">{{ translate('Praticiens') }}</h4>
+            <p class="text-sm text-slate-400 mb-6 leading-relaxed">{{ translate('Vous êtes professionnel de santé ? Équipez votre cabinet avec notre solution.') }}</p>
+            <a routerLink="/auth/register-cabinet" class="inline-flex justify-center items-center bg-slate-800 text-white px-5 py-2.5 rounded-lg text-sm font-semibold border border-slate-700 hover:bg-slate-700 hover:border-slate-600 transition w-full sm:w-auto">
+              {{ translate('Inscrire mon cabinet') }}
+            </a>
+          </div>
+
+        </div>
+        <div class="max-w-7xl mx-auto px-4 mt-16 pt-8 border-t border-slate-800 text-center text-sm text-slate-500">
+          &copy; {{ currentYear }} MedConnect. {{ translate('Tous droits réservés.') }}
+        </div>
+      </footer>
+    </div>
+  

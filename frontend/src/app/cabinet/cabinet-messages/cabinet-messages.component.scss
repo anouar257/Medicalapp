@@ -1,0 +1,39 @@
+.glass-head {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+:host-context(html.dark) .glass-head,
+:host-context(.dark) .glass-head {
+  background: rgba(15, 23, 42, 0.75);
+}
+
+.glass-detail {
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.1);
+}
+
+:host-context(html.dark) .glass-detail,
+:host-context(.dark) .glass-detail {
+  background: rgba(15, 23, 42, 0.55);
+  border-color: rgba(71, 85, 105, 0.35);
+}
+
+.cabinet-msgs {
+  /* RTL: grille colonnes inversées côté LG */
+}
+
+[dir='rtl'] .cabinet-msgs aside {
+  border-inline-end: none;
+  border-inline-start: 1px solid rgb(226 232 240);
+}
+
+@media (min-width: 1024px) {
+  [dir='rtl'] .cabinet-msgs aside {
+    border-inline-start-color: rgb(30 41 59);
+  }
+}

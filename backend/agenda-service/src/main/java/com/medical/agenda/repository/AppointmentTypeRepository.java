@@ -11,5 +11,7 @@ public interface AppointmentTypeRepository extends JpaRepository<AppointmentType
 
   List<AppointmentType> findAllByOrderByDisplayOrderAscIdAsc();
 
+  List<AppointmentType> findByActiveTrueOrderByDisplayOrderAsc();
+
   boolean existsByCode(String code);
 }

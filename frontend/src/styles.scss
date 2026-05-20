@@ -1,6 +1,9 @@
+/* stylelint-disable at-rule-no-unknown */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@import 'leaflet/dist/leaflet.css';
 
 html,
 body {
@@ -8,7 +11,29 @@ body {
 }
 
 body {
-  @apply min-h-screen bg-slate-50 text-slate-900 antialiased dark:bg-[#0F172A] dark:text-slate-100;
+  /* stylelint-disable-next-line scss/at-rule-no-unknown */
+  @apply min-h-screen bg-slate-50 text-slate-900 antialiased transition-colors duration-300 dark:bg-slate-950 dark:text-white;
+}
+
+/* ── Zoom Accessibility ── */
+html.zoom-faible { font-size: 14px; }
+html.zoom-moyen { font-size: 16px; }
+html.zoom-fort { font-size: 18px; }
+
+/* ── RTL Support pour l'Arabe ── */
+html[dir="rtl"] {
+  text-align: right;
+}
+html[dir="rtl"] .ml-auto { margin-left: 0; margin-right: auto; }
+html[dir="rtl"] .mr-auto { margin-right: 0; margin-left: auto; }
+html[dir="rtl"] .pl-4 { padding-left: 0; padding-right: 1rem; }
+html[dir="rtl"] .pr-4 { padding-right: 0; padding-left: 1rem; }
+html[dir="rtl"] .text-left { text-align: right; }
+html[dir="rtl"] .text-right { text-align: left; }
+
+.leaflet-container {
+  z-index: 0;
+  font-family: inherit;
 }
 
 .cdk-drag-preview {
@@ -59,4 +84,165 @@ body {
 
 .dark .scrollbar-calendar::-webkit-scrollbar-thumb:hover {
   background: rgb(100 116 139 / 0.85);
+}
+
+:root {
+  --primary: #0ea5e9;
+  --primary-hover: #0284c7;
+  --secondary: #64748b;
+  
+  /* Mode clair par défaut */
+  --bg-dark: #f8fafc;
+  --bg-card: #ffffff;
+  --border: #e2e8f0;
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  
+  --success: #22c55e;
+  --error: #ef4444;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+  /* Auth patient (écrans clairs) */
+  --auth-light-page: #f8fafc;
+  --auth-light-surface: #ffffff;
+  --auth-light-heading: #0f172a;
+  --auth-light-muted: #64748b;
+  --auth-light-label: #1e293b;
+  --auth-light-border: #e2e8f0;
+  --auth-light-input: #334155;
+  --auth-light-soft: #f1f5f9;
+  --auth-light-slate: #cbd5e1;
+
+  --auth-pro-accent: var(--primary);
+  --auth-pro-accent-hover: var(--primary-hover);
+}
+
+.dark {
+  --bg-dark: #0f172a;
+  --bg-card: #1e293b;
+  --border: #334155;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  
+  --auth-light-page: #0f172a;
+  --auth-light-surface: #1e293b;
+  --auth-light-heading: #f8fafc;
+  --auth-light-muted: #94a3b8;
+  --auth-light-label: #f1f5f9;
+  --auth-light-border: #334155;
+  --auth-light-input: #f8fafc;
+  --auth-light-soft: #0f172a;
+  --auth-light-slate: #475569;
+}
+
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.text-error { color: var(--error); font-size: 0.875rem; }
+.text-success { color: var(--success); font-size: 0.875rem; }
+
+.fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Bouton de retour global stylé et moderne */
+.btn-global-back {
+  position: absolute;
+  top: 1.5rem;
+  left: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 99px;
+  color: #475569;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  z-index: 50;
+  cursor: pointer;
+}
+
+.btn-global-back:hover {
+  background: #f8fafc;
+  color: #0f172a;
+  transform: translateX(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border-color: #cbd5e1;
+}
+
+.dark .btn-global-back {
+  background: #1e293b;
+  border-color: #334155;
+  color: #cbd5e1;
+}
+
+.dark .btn-global-back:hover {
+  background: #0f172a;
+  color: #f1f5f9;
+  border-color: #475569;
+}
+
+/* ── Select Dropdown Fix for Dark Mode ── */
+select option {
+  background-color: #ffffff;
+  color: #0f172a;
+}
+
+.dark select option {
+  background-color: #1e293b;
+  color: #f1f5f9;
 }

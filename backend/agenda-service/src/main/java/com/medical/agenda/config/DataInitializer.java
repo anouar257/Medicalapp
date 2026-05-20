@@ -2,7 +2,6 @@ package com.medical.agenda.config;
 
 import com.medical.agenda.entity.AppointmentType;
 import com.medical.agenda.entity.Doctor;
-import com.medical.agenda.repository.AppointmentRepository;
 import com.medical.agenda.repository.AppointmentTypeRepository;
 import com.medical.agenda.repository.DoctorRepository;
 import com.medical.agenda.service.DoctorService;
@@ -13,21 +12,23 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Initialisation cabinet : synchronisation du catalogue officiel des types de visite + compléments
- * (photos médecins, FK legacy sur anciens RDV). Aucun médecin ni rendez-vous injectés — tout passe
- * par l’admin ou l’agenda.
+ * Initialisation technique du module agenda : catalogue des types de visite (référentiel) et
+ * compléments non destructifs sur les données existantes (photos, spécialités manquantes).
+ *
+ * <p>Aucun compte patient, praticien ni rendez-vous fictif n’est créé ici — uniquement des données
+ * de configuration métier lorsque la base est vide sur ces référentiels.
  */
 @Configuration
 public class DataInitializer {
 
   /**
    * Les trois types « métier » du cabinet — libellés FR, couleurs et ordre d’affichage alignés
-   * sidebar / formulaires (source unique ici, pas de jeu de données fictif).
+   * sidebar / formulaires.
    */
   private static final CatalogType[] VISIT_TYPES = {
     new CatalogType("CONSULTATION", "Consultation", "#ef4444", 15, 10),
     new CatalogType("SURGERY", "Chirurgie", "#a855f7", 45, 15),
-    new CatalogType("CONTROL", "Contrôle", "#0284c7", 5, 20),
+    new CatalogType("AUDIO_SESSION", "Séance longue (audioprothèse, bilan)", "#14b8a6", 45, 12),
   };
 
   /** Renseigne une spécialité par défaut si la colonne existe mais est vide (migration). */
@@ -51,9 +52,7 @@ public class DataInitializer {
 
   @Bean
   CommandLineRunner seedAgenda(
-      DoctorRepository doctorRepository,
-      AppointmentRepository appointmentRepository,
-      AppointmentTypeRepository typeRepository) {
+      DoctorRepository doctorRepository, AppointmentTypeRepository typeRepository) {
     return args -> {
       syncVisitTypeCatalog(typeRepository);
       backfillDoctorPhotos(doctorRepository);
@@ -94,5 +93,4 @@ public class DataInitializer {
       doctorRepository.saveAll(docs);
     }
   }
-
 }

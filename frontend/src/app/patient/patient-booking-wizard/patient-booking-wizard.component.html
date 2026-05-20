@@ -1,0 +1,405 @@
+<div class="min-h-screen bg-slate-50 text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-white">
+  <nav class="sticky top-0 z-50 border-b border-slate-200 bg-white/90 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/90">
+    <div class="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3">
+      <a routerLink="/patient/dashboard" class="text-sm font-semibold text-blue-600 dark:text-blue-400">
+        {{ prefs.translate('Retour') }}
+      </a>
+      <app-preferences-toolbar />
+    </div>
+  </nav>
+
+  <main class="mx-auto max-w-3xl px-4 py-8">
+    <h1 class="text-2xl font-extrabold text-slate-900 dark:text-white">
+      {{ prefs.translate('patient.booking.title') }}
+    </h1>
+
+    <ol class="mt-6 flex flex-wrap gap-2 text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+      <li [class.text-blue-600]="step >= 1">{{ prefs.translate('patient.booking.step1') }}</li>
+      <li aria-hidden="true">·</li>
+      <li [class.text-blue-600]="step >= 2">{{ prefs.translate('patient.booking.step2') }}</li>
+      <li aria-hidden="true">·</li>
+      <li [class.text-blue-600]="step >= 3">{{ prefs.translate('patient.booking.step3') }}</li>
+    </ol>
+
+    @if (step === 1) {
+      <section class="mt-8 space-y-4 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <p class="text-sm text-slate-600 dark:text-slate-300">{{ prefs.translate('patient.booking.step1') }}</p>
+        <div class="grid gap-3 sm:grid-cols-2">
+          <input
+            type="text"
+            class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+            [placeholder]="prefs.translate('patient.booking.namePlaceholder')"
+            [(ngModel)]="practitionerName"
+            (ngModelChange)="triggerSearch()"
+          />
+          <input
+            type="text"
+            class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+            [placeholder]="prefs.translate('patient.booking.cityPlaceholder')"
+            [(ngModel)]="city"
+            (ngModelChange)="triggerSearch()"
+          />
+        </div>
+        <div class="relative">
+          <button
+            type="button"
+            (click)="isSpecialtyDropdownOpen = !isSpecialtyDropdownOpen"
+            class="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+          >
+            <span class="truncate">{{ selectedSpecialtyLabel || prefs.translate('Spécialité') }}</span>
+            <span class="text-slate-400">▾</span>
+          </button>
+          @if (isSpecialtyDropdownOpen) {
+            <div
+              class="absolute left-0 right-0 top-full z-20 mt-1 max-h-56 overflow-y-auto rounded-xl border border-slate-200 bg-white py-1 shadow-xl dark:border-slate-700 dark:bg-slate-900"
+            >
+              <button type="button" class="block w-full px-4 py-2 text-left text-sm text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800" (click)="selectSpecialty(null)">
+                {{ prefs.translate('patient.booking.specialtyAll') }}
+              </button>
+              @for (s of specialtyCatalog; track s.id) {
+                <button type="button" class="block w-full px-4 py-2 text-left text-sm hover:bg-slate-50 dark:hover:bg-slate-800" (click)="selectSpecialty(s)">
+                  {{ s.libelle }}
+                </button>
+              }
+            </div>
+          }
+        </div>
+
+        @if (isSearching) {
+          <div class="space-y-2 py-4">
+            @for (x of [1, 2, 3]; track x) {
+              <div class="h-12 animate-pulse rounded-xl bg-slate-200 dark:bg-slate-800"></div>
+            }
+          </div>
+        } @else {
+          @if (filteredRows.length === 0) {
+            <p class="py-8 text-center text-sm text-slate-500 dark:text-slate-400">{{ prefs.translate('patient.booking.noResults') }}</p>
+          } @else {
+            <ul class="mt-4 max-h-80 space-y-2 overflow-y-auto">
+              @for (r of filteredRows; track r.key) {
+                <li>
+                  <button
+                    type="button"
+                    (click)="pickRow(r)"
+                    class="flex w-full items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-left text-sm transition duration-300"
+                    [class.border-blue-500]="selected?.key === r.key"
+                    [class.bg-blue-50]="selected?.key === r.key"
+                    [class.ring-2]="selected?.key === r.key"
+                    [class.ring-blue-400]="selected?.key === r.key"
+                  >
+                    <span>
+                      <span class="font-bold text-slate-900 dark:text-white">{{ r.nom }}</span>
+                      <span class="mt-0.5 block text-xs text-slate-500 dark:text-slate-400">
+                        {{ r.specialty }}
+                        @if (r.ville) {
+                          <span> · {{ r.ville }}</span>
+                        }
+                      </span>
+                    </span>
+                  </button>
+                </li>
+              }
+            </ul>
+          }
+        }
+
+        <div class="mt-6 flex flex-wrap gap-3">
+          <button type="button" class="rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold dark:border-slate-600" (click)="back()">
+            {{ prefs.translate('patient.booking.back') }}
+          </button>
+          <button
+            type="button"
+            class="rounded-xl bg-blue-600 px-5 py-2 text-sm font-bold text-white shadow-md transition duration-300 hover:bg-blue-700 disabled:opacity-50"
+            [disabled]="!selected"
+            (click)="goStep2()"
+          >
+            {{ prefs.translate('patient.booking.continue') }}
+          </button>
+        </div>
+      </section>
+    }
+
+    @if (step === 2) {
+      <section class="mt-8 space-y-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <p class="text-sm font-semibold text-slate-800 dark:text-white">{{ selected?.nom }}</p>
+        <div class="space-y-3">
+          <label class="flex cursor-pointer items-center gap-3 rounded-2xl border border-slate-200 p-4 dark:border-slate-700">
+            <input type="radio" name="ben" [(ngModel)]="beneficiary" value="self" />
+            <span>{{ prefs.translate('patient.booking.forMe') }}</span>
+          </label>
+          <label class="flex cursor-pointer items-center gap-3 rounded-2xl border border-slate-200 p-4 dark:border-slate-700">
+            <input type="radio" name="ben" [(ngModel)]="beneficiary" value="relative" />
+            <span>{{ prefs.translate('patient.booking.forRelative') }}</span>
+          </label>
+        </div>
+        @if (beneficiary === 'relative') {
+          @if (loadingProches) {
+            <p class="text-sm text-slate-500">{{ prefs.translate('Chargement') }}</p>
+          } @else if (proches.length === 0) {
+            <p class="text-sm text-amber-700 dark:text-amber-300">
+              {{ prefs.translate('Mes Proches') }} — <a routerLink="/patient/proches" class="font-bold underline">{{ prefs.translate('Retour') }}</a>
+            </p>
+          } @else {
+            <select
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+              [(ngModel)]="selectedProcheId"
+            >
+              <option [ngValue]="null">{{ prefs.translate('auth.register.choose') }}</option>
+              @for (p of proches; track p.id) {
+                <option [ngValue]="p.id">{{ p.prenom }} {{ p.nom }}</option>
+              }
+            </select>
+          }
+        }
+        <div class="flex flex-wrap gap-3">
+          <button type="button" class="rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold dark:border-slate-600" (click)="back()">
+            {{ prefs.translate('patient.booking.back') }}
+          </button>
+          <button
+            type="button"
+            class="rounded-xl bg-blue-600 px-5 py-2 text-sm font-bold text-white disabled:opacity-50"
+            [disabled]="beneficiary === 'relative' && !selectedProcheId"
+            (click)="goStep3()"
+          >
+            {{ prefs.translate('patient.booking.continue') }}
+          </button>
+        </div>
+      </section>
+    }
+
+    @if (step === 3) {
+      <section class="mt-8 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <div class="bg-blue-600 px-6 py-4 text-white">
+          <h2 class="text-lg font-bold">{{ prefs.translate('patient.booking.step3') }}</h2>
+          @if (wizardOptions) {
+            <p class="mt-1 text-xs text-blue-100">
+              {{ wizardOptions.resolvedSpecialtyCode }}
+            </p>
+          }
+        </div>
+        <div class="space-y-6 p-6">
+          @if (loadingStep3) {
+            <div class="space-y-3 py-6">
+              @for (sk of [1, 2, 3, 4]; track sk) {
+                <div class="h-10 animate-pulse rounded-xl bg-slate-200 dark:bg-slate-800"></div>
+              }
+            </div>
+          } @else if (step3LoadError) {
+            <p class="text-sm text-amber-800 dark:text-amber-200">{{ step3LoadError }}</p>
+          } @else if (submitSuccess) {
+            <p class="text-sm font-semibold text-emerald-800 dark:text-emerald-200">
+              {{ prefs.translate('patient.booking.requestSent') }}
+            </p>
+            <a
+              routerLink="/patient/dashboard"
+              class="inline-flex rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-bold text-white dark:bg-slate-100 dark:text-slate-900"
+            >
+              {{ prefs.translate('Retour au tableau de bord') }}
+            </a>
+          } @else {
+            <p class="text-sm text-slate-600 dark:text-slate-300">{{ prefs.translate('patient.booking.nextPhasesHint') }}</p>
+
+            <!-- ── 1. Type de visite ── -->
+            <div class="space-y-3">
+              <label class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                {{ prefs.translate('1. Type de visite') }}
+              </label>
+              <div class="grid gap-2 sm:grid-cols-2">
+                @for (t of appointmentTypes; track t.id) {
+                  <button
+                    type="button"
+                    (click)="typeCode = t.code; onTypeCodeChange()"
+                    [ngClass]="{
+                      'border-blue-500 bg-blue-50': typeCode === t.code,
+                      'border-slate-200': typeCode !== t.code
+                    }"
+                    class="flex flex-col rounded-2xl border p-4 text-left transition-all duration-300"
+                  >
+                    <span
+                      class="text-sm font-bold"
+                      [class.text-blue-700]="typeCode === t.code"
+                    >{{ t.label }}</span>
+                    <span class="text-xs text-slate-500">{{ t.defaultDurationMinutes }} min</span>
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- ── 2. Choisir un jour ── -->
+            <div class="space-y-3">
+              <label class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                {{ prefs.translate('2. Choisir un jour') }}
+              </label>
+              <div class="flex gap-2 overflow-x-auto pb-2">
+                @for (d of availableDays; track d.value) {
+                  <button
+                    type="button"
+                    (click)="selectedDay = d.value; onDateTimeUIChange()"
+                    [ngClass]="{
+                      'bg-blue-600 text-white border-blue-600': selectedDay === d.value,
+                      'border-slate-200 text-slate-700': selectedDay !== d.value
+                    }"
+                    class="shrink-0 rounded-2xl border px-4 py-3 text-center transition-all duration-300"
+                  >
+                    <span class="block text-xs font-bold">{{ d.label }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- ── 3. Choisir une heure ── -->
+            <div class="space-y-3">
+              <label class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                {{ prefs.translate('3. Choisir une heure') }}
+              </label>
+              <div class="grid grid-cols-4 gap-2 sm:grid-cols-6">
+                @for (h of availableHours; track h) {
+                  <button
+                    type="button"
+                    (click)="selectedHour = h; onDateTimeUIChange()"
+                    [ngClass]="{
+                      'bg-slate-900 text-white border-slate-900': selectedHour === h,
+                      'border-slate-200 text-slate-700': selectedHour !== h
+                    }"
+                    class="rounded-xl border py-2 text-center text-xs font-bold transition-all duration-300"
+                  >
+                    {{ h }}
+                  </button>
+                }
+              </div>
+            </div>
+
+            <!-- ── Questionnaire (Facultatif) ── -->
+            <div class="rounded-3xl bg-slate-50 p-6 dark:bg-slate-800">
+              <div class="mb-4 flex items-center justify-between">
+                <p class="text-sm font-bold text-slate-900 dark:text-white">{{ prefs.translate('Questionnaire Médical') }}</p>
+                <span class="rounded-full bg-slate-200 px-2 py-0.5 text-xs font-bold uppercase text-slate-500 dark:bg-slate-700 dark:text-slate-400">
+                  {{ prefs.translate('Facultatif') }}
+                </span>
+              </div>
+
+              @if (wizardOptions) {
+                <div class="space-y-6">
+                  <div class="space-y-2">
+                    <p class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ prefs.translate('patient.booking.priorQuestion') }}</p>
+                    <div class="grid gap-2 sm:grid-cols-2">
+                      @for (c of wizardOptions.choicesPrior; track c.code) {
+                        <label class="flex cursor-pointer items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 transition-all dark:border-slate-700 dark:bg-slate-900">
+                          <input type="radio" name="prior" [(ngModel)]="priorCareCode" [value]="c.code" />
+                          <span class="text-xs font-medium">{{ c.labelFr }}</span>
+                        </label>
+                      }
+                    </div>
+                  </div>
+
+                  <div class="space-y-2">
+                    <p class="text-xs font-bold text-slate-700 dark:text-slate-300">{{ prefs.translate('patient.booking.visitQuestion') }}</p>
+                    <div class="grid gap-2 sm:grid-cols-2">
+                      @for (c of wizardOptions.choicesVisit; track c.code) {
+                        <label class="flex cursor-pointer items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 transition-all dark:border-slate-700 dark:bg-slate-900">
+                          <input type="radio" name="visit" [(ngModel)]="visitReasonCode" [value]="c.code" />
+                          <span class="text-xs font-medium">{{ c.labelFr }}</span>
+                        </label>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <!-- ── Lieu de consultation ── -->
+            <div class="space-y-3">
+              <label class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                {{ prefs.translate('patient.booking.location') }}
+              </label>
+              <div class="flex flex-wrap gap-3">
+                <label class="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm dark:border-slate-700">
+                  <input type="radio" name="loc" [(ngModel)]="locationMode" value="CABINET" />
+                  {{ prefs.translate('patient.booking.locCabinet') }}
+                </label>
+                <label class="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm dark:border-slate-700">
+                  <input type="radio" name="loc" [(ngModel)]="locationMode" value="CLINIC" />
+                  {{ prefs.translate('patient.booking.locClinic') }}
+                </label>
+                <label class="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm dark:border-slate-700">
+                  <input type="radio" name="loc" [(ngModel)]="locationMode" value="REMOTE" />
+                  {{ prefs.translate('patient.booking.locRemote') }}
+                </label>
+              </div>
+            </div>
+
+            @if (locations.length > 0 && locationMode !== 'REMOTE') {
+              <div class="space-y-2">
+                <label class="text-sm font-bold text-slate-900 dark:text-white">{{ prefs.translate('patient.booking.pickCabinet') }}</label>
+                <select
+                  class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+                  [(ngModel)]="selectedLocationId"
+                  (ngModelChange)="onLocationPicked()"
+                >
+                  <option [ngValue]="null">{{ prefs.translate('auth.register.choose') }}</option>
+                  @for (loc of locations; track loc.id) {
+                    <option [ngValue]="loc.id">{{ loc.nomEtablissement }} — {{ loc.ville }}</option>
+                  }
+                </select>
+              </div>
+            }
+
+            <!-- ── Adressé par ── -->
+            <div class="space-y-2">
+              <label class="text-sm font-bold text-slate-900 dark:text-white">{{ prefs.translate('patient.booking.referredBy') }}</label>
+              <input
+                type="text"
+                class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+                [(ngModel)]="referredBy"
+              />
+            </div>
+
+            <!-- ── Carte / Map ── -->
+            <div class="space-y-2">
+              <p class="text-sm font-bold text-slate-900 dark:text-white">{{ prefs.translate('patient.booking.mapHint') }}</p>
+              <input
+                type="text"
+                class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+                [(ngModel)]="mapQuery"
+                (ngModelChange)="onMapQueryChange()"
+                [placeholder]="prefs.translate('Où ? (Ville)')"
+              />
+              <p class="text-xs text-slate-500 dark:text-slate-400">{{ prefs.translate('patient.booking.mapLive') }}</p>
+              <div
+                id="patient-booking-leaflet-map"
+                class="relative z-0 h-72 w-full overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 dark:border-slate-700 dark:bg-slate-800"
+                role="region"
+                [attr.aria-label]="prefs.translate('patient.booking.openMap')"
+              ></div>
+              <button type="button" class="text-sm font-bold text-blue-600 underline dark:text-blue-400" (click)="openMapInOsm()">
+                {{ prefs.translate('patient.booking.openMap') }}
+              </button>
+            </div>
+
+            @if (submitError) {
+              <p class="text-sm text-red-700 dark:text-red-300">{{ submitError }}</p>
+            }
+
+            <div class="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4 dark:border-slate-800">
+              <button
+                type="button"
+                class="rounded-xl border border-slate-300 px-5 py-2.5 text-sm font-bold dark:border-slate-600"
+                (click)="back()"
+              >
+                ← {{ prefs.translate('patient.booking.back') }}
+              </button>
+              <button
+                type="button"
+                class="rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-bold text-white shadow-md hover:bg-blue-700 disabled:opacity-50"
+                [disabled]="submitting"
+                (click)="submitBooking()"
+              >
+                {{ prefs.translate('patient.booking.confirmRequest') }}
+              </button>
+            </div>
+          }
+        </div>
+      </section>
+    }
+  </main>
+</div>

@@ -9,10 +9,12 @@
   <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>agenda-backend</name>
-  <description>Agrégateur Maven — agenda : mvn -pl agenda-service spring-boot:run ; patient : mvn -pl patient-service spring-boot:run</description>
+  <description>Agrégateur Maven — agenda, patient, practitioner, messaging (mvn -pl &lt;module&gt; spring-boot:run)</description>
 
   <modules>
     <module>agenda-service</module>
     <module>patient-service</module>
+    <module>practitioner-service</module>
+    <module>messaging-service</module>
   </modules>
 </project>

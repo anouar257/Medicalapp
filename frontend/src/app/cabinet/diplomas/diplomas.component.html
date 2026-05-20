@@ -1,0 +1,85 @@
+
+    <div class="page">
+      <header class="page-header">
+        <div>
+          <h1>Diplômes &amp; certifications</h1>
+          <p class="subtitle">Diplômes, certifications, conférences et formations</p>
+        </div>
+        <button class="btn-primary" (click)="newDiploma()">+ Ajouter</button>
+      </header>
+
+      @if (errorMessage) { <div class="alert error">{{ errorMessage }}</div> }
+      @if (successMessage) { <div class="alert success">{{ successMessage }}</div> }
+
+      @if (diplomas.length === 0 && !editing) {
+        <div class="empty">
+          <h3>Aucun diplôme renseigné</h3>
+          <p>Ajoutez vos diplômes, certifications, conférences ou formations pour les afficher sur votre profil.</p>
+          <button class="btn-primary" (click)="newDiploma()">+ Ajouter un diplôme</button>
+        </div>
+      }
+
+      <div class="grid">
+        @for (d of diplomas; track d.id) {
+          <article class="card">
+            <span class="type-badge type-{{d.type.toLowerCase()}}">{{ typeLabel(d.type) }}</span>
+            <h3>{{ d.intitule }}</h3>
+            @if (d.etablissement) { <p class="etab">{{ d.etablissement }}</p> }
+            @if (d.anneeObtention) { <p class="annee">Obtenu en {{ d.anneeObtention }}</p> }
+            <div class="actions">
+              <button class="btn-ghost" (click)="edit(d)">Modifier</button>
+              <button class="btn-danger" (click)="remove(d)">Supprimer</button>
+            </div>
+          </article>
+        }
+      </div>
+
+      @if (editing) {
+        <div class="modal-backdrop" (click)="cancelEdit()">
+          <div class="modal" (click)="$event.stopPropagation()">
+            <header class="modal-header">
+              <h2>{{ editing.id ? 'Modifier' : 'Nouveau diplôme' }}</h2>
+              <button class="close-btn" (click)="cancelEdit()">×</button>
+            </header>
+
+            <div class="modal-body">
+              <div class="form-group">
+                <label>Type *</label>
+                <select [(ngModel)]="editing.type">
+                  <option value="DIPLOME">Diplôme</option>
+                  <option value="CERTIFICATION">Certification</option>
+                  <option value="CONFERENCE">Conférence</option>
+                  <option value="FORMATION">Formation</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Intitulé *</label>
+                <input type="text" [(ngModel)]="editing.intitule"/>
+              </div>
+              <div class="form-group">
+                <label>Établissement</label>
+                <input type="text" [(ngModel)]="editing.etablissement" placeholder="Faculté de médecine de..."/>
+              </div>
+              <div class="form-group">
+                <label>Année d'obtention</label>
+                <input type="number" [(ngModel)]="editing.anneeObtention" min="1950" max="2100"/>
+              </div>
+              <div class="form-group">
+                <label>URL du document (optionnel)</label>
+                <input type="url" [(ngModel)]="editing.documentUrl"/>
+              </div>
+
+              @if (editingError) { <div class="alert error">{{ editingError }}</div> }
+            </div>
+
+            <footer class="modal-footer">
+              <button class="btn-ghost" (click)="cancelEdit()">Annuler</button>
+              <button class="btn-primary" (click)="save()" [disabled]="saving">
+                {{ saving ? 'Enregistrement…' : 'Enregistrer' }}
+              </button>
+            </footer>
+          </div>
+        </div>
+      }
+    </div>
+  

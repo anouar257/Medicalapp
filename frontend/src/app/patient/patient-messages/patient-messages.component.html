@@ -1,0 +1,298 @@
+
+<div class="min-h-screen bg-gradient-to-br from-slate-100 via-indigo-50/40 to-slate-200 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-slate-900 dark:text-white transition-colors duration-300">
+  <nav class="sticky top-0 z-50 glass-nav border-b border-white/30 dark:border-slate-700/50">
+    <div class="max-w-6xl mx-auto flex items-center justify-between px-4 py-3 gap-3">
+      <div class="flex items-center gap-3 min-w-0">
+        <a routerLink="/patient/dashboard" class="glass-pill px-3 py-1.5 text-sm font-bold shrink-0 text-slate-800 dark:text-slate-100">
+          {{ prefs.translate('messaging.backDashboard') }}
+        </a>
+        <h1 class="text-lg font-black truncate bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
+          {{ prefs.translate('messaging.patient.pageTitle') }}
+        </h1>
+      </div>
+      <div class="flex items-center gap-2 shrink-0" [class.flex-row-reverse]="prefs.language() === 'ar'">
+        <app-preferences-toolbar />
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-6xl mx-auto px-4 py-8 space-y-6">
+    <p class="text-sm text-slate-600 dark:text-slate-400 text-center sm:text-start">
+      {{ prefs.translate('messaging.patient.subtitle') }}
+    </p>
+
+    @if (loadWarnings.length > 0) {
+      <div
+        class="rounded-2xl border border-amber-300/80 dark:border-amber-700/50 bg-amber-50 dark:bg-amber-950/40 px-4 py-3 text-sm text-amber-950 dark:text-amber-100 space-y-1"
+        role="status"
+      >
+        @for (w of loadWarnings; track $index) {
+          <p class="leading-snug">{{ w }}</p>
+        }
+      </div>
+    }
+
+    @if (loading) {
+      <div class="glass-card p-10 text-center animate-pulse font-bold text-slate-700 dark:text-slate-200">
+        {{ prefs.translate('Chargement') }}
+      </div>
+    } @else {
+      <div class="flex flex-wrap gap-3 justify-center sm:justify-start">
+        <button
+          type="button"
+          (click)="view = 'history'"
+          class="pm-tab"
+          [class.pm-tab-active]="view === 'history'"
+        >
+          {{ prefs.translate('messaging.history') }}
+        </button>
+        <button
+          type="button"
+          (click)="openCompose()"
+          class="pm-tab"
+          [class.pm-tab-active]="view === 'compose'"
+        >
+          {{ prefs.translate('messaging.newMessage') }}
+        </button>
+      </div>
+
+      @if (view === 'history') {
+        <section class="glass-card p-6 space-y-4 text-slate-800 dark:text-slate-100">
+          <h2 class="text-xl font-black">{{ prefs.translate('messaging.history') }}</h2>
+          @if (messages.length === 0) {
+            <p class="text-sm text-slate-600 dark:text-slate-400">{{ prefs.translate('messaging.history.empty') }}</p>
+          } @else {
+            <div class="space-y-3">
+              @for (m of messages; track m.id) {
+                <article
+                  class="rounded-2xl border border-slate-200/90 dark:border-slate-600/80 bg-white/70 dark:bg-slate-900/60 p-4 shadow-sm cursor-pointer hover:border-indigo-400 hover:shadow-md transition-all"
+                  (click)="onOpenMessage(m)"
+                >
+                  <div class="flex flex-wrap items-start justify-between gap-2">
+                    <div>
+                      <div class="text-xs font-bold uppercase tracking-wide text-indigo-600 dark:text-indigo-300">
+                        {{ flowLabel(m) }} · {{ doctorNameFor(m) }}
+                      </div>
+                      <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                        {{ prefs.translate('messaging.concerned') }} : {{ concernedLabel(m) }}
+                      </div>
+                      <div class="mt-2 font-bold">{{ subjectLabel(m.subject) }}</div>
+                      <p class="text-sm mt-2 whitespace-pre-wrap text-slate-700 dark:text-slate-200">{{ m.content }}</p>
+                    </div>
+                    <div class="text-end text-xs text-slate-500 shrink-0" [class.text-start]="prefs.language() === 'ar'">
+                      <div>{{ m.sentAt | date: 'short' }}</div>
+                      @if (!m.read && m.receiverPatientId === patient?.patientId) {
+                        <span class="inline-block mt-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200 text-[10px] font-black">
+                          {{ prefs.translate('messaging.unread') }}
+                        </span>
+                      }
+                    </div>
+                  </div>
+                </article>
+              }
+            </div>
+          }
+        </section>
+      } @else {
+        <section
+          class="glass-card p-6 sm:p-8 flex flex-col min-h-0 max-h-[min(85dvh,calc(100dvh-9rem))] text-slate-800 dark:text-slate-100"
+        >
+          <div class="shrink-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+            <h2 class="text-xl font-black">{{ prefs.translate('messaging.newMessage') }}</h2>
+            <nav class="pm-stepper" aria-label="Étapes">
+              @for (s of [1, 2, 3, 4]; track s) {
+                <span
+                  class="pm-step-dot"
+                  [class.pm-step-dot-active]="wizardStep === s"
+                  [class.pm-step-dot-done]="wizardStep > s"
+                >
+                  {{ s }}
+                </span>
+              }
+            </nav>
+          </div>
+
+          @if (sendError) {
+            <div
+              class="shrink-0 mb-4 rounded-xl border border-rose-300/80 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/50 px-3 py-2 text-sm text-rose-900 dark:text-rose-100"
+            >
+              {{ sendError }}
+            </div>
+          }
+
+          <div class="flex-1 min-h-0 overflow-y-auto overscroll-contain space-y-6 pr-1">
+          @if (wizardStep < 4 && !canAdvanceFromCurrentStep()) {
+            <p class="text-xs text-slate-500 dark:text-slate-400">{{ prefs.translate('messaging.wizard.fillStep') }}</p>
+          }
+          @if (wizardStep === 4 && !messageContent.trim() && !sending) {
+            <p class="text-xs text-slate-500 dark:text-slate-400">{{ prefs.translate('messaging.wizard.fillStep') }}</p>
+          }
+
+          @if (wizardStep === 1) {
+            <div class="space-y-3">
+              <h3 class="text-base font-bold text-slate-800 dark:text-white">{{ prefs.translate('messaging.step1.title') }}</h3>
+              <div class="grid sm:grid-cols-2 gap-4">
+                <button
+                  type="button"
+                  (click)="pickMe()"
+                  class="pm-choice"
+                  [class.pm-choice-selected]="concernTargetType === 'SELF'"
+                >
+                  <span class="pm-choice-icon" aria-hidden="true">🙋</span>
+                  <span class="pm-choice-title">{{ prefs.translate('messaging.step1.me') }}</span>
+                  <span class="pm-choice-hint">{{ prefs.translate('messaging.concerned.me') }}</span>
+                </button>
+                @for (pr of proches; track trackProche($index, pr)) {
+                  <button
+                    type="button"
+                    (click)="pickProche(pr)"
+                    class="pm-choice"
+                    [class.pm-choice-selected]="concernTargetType === 'PROCHE' && concernTargetId === pr.id"
+                  >
+                    <span class="pm-choice-icon" aria-hidden="true">👤</span>
+                    <span class="pm-choice-title">{{ pr.prenom }} {{ pr.nom }}</span>
+                    <span class="pm-choice-hint">{{ prefs.translate('messaging.step1.relative') }}</span>
+                  </button>
+                }
+              </div>
+            </div>
+          }
+
+          @if (wizardStep === 2) {
+            <div class="space-y-3">
+              <h3 class="text-base font-bold text-slate-800 dark:text-white">{{ prefs.translate('messaging.step2.title') }}</h3>
+              @if (consultablePractitioners.length === 0) {
+                <p class="text-sm text-amber-800 dark:text-amber-200 bg-amber-50/90 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl px-4 py-3">
+                  {{ prefs.translate('messaging.step2.empty') }}
+                </p>
+              } @else {
+                <div class="grid sm:grid-cols-2 gap-4">
+                  @for (doc of consultablePractitioners; track doc.externalId) {
+                    <button
+                      type="button"
+                      (click)="pickPractitioner(doc.externalId)"
+                      class="pm-choice text-start"
+                      [class.pm-choice-selected]="selectedPractitionerExternalId === doc.externalId"
+                    >
+                      <span class="pm-choice-title">{{ doc.name }}</span>
+                      <span class="pm-choice-hint">{{ doc.specialty }}</span>
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+          @if (wizardStep === 3) {
+            <div class="space-y-3">
+              <h3 class="text-base font-bold text-slate-800 dark:text-white">{{ prefs.translate('messaging.step3.title') }}</h3>
+              <div class="flex flex-col gap-2">
+                @for (sk of subjectKeys; track sk) {
+                  <button
+                    type="button"
+                    (click)="pickSubject(sk)"
+                    class="pm-subject"
+                    [class.pm-subject-selected]="selectedSubject === sk"
+                  >
+                    {{ subjectLabel(sk) }}
+                  </button>
+                }
+              </div>
+
+              @if (selectedSubject === 'AUTRE') {
+                <div class="mt-4">
+                  <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+                    Précisez le sujet de votre message
+                  </label>
+                  <input
+                    type="text"
+                    [(ngModel)]="customSubject"
+                    class="pm-textarea py-3"
+                    placeholder="Veuillez décrire brièvement l'objet de votre message..."
+                  />
+                </div>
+              }
+            </div>
+          }
+
+          @if (wizardStep === 4) {
+            <div class="space-y-4">
+              <h3 class="text-base font-bold text-slate-800 dark:text-white">{{ prefs.translate('messaging.step4.title') }}</h3>
+              <textarea
+                rows="6"
+                class="pm-textarea"
+                [(ngModel)]="messageContent"
+                [placeholder]="prefs.translate('messaging.content.placeholder')"
+              ></textarea>
+              <div>
+                <span class="block text-xs font-bold mb-2 text-slate-700 dark:text-slate-300">{{
+                  prefs.translate('messaging.attachments')
+                }}</span>
+                <div class="flex flex-wrap items-center gap-3">
+                  <input #fileInput type="file" multiple class="sr-only" (change)="onFiles($event)" />
+                  <button type="button" class="pm-btn-secondary" (click)="fileInput.click()">
+                    {{ prefs.translate('messaging.attachments') }}
+                  </button>
+                  @if (selectedFiles.length) {
+                    <span class="text-xs text-slate-600 dark:text-slate-400">
+                      {{ filesCountLabel() }}
+                    </span>
+                  }
+                </div>
+                @if (selectedFiles.length) {
+                  <ul class="mt-3 text-sm space-y-2 border border-slate-200 dark:border-slate-600 rounded-xl p-3 bg-white/60 dark:bg-slate-900/50">
+                    @for (f of selectedFiles; track $index) {
+                      <li class="flex justify-between items-center gap-2">
+                        <span class="truncate text-slate-800 dark:text-slate-100">{{ f.name }}</span>
+                        <button
+                          type="button"
+                          class="pm-remove-file"
+                          (click)="removeFile($index)"
+                          [attr.aria-label]="prefs.translate('messaging.removeFile')"
+                        >
+                          ×
+                        </button>
+                      </li>
+                    }
+                  </ul>
+                }
+              </div>
+            </div>
+          }
+          </div>
+
+          <div
+            class="shrink-0 mt-4 pt-4 border-t border-slate-200/80 dark:border-slate-600/60 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between bg-slate-50/80 dark:bg-slate-900/40 -mx-6 sm:-mx-8 px-6 sm:px-8 pb-1 rounded-b-2xl"
+          >
+            <button type="button" class="pm-btn-secondary w-full sm:w-auto" (click)="prevStep()" [disabled]="wizardStep === 1">
+              {{ prefs.translate('messaging.prev') }}
+            </button>
+            <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto sm:justify-end">
+              @if (wizardStep < 4) {
+                <button
+                  type="button"
+                  class="pm-btn-primary w-full sm:min-w-[10rem]"
+                  (click)="nextStep()"
+                  [disabled]="!canAdvanceFromCurrentStep()"
+                  [attr.title]="!canAdvanceFromCurrentStep() ? prefs.translate('messaging.wizard.fillStep') : null"
+                >
+                  {{ prefs.translate('messaging.next') }}
+                </button>
+              } @else {
+                <button
+                  type="button"
+                  class="pm-btn-primary w-full sm:min-w-[10rem]"
+                  (click)="submit()"
+                  [disabled]="!canSubmit()"
+                  [attr.title]="!canSubmit() ? prefs.translate('messaging.wizard.fillStep') : null"
+                >
+                  {{ sending ? prefs.translate('messaging.sending') : prefs.translate('messaging.send') }}
+                </button>
+              }
+            </div>
+          </div>
+        </section>
+      }
+    }
+  </main>
+</div>

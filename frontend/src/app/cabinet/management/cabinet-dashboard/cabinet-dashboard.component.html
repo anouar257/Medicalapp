@@ -1,0 +1,80 @@
+<div class="page">
+  @if (errorMessage) {
+    <p class="dash-error">{{ prefs.translate(errorMessage) }}</p>
+  }
+
+  @if (loading) {
+    <p class="cd-loading">{{ prefs.translate('cabinet.management.dashboardLoading') }}</p>
+    <div class="cd-skel-header">
+      <span class="cd-skel-line cd-skel-line--h1"></span>
+      <span class="cd-skel-line cd-skel-line--sub"></span>
+    </div>
+    <div class="grid">
+      @for (x of [1, 2, 3]; track x) {
+        <div class="stat-card cd-skel-stat">
+          <span class="cd-skel-line cd-skel-line--num"></span>
+          <span class="cd-skel-line cd-skel-line--lbl"></span>
+        </div>
+      }
+    </div>
+    <div class="card cd-skel-card">
+      <span class="cd-skel-line cd-skel-line--h2"></span>
+      <div class="actions-grid">
+        @for (a of [1, 2, 3, 4]; track a) {
+          <div class="action-card cd-skel-action">
+            <span class="cd-skel-line cd-skel-line--ac1"></span>
+            <span class="cd-skel-line cd-skel-line--ac2"></span>
+          </div>
+        }
+      </div>
+    </div>
+  } @else {
+    <header>
+      <h1>{{ prefs.translate('cabinet.dashboard.h1') }} — {{ cabinet?.nom || prefs.translate('cabinet.defaultOrg') }}</h1>
+      <p class="subtitle">{{ prefs.translate('cabinet.dashboard.subtitle') }}</p>
+    </header>
+
+    <div class="grid">
+      <div class="stat-card">
+        <span class="stat-value">{{ users.length }}</span>
+        <span class="stat-label">{{ prefs.translate('cabinet.management.stat.users') }}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">{{ countByRole('PRATICIEN') }}</span>
+        <span class="stat-label">{{ prefs.translate('cabinet.management.stat.practitioners') }}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value">{{ countByRole('ASSISTANT') }}</span>
+        <span class="stat-label">{{ prefs.translate('cabinet.management.stat.assistants') }}</span>
+      </div>
+    </div>
+
+    <section class="card">
+      <header class="card-header">
+        <h2>{{ prefs.translate('cabinet.management.quickTitle') }}</h2>
+      </header>
+      <div class="actions-grid">
+        <a routerLink="/cabinet/staff" class="action-card">
+          <span class="action-icon">👥</span>
+          <strong>{{ prefs.translate('cabinet.management.action.staffTitle') }}</strong>
+          <small>{{ prefs.translate('cabinet.management.action.staffDesc') }}</small>
+        </a>
+        <a routerLink="/cabinet/practice" class="action-card">
+          <span class="action-icon">🏥</span>
+          <strong>{{ prefs.translate('cabinet.management.action.practiceTitle') }}</strong>
+          <small>{{ prefs.translate('cabinet.management.action.practiceDesc') }}</small>
+        </a>
+        <a routerLink="/agenda-cabinet" class="action-card">
+          <span class="action-icon">📅</span>
+          <strong>{{ prefs.translate('cabinet.management.action.agendaTitle') }}</strong>
+          <small>{{ prefs.translate('cabinet.management.action.agendaDesc') }}</small>
+        </a>
+        <a routerLink="/cabinet/doctors" class="action-card">
+          <span class="action-icon">🩺</span>
+          <strong>{{ prefs.translate('cabinet.management.action.doctorsTitle') }}</strong>
+          <small>{{ prefs.translate('cabinet.management.action.doctorsDesc') }}</small>
+        </a>
+      </div>
+    </section>
+  }
+</div>

@@ -1,0 +1,130 @@
+
+    <div class="min-h-screen bg-slate-50 text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-white">
+      <div class="page">
+        <header class="page-header" [class.flex-row-reverse]="prefs.language() === 'ar'">
+          <div [class.text-end]="prefs.language() === 'ar'">
+            <h1>{{ prefs.translate('profile.title') }}</h1>
+            <p class="subtitle">{{ prefs.translate('profile.subtitle') }}</p>
+          </div>
+          <button type="button" class="btn-primary shrink-0 transition duration-300 hover:scale-[1.02]" (click)="save()" [disabled]="saving">
+            @if (saving) { <span class="spinner"></span> }
+            @else { {{ prefs.translate('profile.save') }} }
+          </button>
+        </header>
+
+        @if (errorMessage) { <div class="alert error">{{ errorMessage }}</div> }
+        @if (successMessage) { <div class="alert success">{{ successMessage }}</div> }
+
+        @if (profile) {
+          <div class="grid">
+
+            <section class="card">
+              <h2>{{ prefs.translate('profile.section.identity') }}</h2>
+              <div class="row">
+                <div class="form-group">
+                  <label>{{ prefs.translate('profile.label.civilite') }}</label>
+                  <select [(ngModel)]="profile.civilite">
+                    <option value="">—</option>
+                    <option value="MME">{{ prefs.translate('profile.option.mme') }}</option>
+                    <option value="M">{{ prefs.translate('profile.option.m') }}</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>{{ prefs.translate('profile.label.titre') }}</label>
+                  <select [(ngModel)]="profile.titre">
+                    <option value="AUCUN">{{ prefs.translate('profile.option.aucun') }}</option>
+                    <option value="DR">{{ prefs.translate('profile.option.dr') }}</option>
+                    <option value="PR">{{ prefs.translate('profile.option.pr') }}</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row">
+                <div class="form-group">
+                  <label>{{ prefs.translate('profile.label.prenom') }}</label>
+                  <input type="text" [(ngModel)]="profile.prenom"/>
+                </div>
+                <div class="form-group">
+                  <label>{{ prefs.translate('profile.label.nom') }}</label>
+                  <input type="text" [(ngModel)]="profile.nom"/>
+                </div>
+              </div>
+              <div class="row">
+                <div class="form-group">
+                  <label>{{ prefs.translate('profile.label.sexe') }}</label>
+                  <select [(ngModel)]="profile.sexe">
+                    <option value="HOMME">{{ prefs.translate('auth.register.homme') }}</option>
+                    <option value="FEMME">{{ prefs.translate('auth.register.femme') }}</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>{{ prefs.translate('profile.label.dob') }}</label>
+                  <input type="date" [(ngModel)]="profile.dateNaissance"/>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>{{ prefs.translate('profile.label.statut') }}</label>
+                <select [(ngModel)]="profile.statut">
+                  <option value="TITULAIRE">{{ prefs.translate('profile.option.titulaire') }}</option>
+                  <option value="REMPLACANT">{{ prefs.translate('profile.option.remplacant') }}</option>
+                  <option value="COLLABORATEUR">{{ prefs.translate('profile.option.collaborateur') }}</option>
+                  <option value="ASSISTANT">{{ prefs.translate('profile.option.assistant') }}</option>
+                  <option value="INTERNE">{{ prefs.translate('profile.option.interne') }}</option>
+                  <option value="ASSOCIE">{{ prefs.translate('profile.option.associe') }}</option>
+                  <option value="INDISPONIBLE">{{ prefs.translate('profile.option.indisponible') }}</option>
+                </select>
+              </div>
+            </section>
+
+            <section class="card">
+              <h2>{{ prefs.translate('profile.section.specialties') }}</h2>
+              <p class="muted">{{ prefs.translate('profile.specialtiesHint') }}</p>
+              @if (specialties.length === 0) { <p class="muted">{{ prefs.translate('Chargement') }}</p> }
+              <div class="checkbox-grid">
+                @for (s of specialties; track s.id) {
+                  <label class="check-card" [class.selected]="hasSpecialty(s.id)">
+                    <input type="checkbox" [checked]="hasSpecialty(s.id)" (change)="toggleSpecialty(s)" hidden/>
+                    <span>{{ s.libelle }}</span>
+                    @if (hasSpecialty(s.id)) { <span class="check">✓</span> }
+                  </label>
+                }
+              </div>
+            </section>
+
+            <section class="card wide">
+              <h2>{{ prefs.translate('profile.section.bio') }}</h2>
+              <div class="form-group">
+                <label>{{ prefs.translate('profile.label.biographie') }}</label>
+                <textarea rows="4" [(ngModel)]="profile.biographie" [placeholder]="prefs.translate('profile.bioPlaceholder')"></textarea>
+              </div>
+              <div class="row">
+                <div class="form-group">
+                  <label>{{ prefs.translate('profile.label.siteWeb') }}</label>
+                  <input type="url" [(ngModel)]="profile.siteWeb" placeholder="https://"/>
+                </div>
+                <div class="form-group">
+                  <label>{{ prefs.translate('profile.label.youtube') }}</label>
+                  <input type="url" [(ngModel)]="profile.lienYoutube" placeholder="https://youtube.com/@..."/>
+                </div>
+              </div>
+              <div class="row">
+                <div class="form-group">
+                  <label>{{ prefs.translate('profile.label.photoUrl') }}</label>
+                  <input type="url" [(ngModel)]="profile.photoUrl" placeholder="https://..."/>
+                </div>
+                <div class="form-group">
+                  <label>{{ prefs.translate('profile.label.color') }}</label>
+                  <input type="color" [(ngModel)]="profile.colorCode"/>
+                </div>
+              </div>
+            </section>
+
+            <section class="card">
+              <h2>{{ prefs.translate('profile.section.empreinte') }}</h2>
+              <p class="muted">{{ prefs.translate('profile.empreinteHint') }}</p>
+              <input type="text" [value]="profile.empreinte || ''" disabled class="empreinte-input"/>
+            </section>
+
+          </div>
+        }
+      </div>
+    </div>

@@ -1,0 +1,196 @@
+
+<div class="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-colors duration-300">
+  <nav class="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-slate-900/90 border-b border-slate-200 dark:border-slate-800 transition-colors duration-300">
+    <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-3 gap-3">
+      <div class="flex items-center gap-3 min-w-0">
+        <span class="text-3xl shrink-0">🏥</span>
+        <h1 class="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent truncate">
+          MedConnect
+        </h1>
+        <span class="hidden sm:inline-block shrink-0 px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase tracking-wider">
+          {{ prefs.translate('Patient') }}
+        </span>
+      </div>
+      <div class="flex items-center gap-2 sm:gap-3 shrink-0" [class.flex-row-reverse]="prefs.language() === 'ar'">
+        <a routerLink="/patient/prendre-rendez-vous" 
+           class="hidden md:flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black shadow-lg shadow-blue-500/20 transition-all duration-300 hover:scale-105 active:scale-95">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
+          {{ prefs.translate('Prendre RDV') }}
+        </a>
+        <app-preferences-toolbar />
+        @if (patient) {
+          <div class="flex items-center gap-3">
+            <div class="hidden sm:flex flex-col items-end text-end" [class.items-start]="prefs.language() === 'ar'" [class.text-start]="prefs.language() === 'ar'">
+              <span class="text-sm font-bold text-slate-700 dark:text-slate-200">
+                {{ patient.prenom }} {{ patient.nom }}
+              </span>
+              <span class="text-[10px] text-slate-400">{{ prefs.translate('Compte vérifié') }}</span>
+            </div>
+            <button (click)="logout()" type="button" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-colors duration-300" [attr.title]="prefs.translate('Déconnexion')">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    <div class="relative overflow-hidden bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-sm border border-slate-100 dark:border-slate-800 mb-8 transition-colors duration-300">
+      <div class="absolute top-0 end-0 p-8 text-6xl opacity-10 select-none">👋</div>
+      <h2 class="text-3xl font-extrabold text-slate-800 dark:text-white mb-2">
+        {{ prefs.translate('Bienvenue') }}, {{ patient?.prenom }}
+      </h2>
+      <p class="text-slate-500 dark:text-slate-400 mb-8">
+        {{ prefs.translate('Heureux de vous revoir sur votre espace santé personnel.') }}
+      </p>
+
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+        <a routerLink="/patient/prendre-rendez-vous" 
+           class="group relative inline-flex items-center gap-4 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black shadow-2xl shadow-blue-500/20 transition-all duration-300 hover:scale-[1.03] active:scale-95 overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
+          <div class="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" /></svg>
+          </div>
+          <span class="text-lg">{{ prefs.translate('Prendre RDV') }}</span>
+        </a>
+
+        <div class="flex flex-wrap gap-3">
+        <div class="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-950/80 border border-slate-100 dark:border-slate-800">
+          <span class="text-emerald-500">@if(patient?.emailVerifie){✅}@else{⏳}</span>
+          <span class="text-sm font-medium text-slate-600 dark:text-slate-300">
+            {{ prefs.translate('Email') }} {{ patient?.emailVerifie ? prefs.translate('vérifié') : prefs.translate('En attente') }}
+          </span>
+        </div>
+        <div class="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-50 dark:bg-slate-950/80 border border-slate-100 dark:border-slate-800">
+          <span class="text-emerald-500">@if(patient?.telephoneVerifie){✅}@else{⏳}</span>
+          <span class="text-sm font-medium text-slate-600 dark:text-slate-300">
+            {{ prefs.translate('Mobile') }} {{ patient?.telephoneVerifie ? prefs.translate('vérifié') : prefs.translate('En attente') }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <a
+        routerLink="/patient/proches"
+        class="group bg-white/70 dark:bg-slate-900/80 backdrop-blur border border-slate-100 dark:border-slate-800 p-6 rounded-3xl shadow-sm hover:shadow-xl hover:shadow-blue-500/5 hover:-translate-y-1 transition-all duration-300"
+      >
+        <div class="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform duration-300">
+          👥
+        </div>
+        <h3 class="font-bold text-slate-800 dark:text-white mb-1">{{ prefs.translate('Mes Proches') }}</h3>
+        <p class="text-xs text-slate-500 dark:text-slate-400">{{ prefs.translate('Gérez les profils et documents de votre famille.') }}</p>
+      </a>
+
+      <a
+        routerLink="/patient/messages"
+        class="group bg-white/70 dark:bg-slate-900/80 backdrop-blur border border-slate-100 dark:border-slate-800 p-6 rounded-3xl shadow-sm hover:shadow-xl hover:shadow-blue-500/5 hover:-translate-y-1 transition-all duration-300"
+      >
+        <div class="w-12 h-12 bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 rounded-2xl flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform duration-300">
+          💬
+        </div>
+        <h3 class="font-bold text-slate-800 dark:text-white mb-1">{{ prefs.translate('Messages') }}</h3>
+        <p class="text-xs text-slate-500 dark:text-slate-400">{{ prefs.translate('messaging.card.messagesSubtitle') }}</p>
+      </a>
+
+      <a
+        routerLink="/patient/prendre-rendez-vous"
+        class="group bg-white/70 dark:bg-slate-900/80 backdrop-blur border border-slate-100 dark:border-slate-800 p-6 rounded-3xl shadow-sm hover:shadow-xl hover:shadow-blue-500/5 hover:-translate-y-1 transition-all duration-300"
+      >
+        <div class="w-12 h-12 bg-slate-50 dark:bg-slate-950 text-slate-400 rounded-2xl flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform duration-300">
+          🔍
+        </div>
+        <h3 class="font-bold text-slate-800 dark:text-white mb-1">{{ prefs.translate('Recherche') }}</h3>
+        <p class="text-xs text-slate-500 dark:text-slate-400">{{ prefs.translate('Trouvez un spécialiste près de chez vous.') }}</p>
+      </a>
+    </div>
+
+    <section class="bg-white/70 dark:bg-slate-900/80 backdrop-blur border border-slate-100 dark:border-slate-800 rounded-3xl p-6 transition-colors duration-300">
+      <div class="flex items-start justify-between gap-4 mb-4">
+        <div>
+          <h3 class="text-xl font-extrabold text-slate-800 dark:text-white">{{ prefs.translate('Vos rendez-vous') }}</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            {{ prefs.translate('Retrouvez vos rendez-vous récents.') }}
+          </p>
+        </div>
+      </div>
+
+      @if (appointmentsError) {
+        <div class="mb-4 rounded-2xl border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/40 px-4 py-3 text-sm text-rose-800 dark:text-rose-200">
+          {{ appointmentsError }}
+        </div>
+      }
+
+      @if (appointmentsLoading) {
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          @for (s of appointmentSkeletons; track s) {
+            <div class="animate-pulse rounded-2xl border border-slate-100 dark:border-slate-800 bg-white/60 dark:bg-slate-950/50 p-5 h-32">
+              <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0 flex-1 space-y-3">
+                  <div class="h-4 w-1/2 rounded-lg bg-slate-200 dark:bg-slate-700"></div>
+                  <div class="h-3 w-2/3 rounded-lg bg-slate-200 dark:bg-slate-700"></div>
+                </div>
+                <div class="h-10 w-24 shrink-0 rounded-lg bg-slate-200 dark:bg-slate-700"></div>
+              </div>
+            </div>
+          }
+        </div>
+      } @else {
+        @if (appointments.length > 0) {
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            @for (apt of appointments; track apt.id) {
+              <div class="rounded-2xl border border-slate-100 dark:border-slate-800 bg-white/60 dark:bg-slate-950/40 p-5 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-slate-200/40 dark:hover:shadow-slate-900/50">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <h4 class="text-base font-extrabold text-slate-800 dark:text-white truncate">
+                        {{ apt.doctorName }}
+                      </h4>
+                      <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold border"
+                        [ngClass]="statusBadgeClasses(apt.status)"
+                      >
+                        {{ statusLabel(apt.status) }}
+                      </span>
+                    </div>
+                    <p class="text-sm text-slate-500 dark:text-slate-300 mt-1">
+                      {{ apt.doctorSpecialty }}
+                    </p>
+                  </div>
+
+                  <div class="text-end shrink-0" [class.text-start]="prefs.language() === 'ar'">
+                    <div class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                      {{ apt.typeLabel }}
+                    </div>
+                    <div class="mt-2 text-sm font-semibold text-slate-800 dark:text-slate-100">
+                      {{ apt.startTime | date:'dd/MM/yyyy HH:mm' }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="text-center py-12">
+            <div class="mx-auto w-16 h-16 rounded-2xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 flex items-center justify-center text-2xl mb-4">
+              🗓️
+            </div>
+            <p class="text-slate-700 dark:text-slate-200 font-bold">
+              {{ prefs.translate('Aucun rendez-vous trouvé.') }}
+            </p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">
+              {{ prefs.translate('Faites une recherche pour prendre rendez-vous.') }}
+            </p>
+            <a
+              routerLink="/patient/prendre-rendez-vous"
+              class="inline-flex items-center justify-center mt-6 px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-md shadow-blue-500/20 transition duration-300 hover:scale-105"
+            >
+              {{ prefs.translate('Rechercher un praticien') }}
+            </a>
+          </div>
+        }
+      }
+    </section>
+  </main>
+</div>

@@ -1,0 +1,17 @@
+@use '../auth-shared' as *;
+
+.auth-container {
+  padding: 3rem 2rem;
+}
+
+.auth-wrapper {
+  max-width: 540px;
+}
+
+.logo-container {
+  margin-bottom: 2rem;
+}
+
+.auth-form {
+  gap: 1.25rem;
+}

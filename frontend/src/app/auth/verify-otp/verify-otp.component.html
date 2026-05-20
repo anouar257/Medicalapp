@@ -1,0 +1,54 @@
+
+    <div class="auth-container fade-in relative">
+      <!-- Bouton Retour -->
+      <a routerLink="/auth/login" class="btn-global-back">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        Retour
+      </a>
+      <div class="auth-wrapper">
+        <div class="logo-container">
+          <span class="logo-icon">🩺</span>
+          <h2>MedConnect</h2>
+        </div>
+        <div class="auth-card">
+          <div class="auth-header">
+            <h3>Vérification requise</h3>
+            <p>Saisissez les codes reçus par email et SMS</p>
+          </div>
+          <div class="otp-section">
+            <h4>📧 Email @if (emailVerified) { <span class="badge-success">✓</span> }</h4>
+            @if (!emailVerified) {
+              <div class="otp-row">
+                <input type="text" [(ngModel)]="emailCode" placeholder="Code email" maxlength="6"/>
+                <button class="btn btn-primary" (click)="verifyEmail()" [disabled]="loadingEmail">Vérifier</button>
+              </div>
+              <button class="btn-link" (click)="resendEmail()" [disabled]="emailCd>0">
+                {{ emailCd > 0 ? 'Renvoyer dans '+emailCd+'s' : 'Renvoyer' }}
+              </button>
+            }
+          </div>
+          <div class="otp-section">
+            <h4>📱 SMS @if (smsVerified) { <span class="badge-success">✓</span> }</h4>
+            @if (!smsVerified) {
+              <div class="otp-row">
+                <input type="text" [(ngModel)]="smsCode" placeholder="Code SMS" maxlength="6"/>
+                <button class="btn btn-primary" (click)="verifySms()" [disabled]="loadingSms">Vérifier</button>
+              </div>
+              <button class="btn-link" (click)="resendSms()" [disabled]="smsCd>0">
+                {{ smsCd > 0 ? 'Renvoyer dans '+smsCd+'s' : 'Renvoyer' }}
+              </button>
+            }
+          </div>
+          @if (err) { <div class="text-error" style="text-align: center; margin-top: 1rem;">{{ err }}</div> }
+          @if (emailVerified && smsVerified) {
+            <button class="btn-submit" (click)="router.navigate(['/auth/login'])">
+              Continuer vers la connexion <span class="arrow">→</span>
+            </button>
+          }
+          <div class="auth-links mt-2">
+            <a routerLink="/auth/login">Retour connexion</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  

@@ -1,0 +1,171 @@
+
+    <div class="min-h-screen bg-slate-50 text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
+      <div class="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 px-4 py-2 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/90">
+        <div class="mx-auto flex max-w-5xl items-center justify-between gap-3">
+          <a routerLink="/" class="text-sm font-semibold text-blue-600 dark:text-blue-400">{{ prefs.translate('Retour') }}</a>
+          <app-preferences-toolbar />
+        </div>
+      </div>
+
+      <div class="auth-container fade-in relative px-4 pb-16 pt-8">
+        <div class="auth-wrapper mx-auto">
+          <div class="logo-container">
+            <span class="logo-icon">🩺</span>
+            <h2>MedConnect</h2>
+          </div>
+
+          <div class="stepper-container">
+            <div class="stepper-item" [class.active]="step >= 1">
+              <div class="step-circle">{{ step > 1 ? '✓' : '1' }}</div>
+              <span class="step-label">{{ prefs.translate('auth.register.stepIdentity') }}</span>
+            </div>
+            <div class="stepper-line" [class.active]="step >= 2"></div>
+
+            <div class="stepper-item" [class.active]="step >= 2">
+              <div class="step-circle">{{ step > 2 ? '✓' : '2' }}</div>
+              <span class="step-label">{{ prefs.translate('auth.register.stepProfile') }}</span>
+            </div>
+            <div class="stepper-line" [class.active]="step >= 3"></div>
+
+            <div class="stepper-item" [class.active]="step >= 3">
+              <div class="step-circle">3</div>
+              <span class="step-label">{{ prefs.translate('auth.register.stepValidation') }}</span>
+            </div>
+          </div>
+
+          <div class="auth-card dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-none">
+            @if (step === 1) {
+              <div class="auth-header">
+                <h3>{{ prefs.translate('auth.register.welcomeTitle') }}</h3>
+                <p>{{ prefs.translate('auth.register.welcomeSubtitle') }}</p>
+              </div>
+              <form (ngSubmit)="checkExistence()" class="auth-form">
+                <div class="form-group">
+                  <label>{{ prefs.translate('Email') }}</label>
+                  <div class="input-with-icon">
+                    <span class="icon">✉️</span>
+                    <input type="email" [(ngModel)]="registerData.email" name="email"
+                           placeholder="vous@domaine.com" required />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>{{ prefs.translate('auth.register.telephone') }}</label>
+                  <div class="input-with-icon">
+                    <span class="icon">📱</span>
+                    <input type="tel" [(ngModel)]="registerData.telephone" name="telephone"
+                           placeholder="+33612345678" required />
+                  </div>
+                </div>
+
+                @if (errorMessage) { <div class="text-error">{{ errorMessage }}</div> }
+
+                <button type="submit" class="btn-submit" [disabled]="loading">
+                  @if (loading) { <span class="spinner"></span> }
+                  @else { {{ prefs.translate('auth.register.continue') }} <span class="arrow">→</span> }
+                </button>
+              </form>
+            }
+
+            @if (step === 2) {
+              <div class="auth-header">
+                <h3>{{ prefs.translate('auth.register.yourInfoTitle') }}</h3>
+                <p>{{ prefs.translate('auth.register.yourInfoSubtitle') }}</p>
+              </div>
+              <form (ngSubmit)="goToStep3()" class="auth-form">
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>{{ prefs.translate('auth.register.sexe') }}</label>
+                    <select [(ngModel)]="registerData.sexe" name="sexe" required class="custom-input">
+                      <option value="" disabled>{{ prefs.translate('auth.register.choose') }}</option>
+                      <option value="HOMME">{{ prefs.translate('auth.register.homme') }}</option>
+                      <option value="FEMME">{{ prefs.translate('auth.register.femme') }}</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>{{ prefs.translate('auth.register.dob') }}</label>
+                    <input type="date" [(ngModel)]="registerData.dateNaissance" name="dateNaissance" required class="custom-input" />
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label>{{ prefs.translate('auth.register.firstname') }}</label>
+                    <input type="text" [(ngModel)]="registerData.prenom" name="prenom" [placeholder]="prefs.translate('auth.register.firstname')" required class="custom-input" />
+                  </div>
+                  <div class="form-group">
+                    <label>{{ prefs.translate('auth.register.lastname') }}</label>
+                    <input type="text" [(ngModel)]="registerData.nom" name="nom" [placeholder]="prefs.translate('auth.register.lastname')" required class="custom-input" />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>{{ prefs.translate('auth.register.password') }}</label>
+                  <div class="input-with-icon">
+                    <span class="icon">🔒</span>
+                    <input type="password" [(ngModel)]="registerData.motDePasse" name="motDePasse" [placeholder]="prefs.translate('auth.register.passwordMinPh')" required class="custom-input pl-icon" />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>{{ prefs.translate('auth.register.passwordConfirm') }}</label>
+                  <div class="input-with-icon">
+                    <span class="icon">🔒</span>
+                    <input type="password" [(ngModel)]="confirmPassword" name="confirmMdp" [placeholder]="prefs.translate('auth.register.passwordConfirmPh')" required class="custom-input pl-icon" />
+                  </div>
+                </div>
+
+                @if (errorMessage) { <div class="text-error">{{ errorMessage }}</div> }
+
+                <div class="form-actions">
+                  <button type="button" class="btn-outline" (click)="step = 1">{{ prefs.translate('Retour') }}</button>
+                  <button type="submit" class="btn-submit" style="margin-top:0" [disabled]="loading">{{ prefs.translate('auth.register.continue') }} <span class="arrow">→</span></button>
+                </div>
+              </form>
+            }
+
+            @if (step === 3) {
+              <div class="auth-header">
+                <h3>{{ prefs.translate('auth.register.cguTitle') }}</h3>
+                <p>{{ prefs.translate('auth.register.cguSubtitle') }}</p>
+              </div>
+              <form (ngSubmit)="onRegister()" class="auth-form">
+                <div class="cgu-box">
+                  <p>
+                    {{ prefs.translate('auth.register.cguLead') }}
+                    <a href="#">{{ prefs.translate('auth.register.cguLink') }}</a>
+                    {{ prefs.translate('auth.register.privacyLead') }}
+                    <a href="#">{{ prefs.translate('auth.register.privacyLink') }}</a>.
+                  </p>
+                </div>
+
+                <div class="form-group checkbox-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" [(ngModel)]="registerData.cguAcceptees" name="cguAcceptees" />
+                    <span>{{ prefs.translate('auth.register.acceptCgu') }}</span>
+                  </label>
+                </div>
+
+                @if (errorMessage) { <div class="text-error">{{ errorMessage }}</div> }
+                @if (successMessage) { <div class="text-success">{{ successMessage }}</div> }
+
+                <div class="form-actions">
+                  <button type="button" class="btn-outline" (click)="step = 2">{{ prefs.translate('Retour') }}</button>
+                  <button type="submit" class="btn-submit" style="margin-top:0" [disabled]="loading || !registerData.cguAcceptees">
+                    @if (loading) { <span class="spinner"></span> }
+                    @else { {{ prefs.translate('auth.register.createAccount') }} <span class="arrow">→</span> }
+                  </button>
+                </div>
+              </form>
+            }
+
+            <div class="auth-links mt-2">
+              <div class="register-prompt">
+                {{ prefs.translate('auth.register.alreadyAccount') }}
+                <a routerLink="/auth/login">{{ prefs.translate('auth.register.signInLink') }}</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>

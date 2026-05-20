@@ -1,37 +1,24 @@
-import { AsyncPipe } from '@angular/common';
-import { Component, ElementRef, inject, signal, viewChild } from '@angular/core';
-import { RouterLink } from '@angular/router';
 
-import type { Doctor } from '../../models/agenda.model';
-import { AgendaStateService, extractHttpErrorDetail } from '../../services/agenda-state.service';
-import { ThemeService } from '../../services/theme.service';
-import { resolveDoctorPhotoUrl } from '../../utils/media-url';
-
-@Component({
-  selector: 'app-admin-doctors-page',
-  standalone: true,
-  imports: [AsyncPipe, RouterLink],
-  template: `
-    <div class="flex min-h-screen flex-col bg-slate-50 dark:bg-[#0F172A]">
+    <div class="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950">
       <header
-        class="sticky top-0 z-40 flex flex-wrap items-center gap-3 border-b border-slate-200/80 bg-white px-3 py-3 shadow-sm dark:border-slate-700/80 dark:bg-[#1E293B] sm:gap-4 sm:px-4 md:px-8"
+        class="sticky top-0 z-40 flex flex-wrap items-center gap-3 border-b border-slate-200/80 bg-white px-3 py-3 shadow-sm dark:border-slate-700/80 dark:bg-slate-900 sm:gap-4 sm:px-4 md:px-8"
       >
         <a
-          routerLink="/"
+          routerLink="/cabinet/agenda"
           class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700/80"
         >
           <svg class="size-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
-          Planning
+          {{ prefs.translate('cabinet.doctors.backToCabinet') }}
         </a>
 
         <div class="min-w-0 flex-1">
           <p class="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
-            Administration
+            {{ prefs.translate('cabinet.doctors.kicker') }}
           </p>
           <h1 class="truncate text-lg font-semibold tracking-tight text-slate-900 dark:text-slate-100 md:text-xl">
-            Médecins
+            {{ prefs.translate('cabinet.doctors.title') }}
           </h1>
         </div>
 
@@ -57,7 +44,7 @@ import { resolveDoctorPhotoUrl } from '../../utils/media-url';
 
       <main class="mx-auto w-full max-w-4xl flex-1 space-y-6 p-4 md:p-8">
         <section
-          class="rounded-xl border border-slate-200/90 bg-white p-5 shadow-sm dark:border-slate-700/80 dark:bg-[#1E293B] sm:p-6"
+          class="rounded-xl border border-slate-200/90 bg-white p-5 shadow-sm dark:border-slate-700/80 dark:bg-slate-900 sm:p-6"
         >
           <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100">
             {{ editingId() ? 'Modifier le médecin' : 'Nouveau médecin' }}
@@ -96,7 +83,7 @@ import { resolveDoctorPhotoUrl } from '../../utils/media-url';
                 @for (c of predefinedColors; track c) {
                   <button
                     type="button"
-                    class="size-8 rounded-full border border-black/10 shadow-sm ring-offset-2 transition hover:scale-110 focus:outline-none focus:ring-2 dark:border-white/10 dark:ring-offset-[#1E293B]"
+                    class="size-8 rounded-full border border-black/10 shadow-sm ring-offset-2 transition hover:scale-110 focus:outline-none focus:ring-2 dark:border-white/10 dark:ring-offset-slate-900"
                     [class.ring-2]="formColor() === c"
                     [class.ring-slate-400]="formColor() === c"
                     [class.scale-110]="formColor() === c"
@@ -105,7 +92,7 @@ import { resolveDoctorPhotoUrl } from '../../utils/media-url';
                     [attr.aria-label]="'Choisir la couleur ' + c"
                   ></button>
                 }
-                <div class="relative flex size-8 cursor-pointer items-center justify-center rounded-full border border-slate-200 bg-white shadow-sm transition hover:scale-110 focus-within:ring-2 focus-within:ring-slate-400 focus-within:ring-offset-2 dark:border-slate-600 dark:bg-slate-800 dark:focus-within:ring-offset-[#1E293B]">
+                <div class="relative flex size-8 cursor-pointer items-center justify-center rounded-full border border-slate-200 bg-white shadow-sm transition hover:scale-110 focus-within:ring-2 focus-within:ring-slate-400 focus-within:ring-offset-2 dark:border-slate-600 dark:bg-slate-800 dark:focus-within:ring-offset-slate-900">
                   <input
                     type="color"
                     class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
@@ -181,7 +168,7 @@ import { resolveDoctorPhotoUrl } from '../../utils/media-url';
         </section>
 
         <section
-          class="overflow-hidden rounded-xl border border-slate-200/90 bg-white shadow-sm dark:border-slate-700/80 dark:bg-[#1E293B]"
+          class="overflow-hidden rounded-xl border border-slate-200/90 bg-white shadow-sm dark:border-slate-700/80 dark:bg-slate-900"
         >
           <div class="border-b border-slate-100 px-5 py-4 dark:border-slate-700/80">
             <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Liste des médecins</h2>
@@ -292,194 +279,4 @@ import { resolveDoctorPhotoUrl } from '../../utils/media-url';
         </section>
       </main>
     </div>
-  `,
-})
-export class AdminDoctorsPageComponent {
-  private readonly agenda = inject(AgendaStateService);
-  readonly theme = inject(ThemeService);
-
-  private readonly photoFileInput = viewChild<ElementRef<HTMLInputElement>>('photoFile');
-
-  protected readonly resolveDoctorPhotoUrl = resolveDoctorPhotoUrl;
-
-  readonly predefinedColors = [
-    '#ef4444', // Red
-    '#f97316', // Orange
-    '#f59e0b', // Amber
-    '#84cc16', // Lime
-    '#10b981', // Emerald
-    '#06b6d4', // Cyan
-    '#3b82f6', // Blue
-    '#8b5cf6', // Violet
-    '#d946ef', // Fuchsia
-    '#f43f5e', // Rose
-    '#64748b', // Slate
-  ];
-
-  /** Fichier choisi pour le prochain enregistrement (upload multipart). */
-  readonly pendingFile = signal<File | null>(null);
-
-  readonly doctors$ = this.agenda.doctors$;
-
-  readonly formName = signal('');
-  readonly formSpecialty = signal('');
-  readonly formColor = signal('');
-  readonly formPhoto = signal('');
-  readonly editingId = signal<string | null>(null);
-  readonly saving = signal(false);
-  readonly deletingId = signal<string | null>(null);
-  readonly formError = signal<string | null>(null);
-  readonly deleteFeedback = signal<string | null>(null);
-
-  initials(name: string): string {
-    return name
-      .split(/\s+/)
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((p) => p.charAt(0).toUpperCase())
-      .join('');
-  }
-
-  startEdit(d: Doctor): void {
-    this.formError.set(null);
-    this.deleteFeedback.set(null);
-    this.editingId.set(d.id);
-    this.formName.set(d.name);
-    this.formSpecialty.set(d.specialty ?? '');
-    this.formColor.set(d.colorCode ?? '');
-    this.formPhoto.set(d.photoUrl ?? '');
-    this.pendingFile.set(null);
-    this.clearPhotoFileInput();
-  }
-
-  cancelEdit(): void {
-    this.editingId.set(null);
-    this.formName.set('');
-    this.formSpecialty.set('');
-    this.formColor.set('');
-    this.formPhoto.set('');
-    this.pendingFile.set(null);
-    this.clearPhotoFileInput();
-    this.formError.set(null);
-    this.deleteFeedback.set(null);
-  }
-
-  onPhotoFileSelected(ev: Event): void {
-    const input = ev.target as HTMLInputElement;
-    const file = input.files?.[0] ?? null;
-    this.pendingFile.set(file);
-  }
-
-  private clearPhotoFileInput(): void {
-    const el = this.photoFileInput()?.nativeElement;
-    if (el) {
-      el.value = '';
-    }
-  }
-
-  submit(): void {
-    const name = this.formName().trim();
-    if (!name) {
-      return;
-    }
-    this.formError.set(null);
-    this.deleteFeedback.set(null);
-    this.saving.set(true);
-    const colorRaw = this.formColor().trim();
-    const photoRaw = this.formPhoto().trim();
-    const specRaw = this.formSpecialty().trim();
-    const pending = this.pendingFile();
-    const body = {
-      name,
-      ...(colorRaw ? { colorCode: colorRaw } : {}),
-      ...(photoRaw && !pending ? { photoUrl: photoRaw } : {}),
-      ...(specRaw ? { specialty: specRaw } : {}),
-    };
-    const id = this.editingId();
-    const doneSaving = (): void => this.saving.set(false);
-
-    const afterDoctorSaved = (doctorId: string): void => {
-      const file = this.pendingFile();
-      if (file) {
-        this.agenda.uploadDoctorPhoto(doctorId, file).subscribe({
-          next: () => {
-            this.pendingFile.set(null);
-            this.clearPhotoFileInput();
-            this.cancelEdit();
-          },
-          complete: () => doneSaving(),
-          error: (err: unknown) => {
-            doneSaving();
-            this.formError.set(extractHttpErrorDetail(err) ?? 'Échec du téléversement de la photo.');
-          },
-        });
-        return;
-      }
-      this.cancelEdit();
-      doneSaving();
-    };
-
-    if (id) {
-      this.agenda.updateDoctor(id, body).subscribe({
-        next: () => afterDoctorSaved(id),
-        error: (err: unknown) => {
-          doneSaving();
-          this.formError.set(extractHttpErrorDetail(err) ?? 'Impossible d’enregistrer le médecin.');
-        },
-      });
-      return;
-    }
-    this.agenda.createDoctor(body).subscribe({
-      next: (doc) => afterDoctorSaved(doc.id),
-      error: (err: unknown) => {
-        doneSaving();
-        this.formError.set(extractHttpErrorDetail(err) ?? 'Impossible de créer le médecin.');
-      },
-    });
-  }
-
-  remove(d: Doctor): void {
-    if ((d.appointmentCount ?? 0) > 0) {
-      this.deleteFeedback.set(
-        `« ${d.name} » a encore ${d.appointmentCount} rendez-vous en base : supprimez ou modifiez ces RDV depuis l’agenda avant de supprimer le médecin.`,
-      );
-      return;
-    }
-    if (!window.confirm(`Supprimer « ${d.name} » ?`)) {
-      return;
-    }
-    this.deleteFeedback.set(null);
-    this.deletingId.set(d.id);
-    this.agenda.deleteDoctor(d.id).subscribe({
-      next: () => this.deletingId.set(null),
-      error: (err: unknown) => {
-        this.deletingId.set(null);
-        const msg = conflictMessage(err);
-        if (msg) {
-          this.deleteFeedback.set(msg);
-        }
-      },
-    });
-  }
-}
-
-function conflictMessage(err: unknown): string | null {
-  if (!err || typeof err !== 'object') {
-    return null;
-  }
-  const e = err as { status?: number; error?: unknown };
-  if (e.status !== 409) {
-    return null;
-  }
-  const ex = e.error;
-  if (typeof ex === 'string' && ex.trim()) {
-    return ex.trim();
-  }
-  if (ex && typeof ex === 'object' && 'message' in ex) {
-    const m = (ex as { message?: unknown }).message;
-    if (typeof m === 'string' && m.trim()) {
-      return m.trim();
-    }
-  }
-  return 'Impossible de supprimer : des rendez-vous sont encore associés à ce médecin.';
-}
+  

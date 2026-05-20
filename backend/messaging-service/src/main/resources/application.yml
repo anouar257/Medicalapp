@@ -1,0 +1,37 @@
+server:
+  port: ${SERVER_PORT:8084}
+
+spring:
+  application:
+    name: messaging-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/messaging_medical
+    username: postgres
+    password: odoo
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        default_batch_fetch_size: 32
+
+# Secrets alignés sur patient-service (patient) et practitioner-service (pro).
+jwt:
+  patient-secret: ${JWT_SECRET:MEDICAl-PATIENT-SERVICE-JWT-SECRET-KEY-256-BITS-CHANGE-IN-PROD-0123456789}
+  pro-secret: ${JWT_PRO_SECRET:MEDICAL-PRACTITIONER-SERVICE-JWT-SECRET-KEY-256-BITS-CHANGE-IN-PROD-9876543210}
+
+integration:
+  agenda-base-url: ${AGENDA_BASE_URL:http://localhost:8081}
+  patient-base-url: ${PATIENT_BASE_URL:http://localhost:8082}
+  practitioner-base-url: ${PRACTITIONER_BASE_URL:http://localhost:8083}
+  messaging-secret: ${MESSAGING_INTEGRATION_SECRET:dev-messaging-secret-change-me}
+
+app:
+  cors:
+    allowed-origins: http://localhost:4300,http://localhost:4200
+  messaging:
+    max-attachment-bytes-total: 5242880

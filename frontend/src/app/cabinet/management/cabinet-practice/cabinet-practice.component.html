@@ -1,0 +1,76 @@
+<div class="page">
+  <header class="page-header">
+    <div>
+      <h1>{{ prefs.translate('cabinet.practice.h1') }}</h1>
+      <p class="subtitle">{{ prefs.translate('cabinet.practice.subtitle') }}</p>
+    </div>
+    <button type="button" class="btn-primary" (click)="save()" [disabled]="saving || loading || !cabinet">
+      {{ saving ? prefs.translate('cabinet.practice.saving') : prefs.translate('cabinet.practice.save') }}
+    </button>
+  </header>
+
+  @if (errorMessage) {
+    <div class="alert error">{{ errorMessage }}</div>
+  }
+  @if (successMessage) {
+    <div class="alert success">{{ successMessage }}</div>
+  }
+
+  @if (loading) {
+    <p class="cp-loading">{{ prefs.translate('cabinet.practice.loading') }}</p>
+    <div class="cp-skel-grid">
+      @for (i of [1, 2]; track i) {
+        <div class="card cp-skel-card">
+          <div class="cp-skel-line cp-skel-line--title"></div>
+          <div class="cp-skel-line"></div>
+          <div class="cp-skel-line"></div>
+          <div class="cp-skel-line cp-skel-line--short"></div>
+        </div>
+      }
+    </div>
+  } @else if (cabinet) {
+    <section class="card">
+      <h2>{{ prefs.translate('cabinet.practice.sectionIdentity') }}</h2>
+      <div class="form-group">
+        <label>{{ prefs.translate('cabinet.practice.label.name') }}</label>
+        <input type="text" [(ngModel)]="cabinet.nom" name="nom" />
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label>{{ prefs.translate('cabinet.practice.label.siret') }}</label>
+          <input type="text" [(ngModel)]="cabinet.siret" name="siret" />
+        </div>
+        <div class="form-group">
+          <label>{{ prefs.translate('cabinet.practice.label.phone') }}</label>
+          <input type="tel" [(ngModel)]="cabinet.telephone" name="tel" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>{{ prefs.translate('cabinet.practice.label.email') }}</label>
+        <input type="email" [(ngModel)]="cabinet.email" name="email" />
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>{{ prefs.translate('cabinet.practice.sectionAddress') }}</h2>
+      <div class="form-group">
+        <label>{{ prefs.translate('cabinet.practice.label.address') }}</label>
+        <input type="text" [(ngModel)]="cabinet.adresse" name="adresse" />
+      </div>
+      <div class="row row--three">
+        <div class="form-group">
+          <label>{{ prefs.translate('cabinet.practice.label.city') }}</label>
+          <input type="text" [(ngModel)]="cabinet.ville" name="ville" />
+        </div>
+        <div class="form-group">
+          <label>{{ prefs.translate('cabinet.practice.label.zip') }}</label>
+          <input type="text" [(ngModel)]="cabinet.codePostal" name="cp" />
+        </div>
+        <div class="form-group">
+          <label>{{ prefs.translate('cabinet.practice.label.country') }}</label>
+          <input type="text" [(ngModel)]="cabinet.pays" name="pays" />
+        </div>
+      </div>
+    </section>
+  }
+</div>

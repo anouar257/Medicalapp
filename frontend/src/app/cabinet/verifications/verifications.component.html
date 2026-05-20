@@ -1,0 +1,62 @@
+
+    <div class="page">
+      <header class="page-header">
+        <div>
+          <h1>Vérification du compte</h1>
+          <p class="subtitle">Pièces requises pour activer toutes les fonctionnalités</p>
+        </div>
+      </header>
+
+      @if (errorMessage) { <div class="alert error">{{ errorMessage }}</div> }
+      @if (successMessage) { <div class="alert success">{{ successMessage }}</div> }
+
+      @if (profile) {
+        <div class="grid">
+
+          <article class="card">
+            <header>
+              <h2>🪪 Vérification d'identité</h2>
+              <span class="status status-{{ profile.verifIdentiteStatus.toLowerCase() }}">
+                {{ statusLabel(profile.verifIdentiteStatus) }}
+              </span>
+            </header>
+            <p class="muted">Carte d'identité ou passeport en cours de validité.</p>
+            <div class="form-group">
+              <label>URL du document</label>
+              <input type="url" [(ngModel)]="docIdentiteUrl" placeholder="https://votre-stockage.com/passeport.pdf"/>
+            </div>
+            <button class="btn-primary" (click)="submitIdentite()" [disabled]="savingIdentite || !docIdentiteUrl">
+              {{ savingIdentite ? 'Envoi…' : 'Soumettre pour vérification' }}
+            </button>
+          </article>
+
+          <article class="card">
+            <header>
+              <h2>📜 Droit d'exercer</h2>
+              <span class="status status-{{ profile.verifDroitExercerStatus.toLowerCase() }}">
+                {{ statusLabel(profile.verifDroitExercerStatus) }}
+              </span>
+            </header>
+            <p class="muted">Document officiel du ministère chargé de la santé.</p>
+            <div class="form-group">
+              <label>URL du document</label>
+              <input type="url" [(ngModel)]="docDroitUrl" placeholder="https://votre-stockage.com/autorisation.pdf"/>
+            </div>
+            <button class="btn-primary" (click)="submitDroit()" [disabled]="savingDroit || !docDroitUrl">
+              {{ savingDroit ? 'Envoi…' : 'Soumettre pour vérification' }}
+            </button>
+          </article>
+
+        </div>
+
+        <div class="info-box">
+          <h3>ℹ️ Comment ça marche ?</h3>
+          <ol>
+            <li>Téléchargez votre document sur un service de stockage privé (votre cloud).</li>
+            <li>Collez l'URL d'accès dans le champ correspondant.</li>
+            <li>Notre équipe vérifie le document sous 48 h ouvrées.</li>
+          </ol>
+        </div>
+      }
+    </div>
+  

@@ -58,6 +58,24 @@ public class Appointment {
   @Column(name = "status", length = 32)
   private AppointmentStatus status;
 
+  /**
+   * Identifiant du patient (stockage simple côté agenda-service).
+   * <p>
+   * Permet au frontend patient d'afficher ses rendez-vous via
+   * {@code GET /api/appointments/patient/{patientId}}.
+   */
+  @Column(name = "patient_id")
+  private Long patientId;
+
+  @Column(name = "patient_prenom", length = 120)
+  private String patientPrenom;
+
+  @Column(name = "patient_nom", length = 120)
+  private String patientNom;
+
+  @Column(name = "visit_reason_code", length = 64)
+  private String visitReasonCode;
+
   public Long getId() {
     return id;
   }
@@ -137,5 +155,37 @@ public class Appointment {
 
   public void setStatus(AppointmentStatus status) {
     this.status = status;
+  }
+
+  public Long getPatientId() {
+    return patientId;
+  }
+
+  public void setPatientId(Long patientId) {
+    this.patientId = patientId;
+  }
+
+  public String getPatientPrenom() {
+    return patientPrenom;
+  }
+
+  public void setPatientPrenom(String patientPrenom) {
+    this.patientPrenom = patientPrenom;
+  }
+
+  public String getPatientNom() {
+    return patientNom;
+  }
+
+  public void setPatientNom(String patientNom) {
+    this.patientNom = patientNom;
+  }
+
+  public String getVisitReasonCode() {
+    return visitReasonCode;
+  }
+
+  public void setVisitReasonCode(String visitReasonCode) {
+    this.visitReasonCode = visitReasonCode;
   }
 }

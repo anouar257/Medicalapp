@@ -1,0 +1,45 @@
+
+    <div class="cabinet-layout min-h-screen transition-colors duration-300 bg-slate-50 dark:bg-slate-950">
+      <aside class="sidebar">
+        <div class="brand">
+          <span class="logo-icon">🩺</span>
+          <div class="brand-text min-w-0">
+            <strong class="truncate">{{ orgName() }}</strong>
+            <small>{{ roleLabel() }}</small>
+          </div>
+        </div>
+
+        <div class="px-1">
+          <app-preferences-toolbar />
+        </div>
+
+        <nav class="nav-list">
+          @for (item of visibleNavItems(); track item.path) {
+            <a
+              [routerLink]="item.path"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: item.exact }"
+              class="nav-item group"
+            >
+              <span class="nav-icon shrink-0">{{ item.icon }}</span>
+              <span class="truncate">{{ prefs.translate(item.labelKey) }}</span>
+            </a>
+          }
+        </nav>
+
+        <div class="user-block">
+          <div class="user-avatar shrink-0">{{ initials() }}</div>
+          <div class="user-info min-w-0">
+            <strong class="truncate">{{ userName() }}</strong>
+            <small class="truncate">{{ userEmail() }}</small>
+          </div>
+          <button type="button" class="logout-btn shrink-0" (click)="logout()" [attr.title]="prefs.translate('nav.logoutTitle')">
+            ⏻
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-content min-h-screen">
+        <router-outlet></router-outlet>
+      </main>
+    </div>

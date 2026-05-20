@@ -1,0 +1,9 @@
+@use '../patient-shared' as *;
+
+// All styles are now handled by Tailwind CSS for better performance and consistency.
+// This file is kept for future custom extensions if needed.
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}

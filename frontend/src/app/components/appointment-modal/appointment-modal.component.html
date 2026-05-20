@@ -1,0 +1,195 @@
+
+    @if (open()) {
+      <div
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="appointment-modal-title"
+      >
+        <button
+          type="button"
+          class="absolute inset-0 bg-slate-950/55 backdrop-blur-sm transition hover:bg-slate-950/65 dark:bg-black/60 dark:hover:bg-black/70"
+          aria-label="Fermer"
+          (click)="onCancel()"
+        ></button>
+
+        <div
+          class="relative z-10 flex w-full max-w-4xl flex-col overflow-hidden rounded-[1.75rem] border border-slate-200/80 bg-white shadow-[0_24px_80px_-32px_rgba(15,23,42,0.55)] ring-1 ring-slate-100 dark:border-slate-600/70 dark:bg-slate-900 dark:ring-slate-700/80"
+          (click)="$event.stopPropagation()"
+        >
+          <div class="shrink-0 border-b border-slate-100 px-6 py-5 dark:border-slate-700">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <h2
+                  id="appointment-modal-title"
+                  class="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100"
+                >
+                  {{ appointmentToEdit() ? 'Modifier le rendez-vous' : 'Nouveau rendez-vous' }}
+                </h2>
+                <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                  Type, intitulé et description à gauche · médecin, date et durée à droite.
+                </p>
+              </div>
+              <button
+                type="button"
+                class="flex size-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-base text-slate-500 transition hover:border-slate-300 hover:bg-white hover:text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-400/70 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                (click)="onCancel()"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+
+          @if (vm$ | async; as vm) {
+            <form class="flex flex-col px-6 py-5" [formGroup]="form" (ngSubmit)="onSubmit()">
+              <div class="grid gap-6 md:grid-cols-2">
+                <!-- Colonne gauche : type → intitulé → description -->
+                <div class="space-y-4">
+                  <div class="grid gap-1.5">
+                    <label class="text-sm font-medium text-slate-800 dark:text-slate-200" for="apt-type">Type</label>
+                    <select
+                      id="apt-type"
+                      formControlName="typeId"
+                      class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm transition hover:border-slate-300 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/40 dark:border-slate-600 dark:bg-slate-800/90 dark:text-slate-100"
+                    >
+                      <option value="" disabled>Choisir un type…</option>
+                      @for (t of vm.types; track t.id) {
+                        <option [value]="t.id">{{ t.label }}</option>
+                      }
+                    </select>
+                  </div>
+
+                  <div class="grid gap-1.5">
+                    <label class="text-sm font-medium text-slate-800 dark:text-slate-200" for="apt-title">Intitulé</label>
+                    <input
+                      id="apt-title"
+                      type="text"
+                      formControlName="title"
+                      autocomplete="off"
+                      class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm transition hover:border-slate-300 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/40 dark:border-slate-600 dark:bg-slate-800/90 dark:text-slate-100 dark:placeholder:text-slate-500"
+                      placeholder="Ex. Consultation ou suivi — préciser le motif si besoin"
+                    />
+                  </div>
+
+                  <div class="grid gap-1.5">
+                    <label class="text-sm font-medium text-slate-800 dark:text-slate-200" for="apt-desc">Description</label>
+                    <textarea
+                      id="apt-desc"
+                      formControlName="description"
+                      rows="6"
+                      class="w-full resize-none rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm shadow-sm transition hover:border-slate-300 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/40 dark:border-slate-600 dark:bg-slate-800/90 dark:text-slate-100"
+                      placeholder="Notes cliniques, motif…"
+                    ></textarea>
+                  </div>
+                </div>
+
+                <!-- Colonne droite : médecin, date, heure, durée, fin, couleur -->
+                <div class="space-y-4">
+                  <div class="grid gap-1.5">
+                    <label class="text-sm font-medium text-slate-800 dark:text-slate-200" for="apt-doctor">Médecin</label>
+                    <select
+                      id="apt-doctor"
+                      formControlName="doctorId"
+                      class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 shadow-sm transition hover:border-slate-300 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/40 dark:border-slate-600 dark:bg-slate-800/90 dark:text-slate-100"
+                    >
+                      <option value="" disabled>Choisir un médecin</option>
+                      @for (doc of vm.doctors; track doc.id) {
+                        <option [value]="doc.id">{{ doc.name }}</option>
+                      }
+                    </select>
+                  </div>
+
+                  <div class="grid gap-3 sm:grid-cols-2">
+                    <div class="grid gap-1.5">
+                      <label class="text-sm font-medium text-slate-800 dark:text-slate-200" for="apt-start-date">Date</label>
+                      <input
+                        id="apt-start-date"
+                        type="date"
+                        formControlName="startDate"
+                        class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm shadow-sm transition hover:border-slate-300 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/40 dark:border-slate-600 dark:bg-slate-800/90 dark:text-slate-100"
+                      />
+                    </div>
+                    <div class="grid gap-1.5">
+                      <label class="text-sm font-medium text-slate-800 dark:text-slate-200" for="apt-start-time">Début</label>
+                      <input
+                        id="apt-start-time"
+                        type="time"
+                        formControlName="startTime"
+                        [attr.min]="minStartTimeAttr()"
+                        class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm shadow-sm transition hover:border-slate-300 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/40 dark:border-slate-600 dark:bg-slate-800/90 dark:text-slate-100"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="grid gap-3 sm:grid-cols-2">
+                    <div class="grid gap-1.5">
+                      <label class="text-sm font-medium text-slate-800 dark:text-slate-200" for="apt-duration">Durée (min)</label>
+                      <input
+                        id="apt-duration"
+                        type="number"
+                        min="1"
+                        step="1"
+                        formControlName="durationMinutes"
+                        class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm shadow-sm transition hover:border-slate-300 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/40 dark:border-slate-600 dark:bg-slate-800/90 dark:text-slate-100"
+                      />
+                    </div>
+                    <div class="grid gap-1.5">
+                      <label class="text-sm font-medium text-slate-800 dark:text-slate-200" for="apt-end-time">Fin</label>
+                      <input
+                        id="apt-end-time"
+                        type="text"
+                        formControlName="endTimeDisplay"
+                        readonly
+                        tabindex="-1"
+                        class="w-full cursor-not-allowed rounded-xl border border-dashed border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-700 dark:border-slate-600 dark:bg-slate-900/50 dark:text-slate-300"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="grid gap-1.5">
+                    <label class="text-sm font-medium text-slate-800 dark:text-slate-200" for="apt-color">Couleur</label>
+                    <div class="flex items-center gap-3">
+                      <input
+                        id="apt-color"
+                        type="color"
+                        formControlName="color"
+                        class="h-11 w-14 cursor-pointer rounded-lg border border-slate-200 bg-white p-1 shadow-sm dark:border-slate-600"
+                      />
+                      <span class="font-mono text-xs text-slate-500 dark:text-slate-400">{{
+                        form.controls.color.value
+                      }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              @if (form.touched && form.invalid) {
+                <p class="mt-4 text-sm text-red-600 dark:text-red-400">
+                  Veuillez compléter les champs obligatoires.
+                </p>
+              }
+
+              <div
+                class="mt-6 flex shrink-0 flex-wrap justify-end gap-3 border-t border-slate-100 pt-5 dark:border-slate-700"
+              >
+                <button
+                  type="button"
+                  class="rounded-full border border-slate-200 bg-white px-6 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                  (click)="onCancel()"
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  class="rounded-full bg-blue-600 px-8 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
+                  [disabled]="form.invalid"
+                >
+                  {{ appointmentToEdit() ? 'Mettre à jour' : 'Créer' }}
+                </button>
+              </div>
+            </form>
+          }
+        </div>
+      </div>
+    }
+  

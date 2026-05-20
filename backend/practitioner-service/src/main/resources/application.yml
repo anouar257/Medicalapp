@@ -1,0 +1,70 @@
+server:
+  port: ${SERVER_PORT:8083}
+
+spring:
+  application:
+    name: practitioner-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/practitioner_medical
+    username: postgres
+    password: odoo
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  # SMTP — réinitialisation MDP par email
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# ── JWT (clé distincte du patient-service) ───────────────────────────────────
+jwt:
+  secret: ${JWT_PRO_SECRET:MEDICAL-PRACTITIONER-SERVICE-JWT-SECRET-KEY-256-BITS-CHANGE-IN-PROD-9876543210}
+  expiration-ms: ${JWT_EXPIRATION:86400000}   # 24 h
+
+# ── Twilio Verify API (OTP réel SMS + Email) ─────────────────────────────────
+# Mêmes identifiants que patient-service — un seul compte Twilio pour tout le projet.
+twilio:
+  account-sid: AC69ef1be54f3a269f7a80eb0ceb7db939
+  auth-token: 17eb971eb25f973df02e535c3dbba6b8
+  verify-service-sid: VAf3f9c58c4a91c2261fc3a3f7e52bda78
+
+# ── Application ──────────────────────────────────────────────────────────────
+app:
+  cors:
+    allowed-origins: http://localhost:4300,http://localhost:4200
+  password-reset:
+    token-expiration-minutes: 30
+    base-url: ${APP_RESET_URL:http://localhost:4200/auth/reset-password}
+  platform-admin:
+    email: ${PLATFORM_ADMIN_EMAIL:anouarmnt@gmail.com}
+    initial-password: ${PLATFORM_ADMIN_INITIAL_PASSWORD:ChangeMe!PlatformAdmin2026}
+
+# Agrégats inter-services (comptage patients pour la tour de contrôle plateforme).
+integration:
+  patient-base-url: ${PATIENT_BASE_URL:http://localhost:8082}
+  platform-stats-secret: ${PLATFORM_STATS_SECRET:dev-platform-stats-key-change-me}
+  messaging-secret: ${MESSAGING_INTEGRATION_SECRET:dev-messaging-secret-change-me}
+
+# ── Synchronisation Agenda Service (Doctor) ──────────────────────────────────
+# Lorsque l'on crée/met à jour un praticien, on pousse les infos d'affichage
+# (nom, couleur, photo, spécialité) vers l'agenda-service pour que le calendrier
+# puisse afficher correctement les rendez-vous sans appel inter-services.
+agenda:
+  base-url: ${AGENDA_BASE_URL:http://localhost:8081}
+  sync-enabled: ${AGENDA_SYNC_ENABLED:true}
+  sync-secret: ${AGENDA_SYNC_SECRET:dev-agenda-sync-secret-change-me}

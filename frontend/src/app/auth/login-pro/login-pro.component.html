@@ -1,0 +1,122 @@
+
+    <div class="min-h-screen bg-slate-50 text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
+      <div class="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 px-4 py-2 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/90">
+        <div class="mx-auto flex max-w-5xl items-center justify-between gap-3">
+          <a routerLink="/" class="text-sm font-semibold text-blue-600 dark:text-blue-400">{{ prefs.translate('Retour') }}</a>
+          <app-preferences-toolbar />
+        </div>
+      </div>
+
+      <div class="auth-container fade-in relative px-4 pb-16 pt-8">
+        <div class="auth-wrapper mx-auto">
+          <div class="logo-container">
+            <span class="logo-icon">🩺</span>
+            <h2>MedConnect <span class="badge-pro">PRO</span></h2>
+          </div>
+
+          <div class="mb-4 flex flex-wrap justify-center gap-2">
+            <a
+              routerLink="/auth/login-pro"
+              [queryParams]="{}"
+              class="rounded-full border px-4 py-2 text-xs font-bold transition dark:border-slate-600"
+              [class.border-blue-600]="!assistantMode"
+              [class.bg-blue-50]="!assistantMode"
+              [class.text-blue-800]="!assistantMode"
+              [class.dark:bg-blue-950]="!assistantMode"
+              [class.dark:text-blue-200]="!assistantMode"
+            >
+              {{ prefs.translate('auth.pro.staffTab') }}
+            </a>
+            <a
+              routerLink="/auth/login-pro"
+              [queryParams]="{ mode: 'assistant' }"
+              class="rounded-full border px-4 py-2 text-xs font-bold transition dark:border-slate-600"
+              [class.border-blue-600]="assistantMode"
+              [class.bg-blue-50]="assistantMode"
+              [class.text-blue-800]="assistantMode"
+              [class.dark:bg-blue-950]="assistantMode"
+              [class.dark:text-blue-200]="assistantMode"
+            >
+              {{ prefs.translate('auth.pro.assistantTab') }}
+            </a>
+          </div>
+
+          <div class="auth-card dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-none">
+            <div class="auth-header">
+              <h3>{{ prefs.translate('auth.pro.title') }}</h3>
+              <p>{{ prefs.translate('auth.pro.subtitle') }}</p>
+            </div>
+
+            @if (assistantMode) {
+              <div class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-100">
+                {{ prefs.translate('auth.pro.assistantInfo') }}
+              </div>
+            }
+
+            <form (ngSubmit)="onSubmit()" class="auth-form">
+              <div class="form-group">
+                <label for="email">{{ prefs.translate('auth.pro.email') }}</label>
+                <div class="input-with-icon">
+                  <span class="icon">✉️</span>
+                  <input
+                    id="email"
+                    type="email"
+                    [(ngModel)]="loginData.email"
+                    name="email"
+                    placeholder="votre@cabinet.com"
+                    required
+                    autocomplete="email"
+                  />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="password">{{ prefs.translate('auth.pro.password') }}</label>
+                <div class="input-with-icon">
+                  <span class="icon">🔒</span>
+                  <input
+                    id="password"
+                    type="password"
+                    [(ngModel)]="loginData.motDePasse"
+                    name="motDePasse"
+                    placeholder="••••••••"
+                    required
+                    autocomplete="current-password"
+                  />
+                </div>
+                <div class="forgot-link">
+                  <a routerLink="/auth/forgot-password-pro">{{ prefs.translate('auth.pro.forgotLink') }}</a>
+                </div>
+              </div>
+
+              @if (err) {
+                <div class="text-error mt-1">{{ err }}</div>
+              }
+
+              <button type="submit" class="btn-submit" [disabled]="loading">
+                @if (loading) {
+                  <span class="spinner"></span>
+                } @else {
+                  {{ prefs.translate('auth.pro.submit') }} <span class="arrow">→</span>
+                }
+              </button>
+            </form>
+
+            <div class="auth-links mt-2">
+              @if (!assistantMode) {
+                <p>
+                  {{ prefs.translate('auth.pro.noAccount') }}
+                  <a routerLink="/auth/register-cabinet">{{ prefs.translate('auth.pro.registerCabinet') }}</a>
+                  <span class="separator">·</span>
+                  <a routerLink="/auth/register-practitioner">{{ prefs.translate('auth.pro.registerPrac') }}</a>
+                </p>
+              } @else {
+                <p class="text-center text-xs text-slate-500 dark:text-slate-400">
+                  {{ prefs.translate('auth.pro.assistantInfo') }}
+                </p>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>

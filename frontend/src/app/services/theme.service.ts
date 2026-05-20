@@ -57,10 +57,24 @@ export class ThemeService {
     this.applyClass();
   }
 
+  /** Ré-applique la classe sur le document (utile après navigation si besoin). */
+  syncFromStorage(): void {
+    const stored = readStoredDark();
+    if (stored !== null) {
+      this.isDark.set(stored);
+    }
+    this.applyClass();
+  }
+
   toggle(): void {
-    this.isDark.update((v) => !v);
+    this.setDarkMode(!this.isDark());
+  }
+
+  /** Applique explicitement le thème clair ou sombre sur toute l’application (`html.dark`). */
+  setDarkMode(isDark: boolean): void {
+    this.isDark.set(isDark);
     if (typeof localStorage !== 'undefined') {
-      localStorage.setItem(STORAGE_KEY, this.isDark() ? 'dark' : 'light');
+      localStorage.setItem(STORAGE_KEY, isDark ? 'dark' : 'light');
     }
     this.applyClass();
   }

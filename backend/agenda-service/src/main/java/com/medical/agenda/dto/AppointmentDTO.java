@@ -16,6 +16,17 @@ public class AppointmentDTO {
   private Long id;
   private String title;
 
+  /** Identifiant du patient (stocké côté agenda-service). */
+  private Long patientId;
+
+  /** Copie affichage pour le cabinet (assistant) — pas d'appel patient-service. */
+  private String patientPrenom;
+
+  private String patientNom;
+
+  /** Code motif (questionnaire RDV). */
+  private String visitReasonCode;
+
   /** Référence vers la table {@code appointment_types} (obligatoire en POST/PUT). */
   private Long typeId;
 
@@ -30,6 +41,13 @@ public class AppointmentDTO {
   private String description;
   private Long doctorId;
   private String color;
+
+  /** Champs “fusionnés” pour simplifier l'affichage UI côté patient. */
+  private String doctorName;
+  private String doctorSpecialty;
+
+  /** {@code PractitionerProfile.id} côté practitioner-service (messagerie, synchro). */
+  private Long doctorExternalPractitionerId;
 
   private AppointmentStatus status;
 
@@ -47,6 +65,38 @@ public class AppointmentDTO {
 
   public void setTitle(String title) {
     this.title = title;
+  }
+
+  public Long getPatientId() {
+    return patientId;
+  }
+
+  public void setPatientId(Long patientId) {
+    this.patientId = patientId;
+  }
+
+  public String getPatientPrenom() {
+    return patientPrenom;
+  }
+
+  public void setPatientPrenom(String patientPrenom) {
+    this.patientPrenom = patientPrenom;
+  }
+
+  public String getPatientNom() {
+    return patientNom;
+  }
+
+  public void setPatientNom(String patientNom) {
+    this.patientNom = patientNom;
+  }
+
+  public String getVisitReasonCode() {
+    return visitReasonCode;
+  }
+
+  public void setVisitReasonCode(String visitReasonCode) {
+    this.visitReasonCode = visitReasonCode;
   }
 
   public Long getTypeId() {
@@ -127,6 +177,30 @@ public class AppointmentDTO {
 
   public void setColor(String color) {
     this.color = color;
+  }
+
+  public String getDoctorName() {
+    return doctorName;
+  }
+
+  public void setDoctorName(String doctorName) {
+    this.doctorName = doctorName;
+  }
+
+  public String getDoctorSpecialty() {
+    return doctorSpecialty;
+  }
+
+  public void setDoctorSpecialty(String doctorSpecialty) {
+    this.doctorSpecialty = doctorSpecialty;
+  }
+
+  public Long getDoctorExternalPractitionerId() {
+    return doctorExternalPractitionerId;
+  }
+
+  public void setDoctorExternalPractitionerId(Long doctorExternalPractitionerId) {
+    this.doctorExternalPractitionerId = doctorExternalPractitionerId;
   }
 
   public AppointmentStatus getStatus() {

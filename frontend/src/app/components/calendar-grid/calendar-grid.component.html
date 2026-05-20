@@ -1,0 +1,519 @@
+
+    @if (vm$ | async; as vm) {
+      <section
+        class="calendar-dashboard-panel flex min-w-0 flex-col gap-4 rounded-xl border border-slate-200/90 bg-white p-5 shadow-sm dark:border-slate-700/80 dark:bg-slate-900 sm:p-6"
+        aria-label="Grille agenda"
+      >
+        <header
+          class="flex flex-wrap items-end justify-between gap-3 border-b border-slate-100 pb-4 dark:border-slate-700/80"
+        >
+          <div class="flex min-w-0 flex-1 flex-wrap items-end gap-x-6 gap-y-3">
+            <div class="min-w-0">
+              <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                Planning
+              </p>
+              <h2 class="capitalize text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+                {{ vm.title }}
+              </h2>
+              <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ vm.calendarSubtitle }}</p>
+            </div>
+            @if (vm.layoutMode === 'timeline' && vm.view === 'day') {
+              <div
+                class="inline-flex shrink-0 items-center gap-0.5 rounded-full bg-slate-100 p-1 ring-1 ring-slate-200/90 dark:bg-slate-800/90 dark:ring-slate-600/80"
+                role="group"
+                aria-label="Étendre le jour sur trois colonnes ou une seule"
+              >
+                <button
+                  type="button"
+                  class="rounded-full px-3 py-2 text-xs font-semibold transition hover:bg-white hover:text-slate-900 dark:hover:bg-slate-700"
+                  [class.bg-white]="!vm.dayShowsThreeDays"
+                  [class.shadow-sm]="!vm.dayShowsThreeDays"
+                  [class.text-slate-900]="!vm.dayShowsThreeDays"
+                  [class.text-slate-600]="vm.dayShowsThreeDays"
+                  [class.dark:bg-slate-600]="!vm.dayShowsThreeDays"
+                  [class.dark:text-slate-100]="!vm.dayShowsThreeDays"
+                  [class.dark:text-slate-400]="vm.dayShowsThreeDays"
+                  (click)="setDayShowsThreeDays(false)"
+                >
+                  1 jour
+                </button>
+                <button
+                  type="button"
+                  class="rounded-full px-3 py-2 text-xs font-semibold transition hover:bg-white hover:text-slate-900 dark:hover:bg-slate-700"
+                  [class.bg-white]="vm.dayShowsThreeDays"
+                  [class.shadow-sm]="vm.dayShowsThreeDays"
+                  [class.text-slate-900]="vm.dayShowsThreeDays"
+                  [class.text-slate-600]="!vm.dayShowsThreeDays"
+                  [class.dark:bg-slate-600]="vm.dayShowsThreeDays"
+                  [class.dark:text-slate-100]="vm.dayShowsThreeDays"
+                  [class.dark:text-slate-400]="!vm.dayShowsThreeDays"
+                  (click)="setDayShowsThreeDays(true)"
+                >
+                  3 jours
+                </button>
+              </div>
+            }
+          </div>
+          <div
+            class="max-w-[12rem] text-right text-[11px] leading-snug text-slate-400 dark:text-slate-500 sm:max-w-none sm:text-xs"
+          >
+            {{ vm.viewMeta }}
+          </div>
+        </header>
+
+        <div class="hidden sm:block">
+        @if (vm.layoutMode === 'timeline' && !vm.timelineHasEvents) {
+          <div
+            class="flex flex-col items-center rounded-xl border border-dashed border-slate-200 bg-gradient-to-b from-white to-slate-50/80 px-6 py-14 text-center shadow-sm dark:border-slate-600 dark:from-slate-900 dark:to-slate-900/40"
+            role="status"
+          >
+            <span
+              class="mb-4 flex size-14 items-center justify-center rounded-2xl bg-blue-600/10 text-blue-600 ring-1 ring-blue-600/20 dark:bg-blue-500/15 dark:text-blue-400 dark:ring-blue-400/25"
+              aria-hidden="true"
+            >
+              <svg class="size-8" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5a2.25 2.25 0 002.25-2.25m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5a2.25 2.25 0 012.25 2.25v7.5"
+                />
+              </svg>
+            </span>
+            <p class="text-base font-semibold text-slate-800 dark:text-slate-100">Aucun rendez-vous affiché</p>
+            <p class="mt-2 max-w-md text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+              Changez la date, élargissez les médecins cochés ou les types de visite dans la colonne de gauche.
+            </p>
+          </div>
+        } @else if (vm.layoutMode === 'timeline') {
+          <div
+            class="-mx-1 max-h-[min(78vh,1100px)] overflow-auto rounded-xl border border-slate-100 bg-slate-50 scrollbar-calendar shadow-inner dark:border-slate-700/70 dark:bg-slate-900/40"
+          >
+            <div class="flex min-w-max">
+              <div
+                class="sticky left-0 z-40 w-[min(6.5rem,16vw)] shrink-0 rounded-l-xl border-r border-slate-100 bg-white shadow-md dark:border-slate-700/80 dark:bg-slate-900"
+              >
+                <div
+                  class="h-[3.25rem] shrink-0 border-b border-slate-100 bg-slate-50/90 dark:border-slate-700/80 dark:bg-slate-800/60"
+                ></div>
+                <div class="relative bg-white dark:bg-slate-900" [style.height.px]="vm.bodyHeightPx">
+                  @for (tick of vm.quarterTicks; track tick.key) {
+                    <div
+                      class="pointer-events-none absolute left-0 right-0 pr-1"
+                      [ngClass]="timelineTickLineNgClass(tick)"
+                      [style.top.%]="tick.topPct"
+                    >
+                      <span
+                        class="inline-block min-w-[3.75rem] -translate-y-1/2 bg-white px-1 text-right dark:bg-slate-900"
+                        [ngClass]="timelineTickLabelNgClass(tick)"
+                        >{{ tick.label }}</span
+                      >
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <div class="calendar-drag-boundary min-w-0 flex-1 overflow-x-auto overscroll-x-contain">
+                <div class="grid min-w-max" [style.gridTemplateColumns]="vm.gridTemplateColumns">
+                  @for (col of vm.columns; track col.key) {
+                    <div
+                      class="mx-px min-w-0 overflow-hidden rounded-lg border border-slate-200/80 bg-white shadow-[8px_0_28px_-16px_rgba(15,23,42,0.28)] ring-1 ring-slate-900/5 transition-shadow duration-300 hover:shadow-[10px_0_32px_-14px_rgba(15,23,42,0.35)] dark:border-slate-600/70 dark:bg-slate-900 dark:shadow-[10px_0_36px_-18px_rgba(0,0,0,0.62)] dark:ring-white/10 dark:hover:shadow-[12px_0_42px_-16px_rgba(0,0,0,0.75)] sm:rounded-xl"
+                    >
+                      <div
+                        class="flex h-[3.25rem] flex-col items-center justify-center border-b border-slate-100 bg-gradient-to-b from-white to-slate-50/90 px-2 text-center shadow-inner dark:border-slate-700/80 dark:from-slate-900 dark:to-slate-900/40"
+                      >
+                        <span
+                          class="text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500"
+                          >{{ col.sub }}</span
+                        >
+                        <span class="text-sm font-semibold text-slate-800 dark:text-slate-100">{{
+                          col.header
+                        }}</span>
+                      </div>
+                      <div
+                        class="calendar-drop-zone relative border-b border-slate-50 bg-gradient-to-b from-white via-white to-slate-50/[0.35] shadow-inner dark:border-slate-800/50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950"
+                        [attr.data-drop-col]="col.key"
+                        [style.height.px]="vm.bodyHeightPx"
+                      >
+                        @for (tick of vm.quarterTicks; track tick.key) {
+                          <div
+                            class="pointer-events-none absolute inset-x-0"
+                            [ngClass]="timelineTickColumnLineNgClass(tick)"
+                            [style.top.%]="tick.topPct"
+                          ></div>
+                        }
+
+                        @for (apt of col.appointments; track apt.id) {
+                          <article
+                            cdkDrag
+                            [cdkDragBoundary]="'.calendar-drag-boundary'"
+                            [cdkDragData]="apt"
+                            (cdkDragStarted)="onDragStarted(apt)"
+                            (cdkDragMoved)="onDragMoved($event, apt, vm.bodyHeightPx || 0)"
+                            (cdkDragEnded)="onAppointmentDragEnded($event, apt)"
+                            (click)="onAppointmentCardClick($event, apt.id)"
+                            tabindex="0"
+                            (keydown.enter)="openAppointmentKeyboard(apt.id, $event)"
+                            (keydown.space)="openAppointmentKeyboard(apt.id, $event)"
+                            role="button"
+                            class="event-card group absolute flex cursor-grab flex-col justify-start gap-1 overflow-y-auto overflow-x-hidden rounded-lg border border-slate-200/90 px-3 py-2.5 text-left text-sm shadow-sm ring-1 ring-slate-900/5 backdrop-blur-sm transition-all hover:z-40 hover:shadow-md active:cursor-grabbing focus-within:z-40 focus-visible:z-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:border-slate-600/55 dark:ring-white/10 dark:focus-visible:ring-sky-400/40 dark:focus-visible:ring-offset-slate-900"
+                            [ngClass]="appointmentCardStatusNgClass(apt)"
+                            [style.backgroundColor]="hexToRgba(apt.color, cardBackgroundAlpha())"
+                            [style.borderLeftWidth.px]="4"
+                            [style.borderLeftStyle]="'solid'"
+                            [style.borderLeftColor]="resolveAppointmentHex(apt.color)"
+                            [style.top.px]="apt.topPx"
+                            [style.height.px]="apt.heightPx"
+                            [style.left.%]="apt.leftPct"
+                            [style.width.%]="apt.widthPct"
+                            [attr.aria-label]="apt.title + ' — ' + apt.doctorName + ' — ' + apt.timeRangeLabel"
+                          >
+                            <div class="flex shrink-0 flex-wrap items-center gap-0.5">
+                              <span
+                                class="inline-flex max-w-full items-center rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white shadow-sm sm:text-[10px]"
+                                [style.backgroundColor]="resolveAppointmentHex(apt.typeColor)"
+                              >
+                                {{ apt.typeLabel }}
+                              </span>
+                            </div>
+                            <p
+                              class="shrink-0 text-[15px] font-bold tabular-nums leading-none tracking-tight text-slate-900 dark:text-slate-50"
+                            >
+                              {{ appointmentCardPrimaryTime(apt) }}
+                            </p>
+                            @if (!draggingTimes[apt.id]) {
+                              <p
+                                class="shrink-0 text-[10px] font-medium tabular-nums leading-tight text-slate-500 dark:text-slate-400"
+                              >
+                                {{ apt.timeRangeLabel }}
+                              </p>
+                            }
+                            <p
+                              class="line-clamp-[6] shrink-0 text-[13px] font-semibold leading-snug text-slate-900 dark:text-slate-100"
+                              [class.line-through]="apt.status === 'CANCELLED'"
+                            >
+                              {{ apt.title }}
+                            </p>
+                            <div class="flex min-h-0 shrink-0 items-start gap-2 pt-0.5">
+                              <img
+                                class="size-9 shrink-0 rounded-full object-cover ring-1 ring-slate-200/90 dark:ring-slate-600"
+                                [src]="doctorPortraitSrc(apt)"
+                                width="36"
+                                height="36"
+                                alt=""
+                              />
+                              <span
+                                class="line-clamp-3 min-w-0 flex-1 text-[11px] font-medium leading-snug text-slate-500 dark:text-slate-400"
+                              >
+                                {{ apt.doctorName }}
+                              </span>
+                            </div>
+
+                            <div
+                              class="absolute bottom-0 left-0 right-0 h-2 cursor-ns-resize hover:bg-slate-900/10 dark:hover:bg-white/10"
+                              (mousedown)="onResizeStart($event, apt, vm.bodyHeightPx || 0)"
+                              (touchstart)="onResizeStart($event, apt, vm.bodyHeightPx || 0)"
+                            ></div>
+                          </article>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
+        } @else if (vm.layoutMode === 'monthMatrix' && vm.monthWeekRows) {
+          <div
+            class="-mx-1 max-h-[min(82vh,920px)] overflow-y-auto rounded-xl border border-slate-100 bg-slate-50/90 p-3 shadow-inner scrollbar-calendar dark:border-slate-700/70 dark:bg-slate-900/35 sm:p-4"
+          >
+            <div
+              class="grid grid-cols-7 gap-1 border-b border-slate-200 pb-2 dark:border-slate-600 sm:gap-1.5"
+            >
+              @for (wd of matrixWeekdays; track wd) {
+                <div
+                  class="text-center text-[10px] font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400 sm:text-[11px]"
+                >
+                  {{ wd }}
+                </div>
+              }
+            </div>
+            <div class="grid grid-cols-7 gap-1 pt-2 sm:gap-1.5">
+              @for (row of vm.monthWeekRows; track $index) {
+                @for (cell of row; track cell.key) {
+                  <div
+                    class="group flex min-h-[5.5rem] flex-col rounded-lg border p-1 transition sm:min-h-[7rem] sm:p-1.5"
+                    [ngClass]="monthMatrixCellNgClass(cell)"
+                    role="button"
+                    tabindex="0"
+                    [attr.aria-label]="'Jour ' + cell.date.getDate()"
+                    (click)="onMatrixCellClick($event, cell)"
+                    (keydown.enter)="selectMatrixDay(cell.date)"
+                    (keydown.space)="selectMatrixDay(cell.date); $event.preventDefault()"
+                  >
+                    <div class="mb-0.5 flex justify-end">
+                      <span
+                        class="flex size-6 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold tabular-nums sm:size-7 sm:text-xs"
+                        [ngClass]="monthMatrixDayNumberNgClass(cell)"
+                      >
+                        {{ cell.date.getDate() }}
+                      </span>
+                    </div>
+                    <div class="flex min-h-0 flex-1 flex-col gap-0.5 overflow-hidden">
+                      @for (chip of cell.chips; track chip.id) {
+                        <button
+                          type="button"
+                          data-matrix-chip
+                          class="matrix-appt-chip flex w-full min-w-0 cursor-pointer flex-col gap-0.5 rounded-md border border-slate-200/75 px-1.5 py-1 text-left shadow-sm ring-1 ring-slate-900/5 transition hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-slate-600/55 dark:ring-white/10"
+                          [ngClass]="matrixChipStatusNgClass(chip)"
+                          [style.backgroundColor]="matrixChipBg(chip.color)"
+                          [style.borderLeftWidth.px]="3"
+                          [style.borderLeftStyle]="'solid'"
+                          [style.borderLeftColor]="resolveAppointmentHex(chip.color)"
+                          [attr.title]="chip.startLabel + ' — ' + chip.title + ' — ' + chip.doctorName"
+                          (click)="$event.stopPropagation(); onAppointmentChipClick(chip.id)"
+                        >
+                          <div class="flex shrink-0 flex-wrap items-center gap-0.5">
+                            <span
+                              class="inline-flex max-w-full items-center rounded-full px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wide text-white shadow-sm sm:text-[9px]"
+                              [style.backgroundColor]="resolveAppointmentHex(chip.typeColor)"
+                            >
+                              {{ chip.typeLabel }}
+                            </span>
+                          </div>
+                          <p
+                            class="line-clamp-2 text-[10px] font-semibold leading-snug text-slate-800 dark:text-slate-100"
+                          >
+                            {{ chip.title }}
+                          </p>
+                          <p
+                            class="line-clamp-2 text-[9px] font-medium leading-snug text-slate-600 dark:text-slate-400"
+                          >
+                            {{ chip.doctorName }}
+                          </p>
+                        </button>
+                      }
+                      @if (cell.overflowCount > 0) {
+                        <span class="pl-0.5 text-[10px] font-semibold text-slate-500 dark:text-slate-400">
+                          +{{ cell.overflowCount }}
+                          @if (cell.overflowCount > 1) {
+                            autres
+                          } @else {
+                            autre
+                          }
+                        </span>
+                      }
+                    </div>
+                  </div>
+                }
+              }
+            </div>
+          </div>
+        } @else if (vm.layoutMode === 'yearMatrix' && vm.yearMiniMonths) {
+          <div
+            class="-mx-1 max-h-[min(88vh,1024px)] overflow-y-auto rounded-xl border border-slate-100 bg-slate-50/90 p-3 shadow-inner scrollbar-calendar dark:border-slate-700/70 dark:bg-slate-900/35 sm:p-4"
+          >
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              @for (mm of vm.yearMiniMonths; track mm.monthIndex) {
+                <div
+                  class="rounded-xl border border-slate-200/90 bg-white/90 p-2.5 shadow-sm dark:border-slate-600/70 dark:bg-slate-800/50 sm:p-3"
+                >
+                  <h3 class="mb-2 text-center text-sm font-semibold capitalize text-slate-800 dark:text-slate-100">
+                    {{ mm.label }}
+                  </h3>
+                  <div class="grid grid-cols-7 gap-px border-b border-slate-200 pb-1 dark:border-slate-600">
+                    @for (wd of matrixWeekdays; track wd) {
+                      <div
+                        class="text-center text-[8px] font-semibold uppercase text-slate-400 dark:text-slate-500"
+                      >
+                        {{ wd }}
+                      </div>
+                    }
+                  </div>
+                  <div class="grid grid-cols-7 gap-px pt-1">
+                    @for (row of mm.weekRows; track $index) {
+                      @for (cell of row; track cell.key) {
+                        <div
+                          class="flex min-h-[2.35rem] flex-col rounded border border-transparent p-0.5 sm:min-h-[2.6rem]"
+                          [ngClass]="yearMiniCellNgClass(cell)"
+                          role="button"
+                          tabindex="0"
+                          (click)="onMatrixCellClick($event, cell)"
+                          (keydown.enter)="selectMatrixDay(cell.date)"
+                          (keydown.space)="selectMatrixDay(cell.date); $event.preventDefault()"
+                        >
+                          <span
+                            class="block text-right text-[9px] font-semibold tabular-nums leading-none"
+                            [ngClass]="yearMiniDayNumberNgClass(cell)"
+                          >
+                            {{ cell.date.getDate() }}
+                          </span>
+                          <div class="mt-0.5 flex min-h-0 flex-col gap-px">
+                            @for (chip of cell.chips; track chip.id) {
+                              <button
+                                type="button"
+                                data-matrix-chip
+                                class="flex max-w-full cursor-pointer flex-col gap-0.5 truncate rounded-sm border border-slate-200/60 border-l-[3px] px-0.5 py-0.5 text-left shadow-sm ring-1 ring-slate-900/5 dark:border-slate-600/50 dark:ring-white/10"
+                                [ngClass]="matrixChipStatusNgClass(chip)"
+                                [style.backgroundColor]="matrixChipBg(chip.color, true)"
+                                [style.borderLeftColor]="resolveAppointmentHex(chip.color)"
+                                [attr.title]="chip.startLabel + ' — ' + chip.title + ' — ' + chip.doctorName"
+                                (click)="$event.stopPropagation(); onAppointmentChipClick(chip.id)"
+                              >
+                                <span
+                                  class="inline-flex w-fit max-w-full shrink truncate rounded-full px-1 py-px text-[7px] font-bold uppercase tracking-wide text-white"
+                                  [style.backgroundColor]="resolveAppointmentHex(chip.typeColor)"
+                                >
+                                  {{ chip.typeLabel }}
+                                </span>
+                                <span class="line-clamp-1 text-[7px] font-semibold leading-tight text-slate-800 dark:text-slate-100">{{ chip.title }}</span>
+                                <span class="line-clamp-1 text-[7px] font-medium text-slate-600 dark:text-slate-400">{{ chip.doctorName }}</span>
+                              </button>
+                            }
+                            @if (cell.overflowCount > 0) {
+                              <span class="text-[8px] font-semibold text-slate-500 dark:text-slate-400">
+                                +{{ cell.overflowCount }}
+                              </span>
+                            }
+                          </div>
+                        </div>
+                      }
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+        </div>
+
+        <!-- Mobile View (List) -->
+        <div class="block sm:hidden mt-2">
+          @if (vm.layoutMode === 'timeline' && vm.columns) {
+            <div class="flex flex-col gap-4">
+              @for (col of vm.columns; track col.key) {
+                @if (col.appointments.length > 0) {
+                  <div>
+                    <h3 class="mb-2 text-sm font-bold text-slate-800 dark:text-slate-100 border-b border-slate-200 dark:border-slate-700 pb-1">
+                      {{ col.header }} {{ col.sub }}
+                    </h3>
+                    <div class="flex flex-col gap-2">
+                      @for (apt of col.appointments; track apt.id) {
+                        <div
+                          class="flex flex-col gap-1 rounded-lg border border-slate-200/90 bg-white p-3 shadow-sm dark:border-slate-600/70 dark:bg-slate-900"
+                          [ngClass]="appointmentCardStatusNgClass(apt)"
+                          [style.borderLeftWidth.px]="4"
+                          [style.borderLeftStyle]="'solid'"
+                          [style.borderLeftColor]="resolveAppointmentHex(apt.color)"
+                          (click)="onAppointmentCardClick($event, apt.id)"
+                        >
+                          <div class="flex items-center justify-between gap-2">
+                            <div class="min-w-0">
+                              <p
+                                class="text-base font-bold tabular-nums text-slate-900 dark:text-slate-50"
+                              >
+                                {{ apt.startDisplayLabel }}
+                              </p>
+                              <p class="text-[10px] font-medium tabular-nums text-slate-500 dark:text-slate-400">
+                                {{ apt.timeRangeLabel }}
+                              </p>
+                            </div>
+                            <span
+                              class="inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white"
+                              [style.backgroundColor]="resolveAppointmentHex(apt.typeColor)"
+                            >
+                              {{ apt.typeLabel }}
+                            </span>
+                          </div>
+                          <p class="text-sm font-semibold text-slate-900 dark:text-slate-100" [class.line-through]="apt.status === 'CANCELLED'">
+                            {{ apt.title }}
+                          </p>
+                          <div class="flex items-center gap-2 pt-1">
+                            <img
+                              class="size-9 shrink-0 rounded-full object-cover ring-1 ring-slate-200/90 dark:ring-slate-600"
+                              [src]="doctorPortraitSrc(apt)"
+                              width="36"
+                              height="36"
+                              alt=""
+                            />
+                            <p class="min-w-0 flex-1 text-xs font-medium text-slate-500 dark:text-slate-400">
+                              {{ apt.doctorName }}
+                            </p>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+              }
+              @if (!vm.timelineHasEvents) {
+                <div
+                  class="flex flex-col items-center rounded-xl border border-dashed border-slate-200 bg-slate-50/90 px-5 py-10 text-center dark:border-slate-600 dark:bg-slate-800/40"
+                  role="status"
+                >
+                  <span
+                    class="mb-3 flex size-12 items-center justify-center rounded-xl bg-white text-slate-400 shadow-sm ring-1 ring-slate-200 dark:bg-slate-800 dark:text-slate-500 dark:ring-slate-600"
+                    aria-hidden="true"
+                  >
+                    <svg class="size-7" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5a2.25 2.25 0 002.25-2.25m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5a2.25 2.25 0 012.25 2.25v7.5"
+                      />
+                    </svg>
+                  </span>
+                  <p class="text-sm font-semibold text-slate-800 dark:text-slate-100">Calendrier vide</p>
+                  <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Ajustez filtres ou date comme sur bureau.</p>
+                </div>
+              }
+            </div>
+          } @else if (vm.layoutMode === 'monthMatrix' && vm.monthWeekRows) {
+            <div class="flex flex-col gap-4">
+              @for (row of vm.monthWeekRows; track $index) {
+                @for (cell of row; track cell.key) {
+                  @if (cell.belongsToDisplayedMonth && cell.chips.length > 0) {
+                    <div>
+                      <h3 class="mb-2 text-sm font-bold text-slate-800 dark:text-slate-100 border-b border-slate-200 dark:border-slate-700 pb-1">
+                        {{ cell.date.getDate() }}
+                      </h3>
+                      <div class="flex flex-col gap-2">
+                        @for (chip of cell.chips; track chip.id) {
+                          <div
+                            class="flex flex-col gap-1 rounded-lg border border-slate-200/90 bg-white p-3 shadow-sm dark:border-slate-600/70 dark:bg-slate-900"
+                            [style.borderLeftWidth.px]="4"
+                            [style.borderLeftStyle]="'solid'"
+                            [style.borderLeftColor]="resolveAppointmentHex(chip.color)"
+                            (click)="onAppointmentChipClick(chip.id)"
+                          >
+                            <div class="flex items-center justify-end">
+                              <span
+                                class="inline-flex items-center rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white"
+                                [style.backgroundColor]="resolveAppointmentHex(chip.typeColor)"
+                              >
+                                {{ chip.typeLabel }}
+                              </span>
+                            </div>
+                            <p class="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                              {{ chip.title }}
+                            </p>
+                            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">
+                              {{ chip.doctorName }}
+                            </p>
+                          </div>
+                        }
+                      </div>
+                    </div>
+                  }
+                }
+              }
+            </div>
+          } @else if (vm.layoutMode === 'yearMatrix') {
+            <p class="text-center text-sm text-slate-500 py-6">
+              Vue année non optimisée pour liste mobile. Utilisez la vue mois.
+            </p>
+          }
+        </div>
+
+      </section>
+    }
+  

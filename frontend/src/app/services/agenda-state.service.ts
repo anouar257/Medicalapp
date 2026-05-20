@@ -1,5 +1,5 @@
 import { DestroyRef, Injectable, inject } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import {
   BehaviorSubject,
@@ -8,13 +8,16 @@ import {
   catchError,
   combineLatest,
   debounceTime,
+  distinctUntilChanged,
   EMPTY,
   filter,
   map,
   merge,
   of,
+  pairwise,
   shareReplay,
   switchMap,
+  take,
   tap,
   throwError,
 } from 'rxjs';
@@ -27,6 +30,7 @@ import type {
   Doctor,
 } from '../models/agenda.model';
 import { environment } from '../../environments/environment';
+import { AuthProService } from './auth-pro.service';
 
 /** Mode grille timeline : confort / compact (voir `calendar-grid`). */
 export type GridComfortMode = 'comfortable' | 'compact';
@@ -39,7 +43,7 @@ export const AGENDA_API_BASE_URL = (environment.apiBaseUrl ?? '').replace(/\/$/,
 
 const LS_KEY = 'agenda-ui-v1';
 
-type PersistedAgendaUiV1 = {
+interface PersistedAgendaUiV1 {
   v: 1;
   selectedDoctorIds?: string[];
   /** Codes (`CONSULTATION`, `CONTROL`, …) des types visibles. */
@@ -49,9 +53,9 @@ type PersistedAgendaUiV1 = {
   gridComfort?: GridComfortMode;
   /** Uniquement pour la vue `day` : afficher 3 colonnes consécutives au lieu d’une. */
   dayShowsThreeDays?: boolean;
-};
+}
 
-type AppointmentApiDto = {
+interface AppointmentApiDto {
   id: number;
   title: string;
   typeId: number;
@@ -65,16 +69,16 @@ type AppointmentApiDto = {
   doctorId: number;
   color: string;
   status?: string;
-};
+}
 
-type DoctorApiDto = {
+interface DoctorApiDto {
   id: number;
   name: string;
   colorCode: string;
   photoUrl?: string;
   appointmentCount?: number;
   specialty?: string | null;
-};
+}
 
 function parseAppointmentStatus(raw: string | undefined | null): AppointmentStatus {
   if (raw === 'PENDING' || raw === 'CONFIRMED' || raw === 'CANCELLED') {
@@ -83,7 +87,7 @@ function parseAppointmentStatus(raw: string | undefined | null): AppointmentStat
   return 'CONFIRMED';
 }
 
-type AppointmentTypeApiDto = {
+interface AppointmentTypeApiDto {
   id: number;
   code: string;
   label: string;
@@ -91,7 +95,7 @@ type AppointmentTypeApiDto = {
   defaultDurationMinutes: number;
   displayOrder: number;
   active: boolean;
-};
+}
 
 const ALL_VIEWS: AgendaView[] = ['day', 'week', 'month', 'year'];
 
@@ -318,6 +322,7 @@ export class AgendaStateService {
 
   private readonly http = inject(HttpClient);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly authPro = inject(AuthProService);
 
   private readonly selectedDateSubject = new BehaviorSubject<Date>(
     (() => {
@@ -392,14 +397,50 @@ export class AgendaStateService {
 
   constructor() {
     this.bootstrapDoctorsAndAppointments();
+    toObservable(this.authPro.organizationId)
+      .pipe(
+        pairwise(),
+        filter(([prev, now]) => prev !== now),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe(() => this.resetAgendaAfterCabinetContextChange());
+  }
+
+  /**
+   * Vide le cache agenda (médecins, RDV, filtres persistés) et recharge depuis l’API
+   * lorsque le cabinet connecté change (logout / login autre compte, autre organisation).
+   */
+  private resetAgendaAfterCabinetContextChange(): void {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem(LS_KEY);
+      }
+    } catch {
+      /* quota / mode privé */
+    }
+    this.appointmentsSubject.next([]);
+    this.doctorsSubject.next([]);
+    this.visibleTypeCodesSubject.next([]);
+
+    this.fetchAppointmentTypes('refresh')
+      .pipe(take(1), takeUntilDestroyed(this.destroyRef))
+      .subscribe();
+    this.fetchDoctorsAndApplySelection('refresh')
+      .pipe(take(1), takeUntilDestroyed(this.destroyRef))
+      .subscribe();
   }
 
   private handleHttpError(err: unknown): void {
-    console.error('[AgendaStateService]', err);
     const status =
       err && typeof err === 'object' && 'status' in err
         ? (err as { status?: number }).status
         : undefined;
+
+    // Évite l'alerte si on est en cours de déconnexion (jeton supprimé mais requête encore en vol)
+    if ((status === 401 || status === 403) && !this.authPro.getToken()) {
+      return;
+    }
+
     const serverDetail = extractHttpErrorDetail(err);
     if (status === 0 || status === undefined) {
       const where =

@@ -1,0 +1,272 @@
+<div class="pad-layout">
+  <app-preferences-toolbar />
+
+  <header class="pad-header">
+    <div class="pad-header__titles">
+      <p class="pad-badge">{{ prefs.translate('platformAdmin.badge') }}</p>
+      <h1>{{ prefs.translate('platformAdmin.title') }}</h1>
+      <p class="pad-sub">{{ prefs.translate('platformAdmin.subtitle') }}</p>
+    </div>
+    <button type="button" class="pad-btn pad-btn--ghost" (click)="logout()">
+      {{ prefs.translate('platformAdmin.logout') }}
+    </button>
+  </header>
+
+  @if (loading) {
+    <p class="pad-muted pad-skeleton-hint">{{ prefs.translate('common.loadingData') }}</p>
+    <section class="pad-kpis" aria-hidden="true">
+      @for (s of [1, 2, 3]; track s) {
+        <article class="pad-kpi pad-kpi--skeleton">
+          <span class="pad-skeleton-line pad-skeleton-line--short"></span>
+          <span class="pad-skeleton-line pad-skeleton-line--value"></span>
+        </article>
+      }
+    </section>
+    <div class="pad-table-scroll pad-table-scroll--skeleton">
+      <div class="pad-skeleton-table">
+        @for (r of [1, 2, 3, 4, 5]; track r) {
+          <div class="pad-skeleton-row">
+            <span class="pad-skeleton-line pad-skeleton-line--cell"></span>
+            <span class="pad-skeleton-line pad-skeleton-line--cell"></span>
+            <span class="pad-skeleton-line pad-skeleton-line--cell-sm"></span>
+            <span class="pad-skeleton-line pad-skeleton-line--btn"></span>
+          </div>
+        }
+      </div>
+    </div>
+  } @else {
+    @if (loadError) {
+      <p class="pad-alert">{{ loadError }}</p>
+      <button type="button" class="pad-btn" (click)="reload()">{{ prefs.translate('platformAdmin.retry') }}</button>
+    }
+
+    <section class="pad-kpis" aria-label="KPI">
+      <article class="pad-kpi">
+        <span class="pad-kpi__label">{{ prefs.translate('platformAdmin.kpi.cabinets') }}</span>
+        <strong class="pad-kpi__value">{{ stats?.totalActiveCabinets ?? '—' }}</strong>
+      </article>
+      <article class="pad-kpi">
+        <span class="pad-kpi__label">{{ prefs.translate('platformAdmin.kpi.doctors') }}</span>
+        <strong class="pad-kpi__value">{{ stats?.totalSyncedDoctorsInAgenda ?? '—' }}</strong>
+      </article>
+      <article class="pad-kpi">
+        <span class="pad-kpi__label">{{ prefs.translate('platformAdmin.kpi.patients') }}</span>
+        <strong class="pad-kpi__value">{{ stats?.totalPatients ?? '—' }}</strong>
+      </article>
+    </section>
+
+    @if (stats) {
+      <p class="pad-footnote">
+        {{ prefs.translate('platformAdmin.appointmentsNote') }}:
+        <strong>{{ stats.totalAppointments }}</strong>
+      </p>
+    } @else if (!loadError) {
+      <p class="pad-muted">{{ prefs.translate('platformAdmin.statsPartial') }}</p>
+    }
+
+    <nav class="pad-tabs" aria-label="Sections administration">
+      <button
+        type="button"
+        class="pad-tab"
+        [class.pad-tab--active]="activeTab === 'cabinets'"
+        (click)="activeTab = 'cabinets'"
+      >
+        {{ prefs.translate('platformAdmin.tab.cabinets') }}
+      </button>
+      <button
+        type="button"
+        class="pad-tab"
+        [class.pad-tab--active]="activeTab === 'patients'"
+        (click)="activeTab = 'patients'"
+      >
+        {{ prefs.translate('platformAdmin.tab.patients') }}
+      </button>
+    </nav>
+
+    @if (activeTab === 'cabinets') {
+      <section class="pad-table-wrap" aria-labelledby="pad-cabinets-heading">
+        <h2 id="pad-cabinets-heading">{{ prefs.translate('platformAdmin.cabinetsTable') }}</h2>
+        @if (staffError) {
+          <p class="pad-alert">{{ staffError }}</p>
+        }
+        <div class="pad-table-scroll">
+          <table class="pad-table">
+            <thead>
+              <tr>
+                <th>{{ prefs.translate('platformAdmin.col.name') }}</th>
+                <th>{{ prefs.translate('platformAdmin.col.city') }}</th>
+                <th>{{ prefs.translate('Statut') }}</th>
+                <th>{{ prefs.translate('Actions') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (c of cabinets; track c.id) {
+                <tr>
+                  <td>{{ c.nom }}</td>
+                  <td>{{ c.ville || prefs.translate('common.emDash') }}</td>
+                  <td>
+                    @if (c.actif) {
+                      <span class="pad-pill pad-pill--ok">{{ prefs.translate('platformAdmin.active') }}</span>
+                    } @else {
+                      <span class="pad-pill">{{ prefs.translate('platformAdmin.inactive') }}</span>
+                    }
+                  </td>
+                  <td class="pad-actions-cell">
+                    <button type="button" class="pad-btn pad-btn--small pad-btn--ghost" (click)="openCabinetEdit(c)">
+                      {{ prefs.translate('platformAdmin.modify') }}
+                    </button>
+                    <button type="button" class="pad-btn pad-btn--small" (click)="toggleStaff(c.id)">
+                      {{
+                        isStaffExpanded(c.id)
+                          ? prefs.translate('platformAdmin.hideStaff')
+                          : prefs.translate('platformAdmin.showStaff')
+                      }}
+                    </button>
+                  </td>
+                </tr>
+                @if (isStaffExpanded(c.id)) {
+                  <tr class="pad-table__nested">
+                    <td colspan="4">
+                      @if (staffLoadingId === c.id) {
+                        <div class="pad-staff-skeleton" aria-busy="true">
+                          <span class="pad-skeleton-line pad-skeleton-line--wide"></span>
+                          <span class="pad-skeleton-line pad-skeleton-line--wide"></span>
+                          <span class="pad-skeleton-line pad-skeleton-line--wide"></span>
+                        </div>
+                      } @else if (staffFor(c.id).length === 0) {
+                        <p class="pad-muted">{{ prefs.translate('platformAdmin.noStaff') }}</p>
+                      } @else {
+                        <table class="pad-table pad-table--inner">
+                          <thead>
+                            <tr>
+                              <th>{{ prefs.translate('platformAdmin.col.staffName') }}</th>
+                              <th>{{ prefs.translate('Email') }}</th>
+                              <th>{{ prefs.translate('platformAdmin.col.role') }}</th>
+                              <th>{{ prefs.translate('Statut') }}</th>
+                              <th>{{ prefs.translate('Actions') }}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            @for (u of staffFor(c.id); track u.id) {
+                              <tr>
+                                <td>{{ u.prenom }} {{ u.nom }}</td>
+                                <td>{{ u.email }}</td>
+                                <td>{{ u.role }}</td>
+                                <td>
+                                  @if (u.actif) {
+                                    <span class="pad-pill pad-pill--ok">{{ prefs.translate('common.active') }}</span>
+                                  } @else {
+                                    <span class="pad-pill">{{ prefs.translate('common.inactive') }}</span>
+                                  }
+                                </td>
+                                <td>
+                                  <button
+                                    type="button"
+                                    class="pad-btn pad-btn--small"
+                                    [class.pad-btn--danger]="u.actif"
+                                    (click)="toggleUserStatus(u)"
+                                  >
+                                    {{
+                                      u.actif ? prefs.translate('common.block') : prefs.translate('common.activate')
+                                    }}
+                                  </button>
+                                </td>
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      }
+                    </td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+        @if (cabinets.length === 0 && !loadError) {
+          <p class="pad-muted">{{ prefs.translate('platformAdmin.noCabinets') }}</p>
+        }
+      </section>
+    }
+
+    @if (activeTab === 'patients') {
+      <section class="pad-table-wrap" aria-labelledby="pad-patients-heading">
+        <h2 id="pad-patients-heading">{{ prefs.translate('platformAdmin.patientsTable') }}</h2>
+        @if (patientsLoading) {
+          <p class="pad-muted">{{ prefs.translate('common.loadingData') }}</p>
+        } @else {
+          <div class="pad-table-scroll">
+            <table class="pad-table">
+              <thead>
+                <tr>
+                  <th>{{ prefs.translate('platformAdmin.col.staffName') }}</th>
+                  <th>{{ prefs.translate('Email') }}</th>
+                  <th>{{ prefs.translate('Mobile') }}</th>
+                  <th>{{ prefs.translate('Statut') }}</th>
+                  <th>{{ prefs.translate('Actions') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (p of patients; track p.id) {
+                  <tr>
+                    <td>{{ p.prenom }} {{ p.nom }}</td>
+                    <td>{{ p.email }}</td>
+                    <td>{{ p.telephone }}</td>
+                    <td>
+                      @if (p.actif) {
+                        <span class="pad-pill pad-pill--ok">{{ prefs.translate('common.active') }}</span>
+                      } @else {
+                        <span class="pad-pill">{{ prefs.translate('common.inactive') }}</span>
+                      }
+                    </td>
+                    <td>
+                      <button
+                        type="button"
+                        class="pad-btn pad-btn--small"
+                        [class.pad-btn--danger]="p.actif"
+                        (click)="togglePatientStatus(p)"
+                      >
+                        {{ p.actif ? prefs.translate('common.block') : prefs.translate('common.activate') }}
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          @if (patients.length === 0 && !patientsLoading) {
+            <p class="pad-muted">{{ prefs.translate('platformAdmin.noPatients') }}</p>
+          }
+        }
+      </section>
+    }
+  }
+
+  @if (cabinetModalOpen && cabinetEditTarget) {
+    <div class="pad-modal-backdrop" role="presentation" (click)="closeCabinetModal()"></div>
+    <div class="pad-modal" role="dialog" aria-modal="true" [attr.aria-labelledby]="'pad-cabinet-edit-title'">
+      <h3 id="pad-cabinet-edit-title" class="pad-modal__title">{{ prefs.translate('platformAdmin.editCabinetTitle') }}</h3>
+      @if (cabinetEditError) {
+        <p class="pad-alert">{{ cabinetEditError }}</p>
+      }
+      <label class="pad-modal__label">{{ prefs.translate('platformAdmin.col.name') }}</label>
+      <input class="pad-modal__input" type="text" [(ngModel)]="cabinetEditNom" name="cabinetNom" autocomplete="organization" />
+      <label class="pad-modal__label">{{ prefs.translate('platformAdmin.col.address') }}</label>
+      <input
+        class="pad-modal__input"
+        type="text"
+        [(ngModel)]="cabinetEditAdresse"
+        name="cabinetAdresse"
+        autocomplete="street-address"
+      />
+      <div class="pad-modal__actions">
+        <button type="button" class="pad-btn pad-btn--ghost" (click)="closeCabinetModal()" [disabled]="cabinetEditSaving">
+          {{ prefs.translate('platformAdmin.cancel') }}
+        </button>
+        <button type="button" class="pad-btn" (click)="saveCabinetEdit()" [disabled]="cabinetEditSaving">
+          {{ prefs.translate('platformAdmin.save') }}
+        </button>
+      </div>
+    </div>
+  }
+</div>

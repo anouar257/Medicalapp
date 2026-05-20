@@ -13,6 +13,10 @@ public final class AppointmentMapper {
     AppointmentDTO d = new AppointmentDTO();
     d.setId(entity.getId());
     d.setTitle(entity.getTitle());
+    d.setPatientId(entity.getPatientId());
+    d.setPatientPrenom(entity.getPatientPrenom());
+    d.setPatientNom(entity.getPatientNom());
+    d.setVisitReasonCode(entity.getVisitReasonCode());
 
     AppointmentType type = entity.getAppointmentType();
     if (type != null) {
@@ -32,6 +36,9 @@ public final class AppointmentMapper {
     d.setDescription(entity.getDescription());
     d.setDoctorId(entity.getDoctor().getId());
     d.setColor(entity.getColor());
+    d.setDoctorName(entity.getDoctor().getName());
+    d.setDoctorSpecialty(entity.getDoctor().getSpecialty());
+    d.setDoctorExternalPractitionerId(entity.getDoctor().getExternalPractitionerId());
     d.setStatus(
         entity.getStatus() != null ? entity.getStatus() : AppointmentStatus.CONFIRMED);
     return d;
