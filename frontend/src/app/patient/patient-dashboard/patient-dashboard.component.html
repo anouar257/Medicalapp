@@ -1,39 +1,5 @@
 
-<div class="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white transition-colors duration-300">
-  <nav class="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-slate-900/90 border-b border-slate-200 dark:border-slate-800 transition-colors duration-300">
-    <div class="max-w-7xl mx-auto flex items-center justify-between px-4 py-3 gap-3">
-      <div class="flex items-center gap-3 min-w-0">
-        <span class="text-3xl shrink-0">🏥</span>
-        <h1 class="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent truncate">
-          MedConnect
-        </h1>
-        <span class="hidden sm:inline-block shrink-0 px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase tracking-wider">
-          {{ prefs.translate('Patient') }}
-        </span>
-      </div>
-      <div class="flex items-center gap-2 sm:gap-3 shrink-0" [class.flex-row-reverse]="prefs.language() === 'ar'">
-        <a routerLink="/patient/prendre-rendez-vous" 
-           class="hidden md:flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black shadow-lg shadow-blue-500/20 transition-all duration-300 hover:scale-105 active:scale-95">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
-          {{ prefs.translate('Prendre RDV') }}
-        </a>
-        <app-preferences-toolbar />
-        @if (patient) {
-          <div class="flex items-center gap-3">
-            <div class="hidden sm:flex flex-col items-end text-end" [class.items-start]="prefs.language() === 'ar'" [class.text-start]="prefs.language() === 'ar'">
-              <span class="text-sm font-bold text-slate-700 dark:text-slate-200">
-                {{ patient.prenom }} {{ patient.nom }}
-              </span>
-              <span class="text-[10px] text-slate-400">{{ prefs.translate('Compte vérifié') }}</span>
-            </div>
-            <button (click)="logout()" type="button" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-colors duration-300" [attr.title]="prefs.translate('Déconnexion')">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-            </button>
-          </div>
-        }
-      </div>
-    </div>
-  </nav>
+
 
   <main class="max-w-7xl mx-auto px-4 py-8">
     <div class="relative overflow-hidden bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-sm border border-slate-100 dark:border-slate-800 mb-8 transition-colors duration-300">
@@ -73,53 +39,96 @@
   </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      <a
-        routerLink="/patient/proches"
-        class="group bg-white/70 dark:bg-slate-900/80 backdrop-blur border border-slate-100 dark:border-slate-800 p-6 rounded-3xl shadow-sm hover:shadow-xl hover:shadow-blue-500/5 hover:-translate-y-1 transition-all duration-300"
-      >
-        <div class="w-12 h-12 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform duration-300">
-          👥
+      <!-- Card 1: Mes Proches -->
+      <a routerLink="/patient/proches" class="group relative bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 flex overflow-hidden">
+        <div class="flex-1 flex flex-col z-10">
+          <div class="w-10 h-10 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-xl flex items-center justify-center text-xl mb-3">
+            👥
+          </div>
+          <h3 class="font-bold text-slate-800 dark:text-white mb-1 text-sm">{{ prefs.translate('Mes Proches') }}</h3>
+          <p class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mb-3 leading-snug flex-1">{{ prefs.translate('Gérez les profils et documents de votre famille.') }}</p>
+          <div class="text-blue-600 dark:text-blue-400 text-xs font-semibold flex items-center gap-1 group-hover:underline">
+            {{ prefs.translate('Gérer les profils') }} <span aria-hidden="true">&rarr;</span>
+          </div>
         </div>
-        <h3 class="font-bold text-slate-800 dark:text-white mb-1">{{ prefs.translate('Mes Proches') }}</h3>
-        <p class="text-xs text-slate-500 dark:text-slate-400">{{ prefs.translate('Gérez les profils et documents de votre famille.') }}</p>
+        <div class="w-20 flex items-center justify-end text-5xl opacity-90 z-0 pl-2 pointer-events-none">
+          👨‍👩‍👧‍👦
+        </div>
       </a>
 
-      <a
-        routerLink="/patient/messages"
-        class="group bg-white/70 dark:bg-slate-900/80 backdrop-blur border border-slate-100 dark:border-slate-800 p-6 rounded-3xl shadow-sm hover:shadow-xl hover:shadow-blue-500/5 hover:-translate-y-1 transition-all duration-300"
-      >
-        <div class="w-12 h-12 bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 rounded-2xl flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform duration-300">
+      <!-- Card 2: Messages -->
+      <a routerLink="/patient/messages" class="group relative bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 flex overflow-hidden">
+        <div class="flex-1 flex flex-col z-10">
+          <div class="w-10 h-10 bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 rounded-xl flex items-center justify-center text-xl mb-3">
+            💬
+          </div>
+          <h3 class="font-bold text-slate-800 dark:text-white mb-1 text-sm">{{ prefs.translate('Messages') }}</h3>
+          <p class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mb-3 leading-snug flex-1">{{ prefs.translate('Écrivez à un praticien que vous avez consulté.') }}</p>
+          <div class="text-blue-600 dark:text-blue-400 text-xs font-semibold flex items-center gap-1 group-hover:underline">
+            {{ prefs.translate('Démarrer une discussion') }} <span aria-hidden="true">&rarr;</span>
+          </div>
+        </div>
+        <div class="w-20 flex items-center justify-end text-5xl opacity-90 z-0 pl-2 pointer-events-none">
           💬
         </div>
-        <h3 class="font-bold text-slate-800 dark:text-white mb-1">{{ prefs.translate('Messages') }}</h3>
-        <p class="text-xs text-slate-500 dark:text-slate-400">{{ prefs.translate('messaging.card.messagesSubtitle') }}</p>
       </a>
 
-      <a
-        routerLink="/patient/prendre-rendez-vous"
-        class="group bg-white/70 dark:bg-slate-900/80 backdrop-blur border border-slate-100 dark:border-slate-800 p-6 rounded-3xl shadow-sm hover:shadow-xl hover:shadow-blue-500/5 hover:-translate-y-1 transition-all duration-300"
-      >
-        <div class="w-12 h-12 bg-slate-50 dark:bg-slate-950 text-slate-400 rounded-2xl flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform duration-300">
-          🔍
+      <!-- Card 3: Recherche -->
+      <a routerLink="/patient/prendre-rendez-vous" class="group relative bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 flex overflow-hidden">
+        <div class="flex-1 flex flex-col z-10">
+          <div class="w-10 h-10 bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-xl flex items-center justify-center text-xl mb-3">
+            🔍
+          </div>
+          <h3 class="font-bold text-slate-800 dark:text-white mb-1 text-sm">{{ prefs.translate('Recherche') }}</h3>
+          <p class="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 mb-3 leading-snug flex-1">{{ prefs.translate('Trouvez un spécialiste près de chez vous.') }}</p>
+          <div class="text-blue-600 dark:text-blue-400 text-xs font-semibold flex items-center gap-1 group-hover:underline">
+            {{ prefs.translate('Trouver un spécialiste') }} <span aria-hidden="true">&rarr;</span>
+          </div>
         </div>
-        <h3 class="font-bold text-slate-800 dark:text-white mb-1">{{ prefs.translate('Recherche') }}</h3>
-        <p class="text-xs text-slate-500 dark:text-slate-400">{{ prefs.translate('Trouvez un spécialiste près de chez vous.') }}</p>
+        <div class="w-20 flex items-center justify-end text-5xl opacity-90 z-0 pl-2 pointer-events-none">
+          🧑‍⚕️
+        </div>
       </a>
     </div>
 
     <section class="bg-white/70 dark:bg-slate-900/80 backdrop-blur border border-slate-100 dark:border-slate-800 rounded-3xl p-6 transition-colors duration-300">
-      <div class="flex items-start justify-between gap-4 mb-4">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-4 mb-6" [class.flex-col-reverse]="prefs.language() === 'ar'">
         <div>
           <h3 class="text-xl font-extrabold text-slate-800 dark:text-white">{{ prefs.translate('Vos rendez-vous') }}</h3>
           <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
             {{ prefs.translate('Retrouvez vos rendez-vous récents.') }}
           </p>
         </div>
+        
+        <!-- Onglets / Tabs -->
+        <div class="flex items-center gap-1 p-1 bg-slate-100/80 dark:bg-slate-950/80 backdrop-blur rounded-2xl border border-slate-200/50 dark:border-slate-800 self-start md:self-auto" [class.flex-row-reverse]="prefs.language() === 'ar'">
+          <button (click)="changeTab('upcoming')" 
+                  class="px-4 py-2 rounded-xl text-xs font-black transition-all duration-300"
+                  [ngClass]="activeTab === 'upcoming' ? 'bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'">
+            {{ prefs.translate('À venir') }}
+          </button>
+          <button (click)="changeTab('past')" 
+                  class="px-4 py-2 rounded-xl text-xs font-black transition-all duration-300"
+                  [ngClass]="activeTab === 'past' ? 'bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'">
+            {{ prefs.translate('Passés & Annulés') }}
+          </button>
+          <button (click)="changeTab('all')" 
+                  class="px-4 py-2 rounded-xl text-xs font-black transition-all duration-300"
+                  [ngClass]="activeTab === 'all' ? 'bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'">
+            {{ prefs.translate('Tous') }}
+          </button>
+        </div>
       </div>
 
       @if (appointmentsError) {
         <div class="mb-4 rounded-2xl border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/40 px-4 py-3 text-sm text-rose-800 dark:text-rose-200">
           {{ appointmentsError }}
+        </div>
+      }
+
+      @if (reviewSuccess) {
+        <div class="mb-4 rounded-2xl border border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-950/40 px-4 py-3 text-sm text-blue-800 dark:text-blue-200">
+          {{ reviewSuccess }}
         </div>
       }
 
@@ -138,10 +147,10 @@
           }
         </div>
       } @else {
-        @if (appointments.length > 0) {
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            @for (apt of appointments; track apt.id) {
-              <div class="rounded-2xl border border-slate-100 dark:border-slate-800 bg-white/60 dark:bg-slate-950/40 p-5 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-slate-200/40 dark:hover:shadow-slate-900/50">
+        @if (filteredAppointments.length > 0) {
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+            @for (apt of paginatedAppointments; track apt.id) {
+              <div class="rounded-2xl border border-slate-100 dark:border-slate-800 bg-white/60 dark:bg-slate-950/40 p-5 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-slate-200/40 dark:hover:shadow-slate-900/50 animate-[fadeIn_0.3s_ease-out]">
                 <div class="flex items-start justify-between gap-3">
                   <div class="min-w-0">
                     <div class="flex items-center gap-2 flex-wrap">
@@ -159,25 +168,87 @@
                     </p>
                   </div>
 
-                  <div class="text-end shrink-0" [class.text-start]="prefs.language() === 'ar'">
-                    <div class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
-                      {{ apt.typeLabel }}
+                  <div class="flex items-center gap-4 shrink-0" [class.flex-row-reverse]="prefs.language() === 'ar'">
+                    <div class="text-end hidden sm:block" [class.text-start]="prefs.language() === 'ar'">
+                      <div class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                        {{ apt.typeLabel }}
+                      </div>
                     </div>
-                    <div class="mt-2 text-sm font-semibold text-slate-800 dark:text-slate-100">
-                      {{ apt.startTime | date:'dd/MM/yyyy HH:mm' }}
+                    <div class="flex flex-col items-center justify-center bg-blue-600 dark:bg-blue-500 text-white rounded-xl min-w-[76px] px-2 py-2.5 shadow-md shadow-blue-500/20">
+                      <span class="text-[9px] font-bold uppercase tracking-wider opacity-90 text-center leading-none">
+                        {{ getDayOfWeek(apt.startTime) }} {{ getDayOfMonth(apt.startTime) }} {{ getMonthLabel(apt.startTime) }}
+                      </span>
+                      <span class="text-[15px] font-black leading-none my-1.5">{{ getTime(apt.startTime) }}</span>
+                      @if (getYearLabel(apt.startTime)) {
+                        <span class="text-[9px] font-bold opacity-80 mt-0.5">{{ getYearLabel(apt.startTime) }}</span>
+                      }
                     </div>
                   </div>
                 </div>
+
+                @if (canReview(apt)) {
+                  <div class="mt-4 flex items-center justify-end">
+                    <button
+                      type="button"
+                      (click)="openReview(apt)"
+                      class="inline-flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-bold text-blue-700 transition hover:bg-blue-100 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300 dark:hover:bg-blue-500/20"
+                    >
+                      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l2.07 6.372h6.705c.969 0 1.371 1.24.588 1.81l-5.42 3.937 2.07 6.372c.3.921-.755 1.688-1.54 1.118l-5.42-3.937-5.42 3.937c-.785.57-1.84-.197-1.54-1.118l2.07-6.372-5.42-3.937c-.783-.57-.38-1.81.588-1.81h6.705l2.07-6.372z" />
+                      </svg>
+                      Laisser un avis
+                    </button>
+                  </div>
+                }
               </div>
             }
           </div>
+
+          <!-- Contrôles de pagination -->
+          @if (totalPages > 1) {
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-slate-100 dark:border-slate-800" [class.flex-row-reverse]="prefs.language() === 'ar'">
+              <span class="text-xs font-bold text-slate-500 dark:text-slate-400" [class.flex-row-reverse]="prefs.language() === 'ar'">
+                {{ prefs.translate('Affichage de') }} {{ showingStart }} {{ prefs.translate('à') }} {{ showingEnd }} {{ prefs.translate('sur') }} {{ filteredAppointments.length }} {{ prefs.translate('rendez-vous') }}
+              </span>
+              
+              <div class="flex items-center gap-1.5" [class.flex-row-reverse]="prefs.language() === 'ar'">
+                <button (click)="prevPage()" 
+                        [disabled]="currentPage === 1"
+                        class="p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:hover:bg-white dark:disabled:hover:bg-slate-900 transition-colors duration-200"
+                        title="{{ prefs.translate('Précédent') }}">
+                  <svg class="w-4 h-4" [class.rotate-180]="prefs.language() === 'ar'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" /></svg>
+                </button>
+                
+                @for (p of getPageNumbers(); track p) {
+                  <button (click)="goToPage(p)"
+                          class="min-w-[36px] h-9 rounded-xl text-xs font-black transition-all duration-200"
+                          [ngClass]="currentPage === p ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'">
+                    {{ p }}
+                  </button>
+                }
+                
+                <button (click)="nextPage()" 
+                        [disabled]="currentPage === totalPages"
+                        class="p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:hover:bg-white dark:disabled:hover:bg-slate-900 transition-colors duration-200"
+                        title="{{ prefs.translate('Suivant') }}">
+                  <svg class="w-4 h-4" [class.rotate-180]="prefs.language() === 'ar'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" /></svg>
+                </button>
+              </div>
+            </div>
+          }
         } @else {
-          <div class="text-center py-12">
+          <div class="text-center py-12 animate-[fadeIn_0.3s_ease-out]">
             <div class="mx-auto w-16 h-16 rounded-2xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 flex items-center justify-center text-2xl mb-4">
               🗓️
             </div>
             <p class="text-slate-700 dark:text-slate-200 font-bold">
-              {{ prefs.translate('Aucun rendez-vous trouvé.') }}
+              @if (activeTab === 'upcoming') {
+                {{ prefs.translate('Aucun rendez-vous à venir.') }}
+              } @else if (activeTab === 'past') {
+                {{ prefs.translate('Aucun rendez-vous passé.') }}
+              } @else {
+                {{ prefs.translate('Aucun rendez-vous trouvé.') }}
+              }
             </p>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">
               {{ prefs.translate('Faites une recherche pour prendre rendez-vous.') }}
@@ -192,5 +263,103 @@
         }
       }
     </section>
+
+    @if (reviewDialogOpen && selectedReviewAppointment) {
+      <div class="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/60 px-4 py-8 backdrop-blur-sm">
+        <div class="w-full max-w-2xl rounded-[2rem] border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-800 dark:bg-slate-900">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="text-xs font-black uppercase tracking-[0.3em] text-blue-600 dark:text-blue-400">Avis patient</p>
+              <h3 class="mt-2 text-2xl font-black text-slate-950 dark:text-white">{{ selectedReviewAppointment.doctorName }}</h3>
+              <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">{{ selectedReviewAppointment.doctorSpecialty }}</p>
+            </div>
+            <button type="button" (click)="closeReview()" class="rounded-full border border-slate-200 p-2 text-slate-500 transition hover:border-blue-300 hover:text-blue-600 dark:border-slate-800 dark:hover:border-blue-500">
+              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <div class="mt-6 grid gap-4 md:grid-cols-2">
+            <div class="rounded-3xl border border-slate-100 bg-slate-50/50 p-5 dark:border-slate-800 dark:bg-slate-950/40">
+              <p class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider">Note globale</p>
+              <div class="mt-4 flex items-center gap-2">
+                @for (star of [1,2,3,4,5]; track star) {
+                  <button
+                    type="button"
+                    (click)="reviewRating = star"
+                    class="group relative p-1 transition-all duration-300 hover:scale-125 focus:outline-none"
+                    [attr.aria-label]="star + ' étoiles'"
+                  >
+                    <svg
+                      class="h-9 w-9 transition-all duration-300"
+                      [ngClass]="reviewRating >= star ? 'text-amber-400 fill-amber-400 filter drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]' : 'text-slate-300 dark:text-slate-700 fill-none hover:text-amber-300'"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l2.07 6.372h6.705c.969 0 1.371 1.24.588 1.81l-5.42 3.937 2.07 6.372c.3.921-.755 1.688-1.54 1.118l-5.42-3.937-5.42 3.937c-.785.57-1.84-.197-1.54-1.118l2.07-6.372-5.42-3.937c-.783-.57-.38-1.81.588-1.81h6.705l2.07-6.372z" />
+                    </svg>
+                  </button>
+                }
+              </div>
+            </div>
+
+            <div class="rounded-3xl border border-slate-100 bg-slate-50/50 p-5 dark:border-slate-800 dark:bg-slate-950/40">
+              <p class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider">Ponctualité</p>
+              <div class="mt-4 flex items-center gap-2">
+                @for (star of [1,2,3,4,5]; track star) {
+                  <button
+                    type="button"
+                    (click)="reviewPunctuality = star"
+                    class="group relative p-1 transition-all duration-300 hover:scale-125 focus:outline-none"
+                    [attr.aria-label]="star + ' étoiles'"
+                  >
+                    <svg
+                      class="h-9 w-9 transition-all duration-300"
+                      [ngClass]="reviewPunctuality >= star ? 'text-amber-400 fill-amber-400 filter drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]' : 'text-slate-300 dark:text-slate-700 fill-none hover:text-amber-300'"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l2.07 6.372h6.705c.969 0 1.371 1.24.588 1.81l-5.42 3.937 2.07 6.372c.3.921-.755 1.688-1.54 1.118l-5.42-3.937-5.42 3.937c-.785.57-1.84-.197-1.54-1.118l2.07-6.372-5.42-3.937c-.783-.57-.38-1.81.588-1.81h6.705l2.07-6.372z" />
+                    </svg>
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <label class="mb-2 block text-sm font-bold text-slate-700 dark:text-slate-200">Commentaire</label>
+            <textarea
+              [(ngModel)]="reviewComment"
+              rows="4"
+              class="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 dark:border-slate-800 dark:bg-slate-950 dark:text-white"
+              placeholder="Décris ton expérience, la qualité de l'écoute, la clarté des explications..."
+            ></textarea>
+          </div>
+
+          @if (reviewError) {
+            <div class="mt-4 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/40 dark:text-rose-200">
+              {{ reviewError }}
+            </div>
+          }
+
+          <div class="mt-6 flex items-center justify-end gap-3">
+            <button type="button" (click)="closeReview()" class="rounded-2xl border border-slate-200 px-5 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50 dark:border-slate-800 dark:text-slate-200 dark:hover:bg-slate-800">
+              Annuler
+            </button>
+            <button
+              type="button"
+              (click)="submitReview()"
+              [disabled]="reviewSubmitting"
+              class="rounded-2xl bg-blue-600 px-5 py-3 text-sm font-black text-white transition hover:bg-blue-700 disabled:opacity-60"
+            >
+              {{ reviewSubmitting ? 'Enregistrement...' : 'Publier l’avis' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }
   </main>
-</div>

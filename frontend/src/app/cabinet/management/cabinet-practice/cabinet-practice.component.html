@@ -29,6 +29,7 @@
       }
     </div>
   } @else if (cabinet) {
+    <!-- Identity Section -->
     <section class="card">
       <h2>{{ prefs.translate('cabinet.practice.sectionIdentity') }}</h2>
       <div class="form-group">
@@ -51,26 +52,415 @@
       </div>
     </section>
 
+    <!-- Addresses & Locations Section -->
     <section class="card">
-      <h2>{{ prefs.translate('cabinet.practice.sectionAddress') }}</h2>
-      <div class="form-group">
-        <label>{{ prefs.translate('cabinet.practice.label.address') }}</label>
-        <input type="text" [(ngModel)]="cabinet.adresse" name="adresse" />
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem;">
+        <h2 style="margin: 0;">Lieux de consultation (Cabinets, cliniques...)</h2>
+        <button
+          type="button"
+          class="btn-primary"
+          style="padding: 0.5rem 1rem; font-size: 0.85rem;"
+          (click)="newLocation()"
+        >
+          + Ajouter une adresse
+        </button>
       </div>
-      <div class="row row--three">
-        <div class="form-group">
-          <label>{{ prefs.translate('cabinet.practice.label.city') }}</label>
-          <input type="text" [(ngModel)]="cabinet.ville" name="ville" />
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
+        <!-- Dashed Add Card -->
+        <div
+          class="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 p-6 text-center bg-slate-50/40 hover:bg-slate-50 hover:border-blue-400 cursor-pointer transition-all duration-300 dark:border-slate-700/80 dark:bg-slate-900/10 dark:hover:bg-slate-900/30 dark:hover:border-blue-500 min-h-[200px]"
+          (click)="newLocation()"
+          style="display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px dashed var(--border); border-radius: 12px; padding: 1.5rem; text-align: center; cursor: pointer; transition: 0.2s;"
+        >
+          <span style="font-size: 2rem; color: var(--text-secondary); margin-bottom: 0.5rem;">+</span>
+          <h3 style="font-size: 0.95rem; font-weight: bold; margin: 0; color: var(--text-primary);">Ajouter une adresse</h3>
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">
+            Cabinet principal, secondaire ou clinique.
+          </p>
         </div>
-        <div class="form-group">
-          <label>{{ prefs.translate('cabinet.practice.label.zip') }}</label>
-          <input type="text" [(ngModel)]="cabinet.codePostal" name="cp" />
-        </div>
-        <div class="form-group">
-          <label>{{ prefs.translate('cabinet.practice.label.country') }}</label>
-          <input type="text" [(ngModel)]="cabinet.pays" name="pays" />
-        </div>
+
+        <!-- Active Locations -->
+        @for (loc of locations; track loc.id) {
+          <article
+            style="display: flex; flex-direction: column; justify-content: space-between; border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; background: var(--bg-card); position: relative;"
+          >
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: start; gap: 0.5rem; margin-bottom: 0.75rem;">
+                <div style="min-width: 0; flex: 1;">
+                  <h3 style="font-size: 1rem; font-weight: bold; margin: 0; color: var(--text-primary); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;" [title]="loc.nomEtablissement">
+                    {{ loc.nomEtablissement }}
+                  </h3>
+                  <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0.15rem 0 0 0;">
+                    {{ loc.ville }}
+                  </p>
+                </div>
+                <div style="display: flex; gap: 0.35rem;">
+                  <button
+                    type="button"
+                    class="btn-icon"
+                    style="border: 1px solid var(--border); background: var(--bg-dark); border-radius: 6px; padding: 0.25rem 0.5rem; font-size: 0.8rem; cursor: pointer;"
+                    title="Modifier"
+                    (click)="edit(loc)"
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    type="button"
+                    class="btn-icon danger"
+                    style="border: 1px solid var(--error); background: rgba(239, 68, 68, 0.05); border-radius: 6px; padding: 0.25rem 0.5rem; font-size: 0.8rem; cursor: pointer; color: var(--error);"
+                    title="Supprimer"
+                    (click)="removeLocation(loc)"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </div>
+
+              <!-- Address -->
+              <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 0.75rem 0; line-height: 1.4;">
+                {{ loc.adresse }}<br />{{ loc.codePostal }} {{ loc.ville }}
+              </p>
+
+              <!-- Badges -->
+              <div style="display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.75rem;">
+                @if (loc.ascenseur) {
+                  <span style="font-size: 0.7rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 6px; padding: 0.15rem 0.4rem; color: var(--text-primary);">
+                    🛗 Ascenseur
+                  </span>
+                }
+                @if (loc.entreeAccessible) {
+                  <span style="font-size: 0.7rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 6px; padding: 0.15rem 0.4rem; color: var(--text-primary);">
+                    ♿ PMR
+                  </span>
+                }
+                <span style="font-size: 0.7rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 6px; padding: 0.15rem 0.4rem; color: var(--text-primary);">
+                  🅿️ {{ parkingLabel(loc.parking) }}
+                </span>
+                @if (loc.etage) {
+                  <span style="font-size: 0.7rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 6px; padding: 0.15rem 0.4rem; color: var(--text-primary);">
+                    🏢 Étage {{ loc.etage }}
+                  </span>
+                }
+              </div>
+            </div>
+
+            <!-- Horaires Accordion/Block -->
+            @if (loc.horaires.length) {
+              <div style="margin-top: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;">
+                <strong style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 0.35rem;">
+                  Horaires d'ouverture
+                </strong>
+                <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.75rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 0.2rem;">
+                  @for (h of loc.horaires; track h.id) {
+                    <li style="display: flex; justify-content: space-between;">
+                      <span style="font-weight: 600; color: var(--text-primary);">{{ jourLabel(h.jour) }}</span>
+                      <span>
+                        {{ h.heureDebut }} – {{ h.heureFin }}
+                        @if (h.continu) { <em style="font-size: 0.65rem; color: var(--text-muted); font-style: normal; margin-left: 0.25rem;">(continu)</em> }
+                      </span>
+                    </li>
+                  }
+                </ul>
+              </div>
+            }
+          </article>
+        }
       </div>
     </section>
+  }
+
+  <!-- Edit / Add Modal (Overlay Layer) -->
+  @if (editing) {
+    <div
+      style="position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 1rem; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(4px);"
+      role="dialog"
+      aria-modal="true"
+    >
+      <!-- Backdrop click -->
+      <div style="position: absolute; inset: 0; cursor: pointer;" (click)="cancelEdit()"></div>
+
+      <div
+        style="position: relative; z-index: 10; display: flex; flex-direction: column; width: 100%; max-width: 650px; max-height: 90vh; overflow: hidden; border: 1px solid var(--border); border-radius: 20px; background: var(--bg-card); box-shadow: var(--shadow);"
+        (click)="$event.stopPropagation()"
+      >
+        <!-- Modal Header -->
+        <header style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+          <h2 style="font-size: 1.15rem; font-weight: bold; margin: 0;">
+            {{ editing.id ? 'Modifier l\'adresse' : 'Nouvelle adresse de consultation' }}
+          </h2>
+          <button
+            type="button"
+            style="border: none; background: none; font-size: 1.25rem; color: var(--text-secondary); cursor: pointer;"
+            (click)="cancelEdit()"
+          >
+            ✕
+          </button>
+        </header>
+
+        <!-- Modal Body (Scrollable) -->
+        <div style="flex: 1; overflow-y: auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem;">
+          <!-- General Details -->
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div class="row">
+              <div class="form-group">
+                <label>Nom de l'établissement *</label>
+                <input
+                  type="text"
+                  [(ngModel)]="editing.nomEtablissement"
+                  placeholder="Ex. Cabinet Principal, Clinique du Parc..."
+                />
+              </div>
+              <div class="form-group">
+                <label>Téléphone du bureau</label>
+                <input
+                  type="tel"
+                  [(ngModel)]="editing.telephoneBureau"
+                  placeholder="Ex. 01 23 45 67 89"
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Adresse complète *</label>
+              <input
+                type="text"
+                [(ngModel)]="editing.adresse"
+                placeholder="Ex. 12 rue de la Paix"
+              />
+            </div>
+
+            <div class="row">
+              <div class="form-group">
+                <label>Ville</label>
+                <input
+                  type="text"
+                  [(ngModel)]="editing.ville"
+                  placeholder="Ex. Paris"
+                />
+              </div>
+              <div class="form-group">
+                <label>Code postal</label>
+                <input
+                  type="text"
+                  [(ngModel)]="editing.codePostal"
+                  placeholder="Ex. 75001"
+                />
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="form-group">
+                <label>Étage</label>
+                <input
+                  type="text"
+                  [(ngModel)]="editing.etage"
+                  placeholder="Ex. RDC, 3ème..."
+                />
+              </div>
+              <div class="form-group">
+                <label>Fax</label>
+                <input
+                  type="tel"
+                  [(ngModel)]="editing.fax"
+                  placeholder="Ex. 01 23 45 67 80"
+                />
+              </div>
+              <div class="form-group">
+                <label>Tarif consultation (DH)</label>
+                <input
+                  type="number"
+                  [(ngModel)]="editing.consultationFee"
+                  placeholder="Ex. 400"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Accessibilité -->
+          <div style="border-top: 1px solid var(--border); padding-top: 1rem;">
+            <h3 style="font-size: 0.9rem; font-weight: bold; margin-bottom: 0.75rem;">Accessibilité & Infrastructure</h3>
+            <div style="display: flex; gap: 1.5rem; margin-bottom: 0.75rem;">
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; cursor: pointer;">
+                <input
+                  type="checkbox"
+                  [(ngModel)]="editing.ascenseur"
+                  style="width: auto;"
+                />
+                Ascenseur disponible
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; cursor: pointer;">
+                <input
+                  type="checkbox"
+                  [(ngModel)]="editing.entreeAccessible"
+                  style="width: auto;"
+                />
+                Accès PMR
+              </label>
+            </div>
+            <div class="form-group" style="max-width: 250px;">
+              <label>Stationnement / Parking</label>
+              <select [(ngModel)]="editing.parking">
+                <option value="AUCUN">Aucun parking</option>
+                <option value="GRATUIT">Parking gratuit</option>
+                <option value="PAYANT">Parking payant</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Contact Urgence -->
+          <div style="border-top: 1px solid var(--border); padding-top: 1rem;">
+            <h3 style="font-size: 0.9rem; font-weight: bold; margin-bottom: 0.75rem;">Contact en cas d'urgence</h3>
+            <div class="row">
+              <div class="form-group">
+                <label>Type de contact</label>
+                <select [(ngModel)]="editing.contactUrgenceType">
+                  <option [ngValue]="null">— Aucun —</option>
+                  <option value="SECRETARIAT">Secrétariat</option>
+                  <option value="SOS_MEDECINS">SOS Médecins</option>
+                  <option value="NUMERO_PERSONNEL">Numéro personnel</option>
+                  <option value="NUMERO_DIRECT">Numéro direct</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Numéro d'urgence</label>
+                <input
+                  type="tel"
+                  [(ngModel)]="editing.telephoneUrgence"
+                  placeholder="Ex. 06 12 34 56 78"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Horaires -->
+          <div style="border-top: 1px solid var(--border); padding-top: 1rem;">
+            <h3 style="font-size: 0.9rem; font-weight: bold; margin-bottom: 0.5rem;">Horaires d'ouverture</h3>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.75rem; line-height: 1.4;">
+              Configurez vos plages horaires. Le format 24h sera appliqué automatiquement par votre navigateur.
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem;">
+              @for (h of editing.horaires; track $index; let i = $index) {
+                <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 10px; padding: 0.75rem;">
+                  <div style="flex: 1; min-width: 120px;">
+                    <select [(ngModel)]="h.jour" [name]="'jour'+i">
+                      @for (j of jours; track j) {
+                        <option [value]="j">{{ jourLabel(j) }}</option>
+                      }
+                    </select>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 0.35rem;">
+                    <!-- Heure Début -->
+                    <div style="display: flex; align-items: center; gap: 0.15rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 0.25rem 0.4rem;">
+                      <select
+                        [ngModel]="getHour(h.heureDebut)"
+                        (ngModelChange)="setHour(h, 'heureDebut', $event)"
+                        [name]="'hdh'+i"
+                        style="border: none; background: transparent; padding: 0; margin: 0; font-size: 0.85rem; width: 45px; outline: none; text-align: center; color: var(--text-primary);"
+                      >
+                        @for (hour of hourOptions; track hour) {
+                          <option [value]="hour">{{ hour }}</option>
+                        }
+                      </select>
+                      <span style="color: var(--text-secondary); font-size: 0.85rem; font-weight: bold;">:</span>
+                      <select
+                        [ngModel]="getMinute(h.heureDebut)"
+                        (ngModelChange)="setMinute(h, 'heureDebut', $event)"
+                        [name]="'hdm'+i"
+                        style="border: none; background: transparent; padding: 0; margin: 0; font-size: 0.85rem; width: 45px; outline: none; text-align: center; color: var(--text-primary);"
+                      >
+                        @for (minute of minuteOptions; track minute) {
+                          <option [value]="minute">{{ minute }}</option>
+                        }
+                      </select>
+                    </div>
+
+                    <span style="color: var(--text-secondary); font-size: 0.85rem; margin: 0 0.25rem;">à</span>
+
+                    <!-- Heure Fin -->
+                    <div style="display: flex; align-items: center; gap: 0.15rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 0.25rem 0.4rem;">
+                      <select
+                        [ngModel]="getHour(h.heureFin)"
+                        (ngModelChange)="setHour(h, 'heureFin', $event)"
+                        [name]="'hfh'+i"
+                        style="border: none; background: transparent; padding: 0; margin: 0; font-size: 0.85rem; width: 45px; outline: none; text-align: center; color: var(--text-primary);"
+                      >
+                        @for (hour of hourOptions; track hour) {
+                          <option [value]="hour">{{ hour }}</option>
+                        }
+                      </select>
+                      <span style="color: var(--text-secondary); font-size: 0.85rem; font-weight: bold;">:</span>
+                      <select
+                        [ngModel]="getMinute(h.heureFin)"
+                        (ngModelChange)="setMinute(h, 'heureFin', $event)"
+                        [name]="'hfm'+i"
+                        style="border: none; background: transparent; padding: 0; margin: 0; font-size: 0.85rem; width: 45px; outline: none; text-align: center; color: var(--text-primary);"
+                      >
+                        @for (minute of minuteOptions; track minute) {
+                          <option [value]="minute">{{ minute }}</option>
+                        }
+                      </select>
+                    </div>
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <label style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.75rem; cursor: pointer;">
+                      <input
+                        type="checkbox"
+                        [(ngModel)]="h.continu"
+                        [name]="'cnt'+i"
+                        style="width: auto;"
+                      />
+                      Continu
+                    </label>
+                    <button
+                      type="button"
+                      style="border: none; background: none; color: var(--error); cursor: pointer; font-size: 1.1rem; padding: 0 0.25rem;"
+                      (click)="removeHoraire(i)"
+                      title="Supprimer la plage"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <button
+              type="button"
+              class="btn-primary"
+              style="padding: 0.4rem 0.8rem; font-size: 0.8rem;"
+              (click)="addHoraire()"
+            >
+              + Ajouter une plage
+            </button>
+          </div>
+
+          @if (editingError) {
+            <div class="alert error">{{ editingError }}</div>
+          }
+        </div>
+
+        <!-- Modal Footer -->
+        <footer style="padding: 1rem 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 0.75rem; background: var(--bg-dark);">
+          <button
+            type="button"
+            class="btn-primary"
+            style="background: transparent; border: 1px solid var(--border); color: var(--text-primary);"
+            (click)="cancelEdit()"
+          >
+            Annuler
+          </button>
+          <button
+            type="button"
+            class="btn-primary"
+            (click)="saveLocation()"
+            [disabled]="editingSaving"
+          >
+            {{ editingSaving ? 'Enregistrement…' : 'Enregistrer' }}
+          </button>
+        </footer>
+      </div>
+    </div>
   }
 </div>

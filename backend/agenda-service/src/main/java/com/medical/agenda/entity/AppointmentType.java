@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import java.math.BigDecimal;
 
 /**
  * Type de visite — catalogue dynamique stocké en base ({@code appointment_types}).
@@ -48,6 +49,18 @@ public class AppointmentType {
   /** Désactivé = caché des sélecteurs (mais toujours utilisable pour les RDV historiques). */
   @Column(nullable = false)
   private boolean active;
+
+  @Column(precision = 10, scale = 2)
+  private BigDecimal price;
+
+  @Column(name = "price_variable", nullable = false)
+  private boolean priceVariable;
+
+  @Column(name = "source_practitioner_id")
+  private Long sourcePractitionerId;
+
+  @Column(name = "source_act_id")
+  private Long sourceActId;
 
   public Long getId() {
     return id;
@@ -103,5 +116,37 @@ public class AppointmentType {
 
   public void setActive(boolean active) {
     this.active = active;
+  }
+
+  public BigDecimal getPrice() {
+    return price;
+  }
+
+  public void setPrice(BigDecimal price) {
+    this.price = price;
+  }
+
+  public boolean isPriceVariable() {
+    return priceVariable;
+  }
+
+  public void setPriceVariable(boolean priceVariable) {
+    this.priceVariable = priceVariable;
+  }
+
+  public Long getSourcePractitionerId() {
+    return sourcePractitionerId;
+  }
+
+  public void setSourcePractitionerId(Long sourcePractitionerId) {
+    this.sourcePractitionerId = sourcePractitionerId;
+  }
+
+  public Long getSourceActId() {
+    return sourceActId;
+  }
+
+  public void setSourceActId(Long sourceActId) {
+    this.sourceActId = sourceActId;
   }
 }

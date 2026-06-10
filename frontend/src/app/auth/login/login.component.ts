@@ -5,12 +5,12 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { LoginRequest } from '../../models/patient.model';
 import { PreferencesService } from '../../services/preferences.service';
-import { AppPreferencesToolbarComponent } from '../../shared/app-preferences-toolbar.component';
+import { AppNavbarComponent } from '../../shared/app-navbar.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, AppPreferencesToolbarComponent],
+  imports: [CommonModule, FormsModule, RouterLink, AppNavbarComponent],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
@@ -23,6 +23,7 @@ export class LoginComponent {
   loginData: LoginRequest = { identifiant: '', motDePasse: '' };
   loading = false;
   errorMessage = '';
+  showPassword = false;
 
   onLogin(): void {
     this.loading = true;

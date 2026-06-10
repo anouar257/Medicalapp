@@ -8,6 +8,18 @@
     },
     "logLevel": "debug"
   },
+  "/api/payments/**": {
+    "target": "http://localhost:8085",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/api/pro/**": {
+    "target": "http://localhost:8083",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
   "/api/**": {
     "target": "http://localhost:8081",
     "secure": false,

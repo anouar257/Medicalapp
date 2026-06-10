@@ -15,5 +15,6 @@ public interface AgendaMessagingClient {
   @GetMapping("/has-relationship")
   Map<String, Boolean> hasRelationship(
       @RequestParam("patientId") Long patientId,
-      @RequestParam("externalPractitionerId") Long externalPractitionerId);
+      @RequestParam("externalPractitionerId") Long externalPractitionerId,
+      @RequestParam("completedOnly") boolean completedOnly);
 }

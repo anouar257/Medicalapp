@@ -75,6 +75,7 @@ public class MessageController {
         mediaType = MediaType.parseMediaType(dl.fileType());
       }
     } catch (Exception ignored) {
+      // Exception ignorée : on conserve le mediaType par défaut si le parsing du fileType échoue.
     }
     ByteArrayResource body = new ByteArrayResource(dl.data());
     return ResponseEntity.ok()

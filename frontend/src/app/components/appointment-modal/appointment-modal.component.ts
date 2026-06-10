@@ -1,4 +1,4 @@
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe, NgClass } from '@angular/common';
 import { Component, effect, inject, input, output, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -40,7 +40,7 @@ function toDateInputValue(d: Date): string {
 @Component({
   selector: 'app-appointment-modal',
   standalone: true,
-  imports: [AsyncPipe, ReactiveFormsModule],
+  imports: [AsyncPipe, NgClass, ReactiveFormsModule],
   templateUrl: './appointment-modal.component.html',
   styleUrls: ['./appointment-modal.component.scss'],
 })
@@ -204,21 +204,60 @@ export class AppointmentModalComponent {
     }
   }
 
+  markAsCompleted(): void {
+    const existing = this.appointmentToEdit();
+    if (!existing) return;
+    this.agenda.updateAppointmentStatus(existing.id, 'COMPLETED').subscribe({
+      next: () => this.closed.emit(),
+    });
+  }
+
+  markAsNoShow(): void {
+    const existing = this.appointmentToEdit();
+    if (!existing) return;
+    this.agenda.updateAppointmentStatus(existing.id, 'NO_SHOW').subscribe({
+      next: () => this.closed.emit(),
+    });
+  }
+
+  isCustomDurationActive = false;
+
+  isCustomSelected(): boolean {
+    const val = this.form.controls.durationMinutes.value;
+    if (val === null || val === undefined) {
+      return true;
+    }
+    if (this.isCustomDurationActive) {
+      return true;
+    }
+    return ![15, 20, 30].includes(Number(val));
+  }
+
+  selectCustomDuration(): void {
+    this.isCustomDurationActive = true;
+  }
+
+  setDuration(minutes: number): void {
+    this.isCustomDurationActive = false;
+    this.form.patchValue({ durationMinutes: minutes });
+  }
+
   /** Résolution robuste : les options du select renvoient toujours une chaîne. */
   private findTypeById(id: string | null | undefined): AppointmentType | undefined {
     const sid = String(id ?? '').trim();
     if (!sid) {
       return undefined;
     }
-    return this.agenda.appointmentTypes.find((t) => t.id === sid);
+    return this.agenda.appointmentTypes.find((t) => t.id === sid || t.code === sid);
   }
 
   private patchFromAppointment(apt: Appointment): void {
+    this.isCustomDurationActive = ![15, 20, 30].includes(Number(apt.durationMinutes));
     this.form.patchValue(
       {
         title: apt.title,
         doctorId: apt.doctorId,
-        typeId: apt.typeId,
+        typeId: apt.typeCode || apt.typeId,
         startDate: toDateInputValue(apt.startTime),
         startTime: formatHm(apt.startTime),
         durationMinutes: apt.durationMinutes,
@@ -231,6 +270,24 @@ export class AppointmentModalComponent {
     this.syncEndTimeDisplay();
   }
 
+  formatTariff(price: number | null | undefined, isVariable?: boolean): string {
+    if (isVariable || price == null || Number.isNaN(Number(price))) {
+      return 'à discuter';
+    }
+    return `${Math.round(Number(price)).toLocaleString('fr-FR')} DH`;
+  }
+
+  formatTypeOption(type: AppointmentType): string {
+    const parts = [type.label];
+    if (type.doctorName) {
+      parts.push(type.doctorName);
+    }
+    if (type.price !== undefined) {
+      parts.push(this.formatTariff(type.price, type.priceVariable));
+    }
+    return parts.join(' — ');
+  }
+
   private resetForm(): void {
     const now = new Date();
     now.setSeconds(0, 0);
@@ -239,6 +296,9 @@ export class AppointmentModalComponent {
     const preferredDoctor = this.agenda.selectedDoctorIds[0] ?? '';
     const dateStr = toDateInputValue(now);
     const timeStr = formatHm(now);
+    const defaultDuration = defaultType?.defaultDurationMinutes ?? 15;
+
+    this.isCustomDurationActive = ![15, 20, 30].includes(Number(defaultDuration));
 
     this.form.reset({
       title: defaultType ? `${defaultType.label} — ${timeStr}` : '',
@@ -246,7 +306,7 @@ export class AppointmentModalComponent {
       typeId: defaultType?.id ?? '',
       startDate: dateStr,
       startTime: timeStr,
-      durationMinutes: defaultType?.defaultDurationMinutes ?? 15,
+      durationMinutes: defaultDuration,
       endTimeDisplay: '',
       color: '#93c5fd',
       description: '',

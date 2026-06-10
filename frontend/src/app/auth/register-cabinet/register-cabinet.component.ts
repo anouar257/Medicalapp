@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthProService } from '../../services/auth-pro.service';
 import { RegisterCabinetRequest } from '../../models/practitioner.model';
+import { AppNavbarComponent } from '../../shared/app-navbar.component';
 
 /**
  * Inscription d'un cabinet (organisme médical).
@@ -18,7 +19,7 @@ import { RegisterCabinetRequest } from '../../models/practitioner.model';
 @Component({
   selector: 'app-register-cabinet',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, AppNavbarComponent],
   templateUrl: './register-cabinet.component.html',
   styleUrls: ['./register-cabinet.component.scss'],
 })
@@ -34,6 +35,8 @@ export class RegisterCabinetComponent {
     cguAcceptees: false,
   };
   confirmPassword = '';
+  showPassword = false;
+  showConfirmPassword = false;
   loading = false;
   errorMessage = '';
   successMessage = '';

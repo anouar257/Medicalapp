@@ -112,6 +112,19 @@ public class PractitionerProfile {
     @Column(name = "disponible", nullable = false)
     private boolean disponible = true;
 
+    @Column(name = "consultation_fee", precision = 10, scale = 2)
+    private java.math.BigDecimal consultationFee;
+
+    // ── Avis et Notes ──────────────────────────────────────────────────────
+
+    @Column(name = "global_rating")
+    private Double globalRating;
+
+    @Column(name = "review_count")
+    private Integer reviewCount;
+
+    // ── Relations ──────────────────────────────────────────────────────────
+
     // ── Relations ──────────────────────────────────────────────────────────
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -127,6 +140,9 @@ public class PractitionerProfile {
 
     @OneToMany(mappedBy = "practitioner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ConsultationLocation> lieuxConsultation = new ArrayList<>();
+
+    @OneToMany(mappedBy = "practitioner", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PractitionerAct> actes = new ArrayList<>();
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -182,6 +198,9 @@ public class PractitionerProfile {
     public boolean isDisponible() { return disponible; }
     public void setDisponible(boolean disponible) { this.disponible = disponible; }
 
+    public java.math.BigDecimal getConsultationFee() { return consultationFee; }
+    public void setConsultationFee(java.math.BigDecimal consultationFee) { this.consultationFee = consultationFee; }
+
     public Set<Specialty> getSpecialites() { return specialites; }
     public void setSpecialites(Set<Specialty> specialites) { this.specialites = specialites; }
 
@@ -190,4 +209,13 @@ public class PractitionerProfile {
 
     public List<ConsultationLocation> getLieuxConsultation() { return lieuxConsultation; }
     public void setLieuxConsultation(List<ConsultationLocation> lieuxConsultation) { this.lieuxConsultation = lieuxConsultation; }
+
+    public List<PractitionerAct> getActes() { return actes; }
+    public void setActes(List<PractitionerAct> actes) { this.actes = actes; }
+
+    public Double getGlobalRating() { return globalRating; }
+    public void setGlobalRating(Double globalRating) { this.globalRating = globalRating; }
+
+    public Integer getReviewCount() { return reviewCount; }
+    public void setReviewCount(Integer reviewCount) { this.reviewCount = reviewCount; }
 }

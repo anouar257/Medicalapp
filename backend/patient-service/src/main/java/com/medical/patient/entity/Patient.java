@@ -93,6 +93,10 @@ public class Patient {
     @Column(nullable = false)
     private boolean actif = true;
 
+    /** Ville de résidence du patient (filtrage par défaut dans la prise de RDV). */
+    @Column(length = 100)
+    private String ville;
+
     /** Liste des proches rattachés à ce patient. */
     @com.fasterxml.jackson.annotation.JsonIgnore
     @OneToMany(mappedBy = "patient", orphanRemoval = true)
@@ -218,6 +222,14 @@ public class Patient {
 
     public void setActif(boolean actif) {
         this.actif = actif;
+    }
+
+    public String getVille() {
+        return ville;
+    }
+
+    public void setVille(String ville) {
+        this.ville = ville;
     }
 
     public List<Proche> getProches() {

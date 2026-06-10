@@ -15,6 +15,10 @@ import java.util.Map;
 @RequestMapping("/api/patients")
 public class PatientController {
 
+    private static final String ERROR_KEY = "error";
+    private static final String NON_AUTHENTIFIE = "Non authentifié";
+    private static final String MESSAGE_KEY = "message";
+
     private final PatientService patientService;
 
     public PatientController(PatientService patientService) {
@@ -25,9 +29,9 @@ public class PatientController {
      * Récupère le profil du patient authentifié.
      */
     @GetMapping("/me")
-    public ResponseEntity<?> getMyProfile(@AuthenticationPrincipal Patient patient) {
+    public ResponseEntity<Map<String, Object>> getMyProfile(@AuthenticationPrincipal Patient patient) {
         if (patient == null) {
-            return ResponseEntity.status(401).body(Map.of("error", "Non authentifié"));
+            return ResponseEntity.status(401).body(Map.of(ERROR_KEY, NON_AUTHENTIFIE));
         }
         // Recharger depuis la BDD pour les données fraîches
         Patient fresh = patientService.findById(patient.getId())
@@ -39,16 +43,16 @@ public class PatientController {
      * Met à jour le profil du patient authentifié.
      */
     @PutMapping("/me")
-    public ResponseEntity<?> updateMyProfile(@AuthenticationPrincipal Patient patient,
+    public ResponseEntity<Map<String, Object>> updateMyProfile(@AuthenticationPrincipal Patient patient,
                                               @RequestBody Patient updates) {
         if (patient == null) {
-            return ResponseEntity.status(401).body(Map.of("error", "Non authentifié"));
+            return ResponseEntity.status(401).body(Map.of(ERROR_KEY, NON_AUTHENTIFIE));
         }
         try {
             Patient updated = patientService.updateProfile(patient.getId(), updates);
             return ResponseEntity.ok(toProfileMap(updated));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+            return ResponseEntity.badRequest().body(Map.of(ERROR_KEY, e.getMessage()));
         }
     }
 
@@ -56,12 +60,12 @@ public class PatientController {
      * Désactive le compte du patient authentifié.
      */
     @DeleteMapping("/me")
-    public ResponseEntity<?> deactivateMyAccount(@AuthenticationPrincipal Patient patient) {
+    public ResponseEntity<Map<String, Object>> deactivateMyAccount(@AuthenticationPrincipal Patient patient) {
         if (patient == null) {
-            return ResponseEntity.status(401).body(Map.of("error", "Non authentifié"));
+            return ResponseEntity.status(401).body(Map.of(ERROR_KEY, NON_AUTHENTIFIE));
         }
         patientService.deactivateAccount(patient.getId());
-        return ResponseEntity.ok(Map.of("message", "Compte désactivé avec succès"));
+        return ResponseEntity.ok(Map.of(MESSAGE_KEY, "Compte désactivé avec succès"));
     }
 
     private Map<String, Object> toProfileMap(Patient p) {

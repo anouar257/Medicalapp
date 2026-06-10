@@ -37,6 +37,9 @@ public class RegisterRequest {
     @NotNull(message = "Vous devez accepter les CGU")
     private Boolean cguAcceptees;
 
+    /** Ville de résidence du patient (optionnel). */
+    private String ville;
+
     // ── Getters & Setters ────────────────────────────────────────────────────
 
     public Sexe getSexe() {
@@ -101,5 +104,13 @@ public class RegisterRequest {
 
     public void setCguAcceptees(Boolean cguAcceptees) {
         this.cguAcceptees = cguAcceptees;
+    }
+
+    public String getVille() {
+        return ville;
+    }
+
+    public void setVille(String ville) {
+        this.ville = ville;
     }
 }

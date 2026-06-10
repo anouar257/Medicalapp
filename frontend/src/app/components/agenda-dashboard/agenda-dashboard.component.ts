@@ -1,5 +1,5 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 
@@ -10,6 +10,7 @@ import { CalendarGridComponent } from '../calendar-grid/calendar-grid.component'
 import { SidebarFilterComponent } from '../sidebar-filter/sidebar-filter.component';
 import { AgendaStateService } from '../../services/agenda-state.service';
 import { ThemeService } from '../../services/theme.service';
+import { MedicalRecordModalComponent } from '../medical-record-modal/medical-record-modal.component';
 
 @Component({
   selector: 'app-agenda-dashboard',
@@ -20,11 +21,12 @@ import { ThemeService } from '../../services/theme.service';
     SidebarFilterComponent,
     CalendarGridComponent,
     AppointmentModalComponent,
+    MedicalRecordModalComponent,
   ],
   templateUrl: './agenda-dashboard.component.html',
   styleUrls: ['./agenda-dashboard.component.scss'],
 })
-export class AgendaDashboardComponent {
+export class AgendaDashboardComponent implements OnInit {
   private readonly agenda = inject(AgendaStateService);
 
   readonly theme = inject(ThemeService);
@@ -45,6 +47,13 @@ export class AgendaDashboardComponent {
   /** Rendez-vous passé au modal en mode édition (`null` pour une création). */
   readonly modalEditAppointment = signal<Appointment | null>(null);
 
+  readonly medicalRecordOpen = signal(false);
+  readonly medicalRecordAppointment = signal<Appointment | null>(null);
+
+  readonly loading = toSignal(this.agenda.loading$, {
+    initialValue: false,
+  });
+
   readonly currentView$ = this.agenda.currentView$;
 
   readonly mobileSidebarOpen = toSignal(this.agenda.mobileSidebarOpen$, {
@@ -57,6 +66,22 @@ export class AgendaDashboardComponent {
     { view: 'month', label: 'Mois' },
     { view: 'year', label: 'Année' },
   ];
+
+  readonly hideCompletedOrAbsent = toSignal(this.agenda.hideCompletedOrAbsent$, {
+    initialValue: false,
+  });
+
+  ngOnInit(): void {
+    this.agenda.refreshAgendaData();
+  }
+
+  refreshAppointments(): void {
+    window.location.reload();
+  }
+
+  toggleHideCompletedOrAbsent(): void {
+    this.agenda.setHideCompletedOrAbsent(!this.hideCompletedOrAbsent());
+  }
 
   filterMyAgenda(): void {
     const id = this.practitionerDoctorId;
@@ -102,5 +127,15 @@ export class AgendaDashboardComponent {
   onModalClosed(): void {
     this.modalOpen.set(false);
     this.modalEditAppointment.set(null);
+  }
+
+  openMedicalRecordFromGrid(apt: Appointment): void {
+    this.medicalRecordAppointment.set(apt);
+    this.medicalRecordOpen.set(true);
+  }
+
+  onMedicalRecordClosed(): void {
+    this.medicalRecordOpen.set(false);
+    this.medicalRecordAppointment.set(null);
   }
 }

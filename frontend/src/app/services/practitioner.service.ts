@@ -7,6 +7,7 @@ import {
   CreateProUserRequest,
   DiplomaDTO,
   MedicalOrganizationDTO,
+  PractitionerActDTO,
   PractitionerProfileDTO,
   ProUserDTO,
   SpecialtyDTO,
@@ -43,8 +44,20 @@ export class PractitionerService {
       specialty: filters.specialty ?? '',
     };
 
-    return this.http.get<PractitionerSearchResult[]>(`${this.base}/practitioners/search`, {
+    return this.http.get<PractitionerSearchResult[]>(`${this.publicBase}/practitioners/search`, {
       params,
+    });
+  }
+
+  /** Liste des villes publiques disponibles pour les filtres de recherche. */
+  listPublicCities(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.publicBase}/cities`);
+  }
+
+  /** Top profils publics mis en avant sur la landing page. */
+  listFeaturedPublicPractitioners(limit = 3): Observable<PractitionerSearchResult[]> {
+    return this.http.get<PractitionerSearchResult[]>(`${this.publicBase}/practitioners/featured`, {
+      params: { limit },
     });
   }
 
@@ -70,6 +83,12 @@ export class PractitionerService {
 
   updateMe(body: Partial<PractitionerProfileDTO>): Observable<PractitionerProfileDTO> {
     return this.http.put<PractitionerProfileDTO>(`${this.base}/practitioners/me`, body);
+  }
+
+  uploadPhoto(file: File): Observable<PractitionerProfileDTO> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<PractitionerProfileDTO>(`${this.base}/practitioners/me/photo`, formData);
   }
 
   setVerification(
@@ -212,10 +231,46 @@ export class PractitionerService {
     });
   }
 
+  /** Profil public complet du praticien (sans auth). */
+  getPublicPractitionerProfile(practitionerId: number): Observable<PractitionerProfileDTO> {
+    return this.http.get<PractitionerProfileDTO>(
+      `${this.publicBase}/practitioners/${practitionerId}/profile`,
+    );
+  }
+
   /** Lieux de consultation publics (praticien publié). */
   getPublicPractitionerLocations(practitionerId: number): Observable<ConsultationLocationDTO[]> {
     return this.http.get<ConsultationLocationDTO[]>(
       `${this.publicBase}/practitioners/${practitionerId}/locations`,
+    );
+  }
+
+  // ── Actes Médicaux / Visites ───────────────────────────────────────────
+
+  listActs(practitionerId: number): Observable<PractitionerActDTO[]> {
+    return this.http.get<PractitionerActDTO[]>(
+      `${this.base}/acts/by-practitioner/${practitionerId}`,
+    );
+  }
+
+  createAct(practitionerId: number, body: PractitionerActDTO): Observable<PractitionerActDTO> {
+    return this.http.post<PractitionerActDTO>(
+      `${this.base}/acts/by-practitioner/${practitionerId}`,
+      body,
+    );
+  }
+
+  updateAct(id: number, body: PractitionerActDTO): Observable<PractitionerActDTO> {
+    return this.http.put<PractitionerActDTO>(`${this.base}/acts/${id}`, body);
+  }
+
+  deleteAct(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.base}/acts/${id}`);
+  }
+
+  getPublicActs(practitionerId: number): Observable<PractitionerActDTO[]> {
+    return this.http.get<PractitionerActDTO[]>(
+      `${this.publicBase}/practitioners/${practitionerId}/acts`,
     );
   }
 }
@@ -227,6 +282,14 @@ export interface PractitionerSearchResult {
   ville: string;
   /** Code spécialité (référentiel) pour questionnaires / créneaux dynamiques. */
   primarySpecialtyCode?: string | null;
+  /** URL de la photo de profil du praticien. */
+  photoUrl?: string | null;
+  /** Adresse du cabinet (organisation). */
+  adresse?: string | null;
+  globalRating?: number;
+  reviewCount?: number;
+  consultationFee?: number | null;
+  hasMultipleLocations?: boolean;
 }
 
 export interface BookingWizardChoiceDTO {

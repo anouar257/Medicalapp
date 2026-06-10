@@ -34,13 +34,21 @@ public final class AppointmentMapper {
     d.setEndTime(entity.getEndTime());
     d.setDurationMinutes(entity.getDurationMinutes());
     d.setDescription(entity.getDescription());
-    d.setDoctorId(entity.getDoctor().getId());
+    if (entity.getDoctor() != null) {
+      d.setDoctorId(entity.getDoctor().getId());
+      d.setDoctorName(entity.getDoctor().getName());
+      d.setDoctorSpecialty(entity.getDoctor().getSpecialty());
+      d.setDoctorExternalPractitionerId(entity.getDoctor().getExternalPractitionerId());
+    } else {
+      d.setDoctorId(null);
+      d.setDoctorName("Médecin inconnu");
+      d.setDoctorSpecialty(null);
+      d.setDoctorExternalPractitionerId(null);
+    }
     d.setColor(entity.getColor());
-    d.setDoctorName(entity.getDoctor().getName());
-    d.setDoctorSpecialty(entity.getDoctor().getSpecialty());
-    d.setDoctorExternalPractitionerId(entity.getDoctor().getExternalPractitionerId());
     d.setStatus(
         entity.getStatus() != null ? entity.getStatus() : AppointmentStatus.CONFIRMED);
+    d.setLocationMode(entity.getLocationMode());
     return d;
   }
 }

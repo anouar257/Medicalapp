@@ -1,7 +1,6 @@
 package com.medical.practitioner.controller;
 
 import com.medical.practitioner.dto.PractitionerProfileDTO;
-import com.medical.practitioner.dto.PractitionerSearchResultDTO;
 import com.medical.practitioner.entity.ProUser;
 import com.medical.practitioner.entity.VerificationStatus;
 import com.medical.practitioner.security.AccessPolicies;
@@ -24,6 +23,8 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/pro/practitioners")
 public class PractitionerController {
+
+    private static final String KEY_EXISTS = "exists";
 
     private final PractitionerService practitionerService;
 
@@ -51,18 +52,7 @@ public class PractitionerController {
         return practitionerService.findByOrganization(organizationId);
     }
 
-    /**
-     * Recherche “public” pour la Landing Page (typeahead).
-     *
-     * <p>Filtres optionnels gérés en {@code LIKE %...%}.
-     */
-    @GetMapping("/search")
-    public List<PractitionerSearchResultDTO> search(
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String ville,
-            @RequestParam(required = false) String specialty) {
-        return practitionerService.searchPublic(name, ville, specialty);
-    }
+
 
     @PutMapping("/{id}")
     public PractitionerProfileDTO update(@PathVariable Long id, @RequestBody PractitionerProfileDTO body) {
@@ -98,13 +88,13 @@ public class PractitionerController {
     public ResponseEntity<Map<String, Boolean>> meExists(@AuthenticationPrincipal ProUser user,
                                                          @RequestParam(required = false) Long fallbackId) {
         if (AccessPolicies.isPlatformAdmin(user)) {
-            return ResponseEntity.ok(Map.of("exists", false));
+            return ResponseEntity.ok(Map.of(KEY_EXISTS, false));
         }
         try {
             practitionerService.findByProUserId(user.getId());
-            return ResponseEntity.ok(Map.of("exists", true));
+            return ResponseEntity.ok(Map.of(KEY_EXISTS, true));
         } catch (Exception e) {
-            return ResponseEntity.ok(Map.of("exists", false));
+            return ResponseEntity.ok(Map.of(KEY_EXISTS, false));
         }
     }
 }

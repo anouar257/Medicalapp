@@ -50,6 +50,16 @@ public class AppointmentController {
     return appointmentService.createPatientBooking(authentication, body);
   }
 
+  @GetMapping("/available-slots")
+  @PreAuthorize("hasAnyRole('PATIENT','ASSISTANT','PRATICIEN','ADMIN')")
+  public com.medical.agenda.dto.AgendaSlotsDTO getAvailableSlots(
+      @RequestParam("doctorId") Long doctorId,
+      @RequestParam("date") String dateString,
+      @RequestParam(value = "durationMinutes", defaultValue = "15") int duration,
+      @RequestParam(value = "timezone", required = false) String timezone) {
+    return appointmentService.getAvailableSlots(doctorId, dateString, duration, timezone);
+  }
+
   /**
    * Demandes {@code PENDING} pour le cabinet connecté (JWT pro : {@code organizationId}).
    * Réservé aux comptes cabinet — pas d’agrégat « tous les cabinets ».

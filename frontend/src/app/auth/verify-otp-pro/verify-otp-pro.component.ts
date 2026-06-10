@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthProService } from '../../services/auth-pro.service';
+import { AppNavbarComponent } from '../../shared/app-navbar.component';
 
 /**
  * Vérification OTP côté pro (email + SMS via Twilio Verify).
@@ -11,7 +12,7 @@ import { AuthProService } from '../../services/auth-pro.service';
 @Component({
   selector: 'app-verify-otp-pro',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, AppNavbarComponent],
   templateUrl: './verify-otp-pro.component.html',
   styleUrls: ['./verify-otp-pro.component.scss'],
 })

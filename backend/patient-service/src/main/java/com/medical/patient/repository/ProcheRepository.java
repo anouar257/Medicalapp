@@ -14,5 +14,5 @@ public interface ProcheRepository extends JpaRepository<Proche, Long> {
   long countByPatientId(Long patientId);
 
   /** Vérifie qu'un proche appartient bien au patient donné (messagerie inter-services). */
-  boolean existsByIdAndPatient_Id(Long procheId, Long patientId);
+  boolean existsByIdAndPatientId(Long procheId, Long patientId);
 }

@@ -30,6 +30,12 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 public class AuthController {
 
+    private static final String ERROR_KEY = "error";
+    private static final String MESSAGE_KEY = "message";
+    private static final String PATIENT_ID_KEY = "patientId";
+    private static final String EMAIL_KEY = "email";
+    private static final String TELEPHONE_KEY = "telephone";
+
     private final AuthService authService;
 
     public AuthController(AuthService authService) {
@@ -41,8 +47,8 @@ public class AuthController {
      */
     @PostMapping("/check-existence")
     public ResponseEntity<Map<String, Boolean>> checkExistence(@RequestBody Map<String, String> body) {
-        String email = body.getOrDefault("email", "");
-        String telephone = body.getOrDefault("telephone", "");
+        String email = body.getOrDefault(EMAIL_KEY, "");
+        String telephone = body.getOrDefault(TELEPHONE_KEY, "");
         boolean exists = authService.existsByEmailOrTelephone(email, telephone);
         return ResponseEntity.ok(Map.of("exists", exists));
     }
@@ -52,17 +58,17 @@ public class AuthController {
      * Déclenche automatiquement l'envoi d'OTP par email et SMS.
      */
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<Map<String, Object>> register(@Valid @RequestBody RegisterRequest request) {
         try {
             Patient patient = authService.register(request);
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
-                    "message", "Inscription réussie. Vérifiez votre email et votre téléphone.",
-                    "patientId", patient.getId(),
-                    "email", patient.getEmail(),
-                    "telephone", patient.getTelephone()
+                    MESSAGE_KEY, "Inscription réussie. Vérifiez votre email et votre téléphone.",
+                    PATIENT_ID_KEY, patient.getId(),
+                    EMAIL_KEY, patient.getEmail(),
+                    TELEPHONE_KEY, patient.getTelephone()
             ));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+            return ResponseEntity.badRequest().body(Map.of(ERROR_KEY, e.getMessage()));
         }
     }
 
@@ -70,12 +76,12 @@ public class AuthController {
      * Connexion — retourne un token JWT + infos patient.
      */
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<Object> login(@Valid @RequestBody LoginRequest request) {
         try {
             AuthResponse response = authService.login(request);
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(ERROR_KEY, e.getMessage()));
         }
     }
 
@@ -83,12 +89,12 @@ public class AuthController {
      * Envoie un code OTP (SMS ou Email) via Twilio Verify.
      */
     @PostMapping("/send-otp")
-    public ResponseEntity<?> sendOtp(@Valid @RequestBody SendOtpRequest request) {
+    public ResponseEntity<Map<String, Object>> sendOtp(@Valid @RequestBody SendOtpRequest request) {
         try {
             authService.resendOtp(request);
-            return ResponseEntity.ok(Map.of("message", "Code OTP envoyé avec succès"));
+            return ResponseEntity.ok(Map.of(MESSAGE_KEY, "Code OTP envoyé avec succès"));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Erreur lors de l'envoi du code OTP : " + e.getMessage()));
+            return ResponseEntity.badRequest().body(Map.of(ERROR_KEY, "Erreur lors de l'envoi du code OTP : " + e.getMessage()));
         }
     }
 
@@ -96,32 +102,32 @@ public class AuthController {
      * Vérifie le code OTP soumis et marque le canal comme vérifié.
      */
     @PostMapping("/verify-otp")
-    public ResponseEntity<?> verifyOtp(
+    public ResponseEntity<Map<String, Object>> verifyOtp(
             @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization,
             @Valid @RequestBody VerifyOtpRequest request) {
         boolean verified = authService.verifyOtp(request);
         if (verified) {
             Map<String, Object> body = new LinkedHashMap<>();
-            body.put("message", "Vérification réussie");
+            body.put(MESSAGE_KEY, "Vérification réussie");
             body.put("verified", true);
             authService
                     .tryRefreshJwtAfterSuccessfulOtp(authorization, request)
                     .ifPresent(
                             ar -> {
                                 body.put("token", ar.getToken());
-                                body.put("patientId", ar.getPatientId());
-                                body.put("email", ar.getEmail());
+                                body.put(PATIENT_ID_KEY, ar.getPatientId());
+                                body.put(EMAIL_KEY, ar.getEmail());
                                 body.put("prenom", ar.getPrenom());
                                 body.put("nom", ar.getNom());
                                 body.put("sexe", ar.getSexe());
                                 body.put("dateNaissance", ar.getDateNaissance());
-                                body.put("telephone", ar.getTelephone());
+                                body.put(TELEPHONE_KEY, ar.getTelephone());
                                 body.put("emailVerifie", ar.isEmailVerifie());
                                 body.put("telephoneVerifie", ar.isTelephoneVerifie());
                             });
             return ResponseEntity.ok(body);
         } else {
-            return ResponseEntity.badRequest().body(Map.of("error", "Code OTP invalide ou expiré", "verified", false));
+            return ResponseEntity.badRequest().body(Map.of(ERROR_KEY, "Code OTP invalide ou expiré", "verified", false));
         }
     }
 
@@ -129,12 +135,12 @@ public class AuthController {
      * Demande de réinitialisation du mot de passe (email ou SMS).
      */
     @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+    public ResponseEntity<Map<String, Object>> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         try {
             authService.forgotPassword(request);
-            return ResponseEntity.ok(Map.of("message", "Instructions de réinitialisation envoyées"));
+            return ResponseEntity.ok(Map.of(MESSAGE_KEY, "Instructions de réinitialisation envoyées"));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+            return ResponseEntity.badRequest().body(Map.of(ERROR_KEY, e.getMessage()));
         }
     }
 
@@ -142,12 +148,12 @@ public class AuthController {
      * Réinitialise le mot de passe avec le token reçu par email.
      */
     @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+    public ResponseEntity<Map<String, Object>> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         try {
             authService.resetPassword(request);
-            return ResponseEntity.ok(Map.of("message", "Mot de passe réinitialisé avec succès"));
+            return ResponseEntity.ok(Map.of(MESSAGE_KEY, "Mot de passe réinitialisé avec succès"));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+            return ResponseEntity.badRequest().body(Map.of(ERROR_KEY, e.getMessage()));
         }
     }
 }

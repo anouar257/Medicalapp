@@ -14,7 +14,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
@@ -28,15 +27,12 @@ public class DoctorService {
 
   private final DoctorRepository doctorRepository;
   private final AppointmentRepository appointmentRepository;
-  private final DoctorPhotoFileService doctorPhotoFileService;
 
   public DoctorService(
       DoctorRepository doctorRepository,
-      AppointmentRepository appointmentRepository,
-      DoctorPhotoFileService doctorPhotoFileService) {
+      AppointmentRepository appointmentRepository) {
     this.doctorRepository = doctorRepository;
     this.appointmentRepository = appointmentRepository;
-    this.doctorPhotoFileService = doctorPhotoFileService;
   }
 
   @Transactional(readOnly = true)
@@ -81,7 +77,7 @@ public class DoctorService {
         doctorRepository
             .findByExternalPractitionerId(externalPractitionerId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Médecin agenda introuvable."));
-    return toDto(d, appointmentRepository.countByDoctor_Id(d.getId()));
+    return toDto(d, appointmentRepository.countByDoctorId(d.getId()));
   }
 
   /** Crée un médecin (corps JSON : {@code name} obligatoire ; {@code colorCode}, {@code photoUrl} optionnels). */
@@ -143,11 +139,7 @@ public class DoctorService {
     }
     String photo = input.getPhotoUrl();
     if (photo != null && !photo.isBlank()) {
-      String prev = d.getPhotoUrl();
       String next = photo.trim();
-      if (!next.equals(prev)) {
-        doctorPhotoFileService.deleteManagedIfPresent(prev);
-      }
       d.setPhotoUrl(next);
     } else if (d.getPhotoUrl() == null || d.getPhotoUrl().isBlank()) {
       d.setPhotoUrl(DEFAULT_DOCTOR_PHOTO_ASSET);
@@ -163,7 +155,7 @@ public class DoctorService {
       d.setOrganizationId(input.getOrganizationId());
     }
     d = doctorRepository.save(d);
-    return toDto(d, appointmentRepository.countByDoctor_Id(d.getId()));
+    return toDto(d, appointmentRepository.countByDoctorId(d.getId()));
   }
 
   /**
@@ -175,7 +167,7 @@ public class DoctorService {
         doctorRepository
             .findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Médecin inconnu."));
-    long appointments = appointmentRepository.countByDoctor_Id(id);
+    long appointments = appointmentRepository.countByDoctorId(id);
     if (appointments > 0) {
       throw new ResponseStatusException(
           HttpStatus.CONFLICT,
@@ -183,7 +175,6 @@ public class DoctorService {
               + appointments
               + " rendez-vous encore liés. Supprimez ou déplacez d’abord ces rendez-vous.");
     }
-    doctorPhotoFileService.deleteManagedIfPresent(d.getPhotoUrl());
     doctorRepository.delete(d);
   }
 
@@ -220,8 +211,11 @@ public class DoctorService {
     d.setExternalPractitionerId(externalPractitionerId);
     d.setName(name.trim());
     d.setColorCode(colorCode != null && !colorCode.isBlank() ? colorCode.trim() : "#0ea5e9");
-    d.setPhotoUrl(
-        photoUrl != null && !photoUrl.isBlank() ? photoUrl.trim() : DEFAULT_DOCTOR_PHOTO_ASSET);
+    if (photoUrl != null && !photoUrl.isBlank()) {
+      d.setPhotoUrl(photoUrl.trim());
+    } else if (d.getPhotoUrl() == null || d.getPhotoUrl().isBlank()) {
+      d.setPhotoUrl(DEFAULT_DOCTOR_PHOTO_ASSET);
+    }
     d.setSpecialty(
         specialty != null && !specialty.isBlank() ? specialty.trim() : "Médecine générale");
     if (specialtyCode != null && !specialtyCode.isBlank()) {
@@ -233,7 +227,7 @@ public class DoctorService {
 
     d = doctorRepository.save(d);
     return toDto(
-        d, d.getId() != null ? appointmentRepository.countByDoctor_Id(d.getId()) : 0L);
+        d, d.getId() != null ? appointmentRepository.countByDoctorId(d.getId()) : 0L);
   }
 
   /**
@@ -248,9 +242,8 @@ public class DoctorService {
         .findByExternalPractitionerId(externalPractitionerId)
         .ifPresent(
             d -> {
-              long appts = appointmentRepository.countByDoctor_Id(d.getId());
+              long appts = appointmentRepository.countByDoctorId(d.getId());
               if (appts == 0) {
-                doctorPhotoFileService.deleteManagedIfPresent(d.getPhotoUrl());
                 doctorRepository.delete(d);
               } else {
                 d.setExternalPractitionerId(null);
@@ -259,20 +252,7 @@ public class DoctorService {
             });
   }
 
-  /** Enregistre un portrait uploadé et met à jour l’URL en base. */
-  @Transactional
-  public DoctorDTO savePhoto(Long id, MultipartFile file) {
-    Doctor d =
-        doctorRepository
-            .findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Médecin inconnu."));
-    String previous = d.getPhotoUrl();
-    String newUrl = doctorPhotoFileService.store(id, file);
-    doctorPhotoFileService.deleteManagedIfPresent(previous);
-    d.setPhotoUrl(newUrl);
-    d = doctorRepository.save(d);
-    return toDto(d, appointmentRepository.countByDoctor_Id(d.getId()));
-  }
+
 
   private DoctorDTO toDto(Doctor d, long appointmentCount) {
     DoctorDTO dto = new DoctorDTO();

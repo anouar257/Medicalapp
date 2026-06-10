@@ -57,12 +57,12 @@ public class DiplomaService {
     }
 
     private Diploma applyToEntity(Diploma d, DiplomaDTO body) {
-        if (body.getIntitule() != null) d.setIntitule(body.getIntitule());
-        if (body.getEtablissement() != null) d.setEtablissement(body.getEtablissement());
-        if (body.getAnneeObtention() != null) d.setAnneeObtention(body.getAnneeObtention());
-        if (body.getDateObtention() != null) d.setDateObtention(body.getDateObtention());
+        d.setIntitule(body.getIntitule());
+        d.setEtablissement(body.getEtablissement());
+        d.setAnneeObtention(body.getAnneeObtention());
+        d.setDateObtention(body.getDateObtention());
         if (body.getType() != null) d.setType(body.getType());
-        if (body.getDocumentUrl() != null) d.setDocumentUrl(body.getDocumentUrl());
+        d.setDocumentUrl(body.getDocumentUrl());
         return d;
     }
 }

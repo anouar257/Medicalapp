@@ -11,6 +11,8 @@ import {
   distinctUntilChanged,
   EMPTY,
   filter,
+  finalize,
+  forkJoin,
   map,
   merge,
   of,
@@ -29,8 +31,10 @@ import type {
   AppointmentType,
   Doctor,
 } from '../models/agenda.model';
+import type { PractitionerActDTO } from '../models/practitioner.model';
 import { environment } from '../../environments/environment';
 import { AuthProService } from './auth-pro.service';
+import { PractitionerService } from './practitioner.service';
 
 /** Mode grille timeline : confort / compact (voir `calendar-grid`). */
 export type GridComfortMode = 'comfortable' | 'compact';
@@ -41,7 +45,8 @@ export type GridComfortMode = 'comfortable' | 'compact';
  */
 export const AGENDA_API_BASE_URL = (environment.apiBaseUrl ?? '').replace(/\/$/, '');
 
-const LS_KEY = 'agenda-ui-v1';
+// Nouvelle version de persistance après migration complète vers les actes dynamiques praticien.
+const LS_KEY = 'agenda-ui-v2';
 
 interface PersistedAgendaUiV1 {
   v: 1;
@@ -53,6 +58,7 @@ interface PersistedAgendaUiV1 {
   gridComfort?: GridComfortMode;
   /** Uniquement pour la vue `day` : afficher 3 colonnes consécutives au lieu d’une. */
   dayShowsThreeDays?: boolean;
+  hideCompletedOrAbsent?: boolean;
 }
 
 interface AppointmentApiDto {
@@ -66,9 +72,11 @@ interface AppointmentApiDto {
   endTime: string;
   durationMinutes: number;
   description: string;
+  visitReasonCode?: string;
   doctorId: number;
   color: string;
   status?: string;
+  locationMode?: string;
 }
 
 interface DoctorApiDto {
@@ -78,11 +86,12 @@ interface DoctorApiDto {
   photoUrl?: string;
   appointmentCount?: number;
   specialty?: string | null;
+  externalPractitionerId?: number | null;
 }
 
 function parseAppointmentStatus(raw: string | undefined | null): AppointmentStatus {
-  if (raw === 'PENDING' || raw === 'CONFIRMED' || raw === 'CANCELLED') {
-    return raw;
+  if (raw === 'PENDING' || raw === 'CONFIRMED' || raw === 'CANCELLED' || raw === 'COMPLETED' || raw === 'NO_SHOW') {
+    return raw as AppointmentStatus;
   }
   return 'CONFIRMED';
 }
@@ -95,6 +104,14 @@ interface AppointmentTypeApiDto {
   defaultDurationMinutes: number;
   displayOrder: number;
   active: boolean;
+  price?: number | null;
+  priceVariable?: boolean;
+  sourcePractitionerId?: number | null;
+  sourceActId?: number | null;
+}
+
+interface PractitionerActApiDto extends PractitionerActDTO {
+  agendaTypeCode?: string;
 }
 
 const ALL_VIEWS: AgendaView[] = ['day', 'week', 'month', 'year'];
@@ -244,12 +261,76 @@ function mapAppointmentDto(d: AppointmentApiDto): Appointment {
     typeLabel: d.typeLabel,
     typeColor: d.typeColor,
     startTime: new Date(d.startTime),
+
     endTime: new Date(d.endTime),
     durationMinutes: d.durationMinutes,
     description: d.description ?? '',
+    visitReasonCode: d.visitReasonCode?.trim() || undefined,
     doctorId: String(d.doctorId),
-    color: d.color,
-    status: parseAppointmentStatus(d.status),
+    color: d.color || '#3b82f6',
+    status: d.status as AppointmentStatus | undefined,
+    locationMode: d.locationMode,
+  };
+}
+
+function normalizeAgendaText(raw: string | undefined | null): string {
+  return (raw ?? '').trim().toLocaleLowerCase('fr');
+}
+
+function appointmentMatchesVisibleTypes(
+  appointment: Appointment,
+  visibleTypeCodes: readonly string[],
+  appointmentTypes: readonly AppointmentType[],
+): boolean {
+  if (!visibleTypeCodes.length) {
+    return false;
+  }
+
+  const visibleCodeSet = new Set(visibleTypeCodes);
+  if (visibleCodeSet.has(appointment.typeCode)) {
+    return true;
+  }
+
+  const appointmentVisitReason = normalizeAgendaText(appointment.visitReasonCode);
+  if (!appointmentVisitReason) {
+    return false;
+  }
+
+  const visibleReasonLabels = new Set(
+    appointmentTypes
+      .filter((type) => visibleCodeSet.has(type.code))
+      .map((type) => normalizeAgendaText(type.label))
+      .filter((label) => label.length > 0),
+  );
+
+  return visibleReasonLabels.has(appointmentVisitReason);
+}
+
+function normalizeTypeCode(raw: string | undefined | null): string {
+  return (raw ?? '').trim().toUpperCase();
+}
+
+function mapPractitionerActToType(
+  doctor: Doctor,
+  act: PractitionerActApiDto,
+  displayOrder: number,
+): AppointmentType {
+  const code =
+    normalizeTypeCode(act.agendaTypeCode) ||
+    `ACT_${String(doctor.externalPractitionerId ?? doctor.id)}_${String(act.id ?? 0)}`.toUpperCase();
+  return {
+    id: code,
+    code,
+    label: act.name,
+    colorCode: doctor.colorCode || '#0ea5e9',
+    defaultDurationMinutes: act.durationMinutes,
+    displayOrder,
+    active: true,
+    price: act.price ?? null,
+    priceVariable: Boolean(act.isPriceVariable),
+    sourcePractitionerId: doctor.externalPractitionerId ?? null,
+    sourceActId: act.id ?? null,
+    doctorName: doctor.name,
   };
 }
 
@@ -323,6 +404,7 @@ export class AgendaStateService {
   private readonly http = inject(HttpClient);
   private readonly destroyRef = inject(DestroyRef);
   private readonly authPro = inject(AuthProService);
+  private readonly practitionerService = inject(PractitionerService);
 
   private readonly selectedDateSubject = new BehaviorSubject<Date>(
     (() => {
@@ -346,10 +428,34 @@ export class AgendaStateService {
     coerceGridComfort(this.persistedInit?.gridComfort, 'comfortable'),
   );
   private readonly mobileSidebarOpenSubject = new BehaviorSubject<boolean>(false);
+  private readonly hideCompletedOrAbsentSubject = new BehaviorSubject<boolean>(
+    Boolean(this.persistedInit?.hideCompletedOrAbsent),
+  );
+
+  private readonly loadingSubject = new BehaviorSubject<boolean>(false);
+  readonly loading$ = this.loadingSubject.asObservable();
 
   private readonly doctorsSubject = new BehaviorSubject<Doctor[]>([]);
   private readonly appointmentsSubject = new BehaviorSubject<Appointment[]>([]);
   private readonly appointmentTypesSubject = new BehaviorSubject<AppointmentType[]>([]);
+  private readonly appointmentTypesLoad$ = new Subject<void>();
+
+  private readonly cabinetHorairesSubject = new BehaviorSubject<any[]>([]);
+  readonly cabinetHoraires$ = this.cabinetHorairesSubject.asObservable().pipe(
+    shareReplay({ bufferSize: 1, refCount: true })
+  );
+
+  private readonly anchorHourSubject = new BehaviorSubject<number>(8);
+  readonly anchorHour$ = this.anchorHourSubject.asObservable().pipe(
+    distinctUntilChanged(),
+    shareReplay({ bufferSize: 1, refCount: true })
+  );
+
+  private readonly endHourSubject = new BehaviorSubject<number>(19);
+  readonly endHour$ = this.endHourSubject.asObservable().pipe(
+    distinctUntilChanged(),
+    shareReplay({ bufferSize: 1, refCount: true })
+  );
 
   /** Redéclenche un GET sur la fenêtre courante (après CRUD). */
   private readonly reload$ = new Subject<void>();
@@ -371,12 +477,13 @@ export class AgendaStateService {
     this.currentViewSubject.asObservable(),
     this.dayShowsThreeDaysSubject.asObservable(),
     this.selectedDoctorsSubject.asObservable(),
+    this.appointmentTypes$,
     this.visibleTypeCodesSubject.asObservable(),
+    this.hideCompletedOrAbsentSubject.asObservable(),
     this.allAppointments$,
   ]).pipe(
-    map(([selectedDate, view, dayThree, doctorIds, typeCodes, all]) => {
+    map(([selectedDate, view, dayThree, doctorIds, appointmentTypes, typeCodes, hideCompletedOrAbsent, all]) => {
       const doctorSet = new Set(doctorIds);
-      const typeSet = new Set(typeCodes);
       const { start, endExclusive } = getViewRange(selectedDate, view, {
         dayShowsThreeDays: dayThree,
       });
@@ -385,10 +492,17 @@ export class AgendaStateService {
         doctorSet.size === 0 ? (): boolean => false : (a: Appointment): boolean =>
           doctorSet.has(a.doctorId);
       const byType =
-        typeSet.size === 0 ? (): boolean => false : (a: Appointment): boolean => typeSet.has(a.typeCode);
+        typeCodes.length === 0
+          ? (): boolean => false
+          : (a: Appointment): boolean => appointmentMatchesVisibleTypes(a, typeCodes, appointmentTypes);
 
       return all
-        .filter((a) => byDoctor(a) && byType(a) && appointmentsOverlapRange(a, start, endExclusive))
+        .filter((a) => {
+          if (hideCompletedOrAbsent && (a.status === 'COMPLETED' || a.status === 'NO_SHOW')) {
+            return false;
+          }
+          return byDoctor(a) && byType(a) && appointmentsOverlapRange(a, start, endExclusive);
+        })
         .slice()
         .sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
     }),
@@ -421,13 +535,12 @@ export class AgendaStateService {
     this.appointmentsSubject.next([]);
     this.doctorsSubject.next([]);
     this.visibleTypeCodesSubject.next([]);
+    this.appointmentTypesSubject.next([]);
 
-    this.fetchAppointmentTypes('refresh')
-      .pipe(take(1), takeUntilDestroyed(this.destroyRef))
-      .subscribe();
     this.fetchDoctorsAndApplySelection('refresh')
       .pipe(take(1), takeUntilDestroyed(this.destroyRef))
       .subscribe();
+    this.appointmentTypesLoad$.next();
   }
 
   private handleHttpError(err: unknown): void {
@@ -467,15 +580,123 @@ export class AgendaStateService {
     window.alert(`Erreur HTTP ${status}. Consultez la console (F12) pour le détail.`);
   }
 
+  public refreshCabinetHoraires(): void {
+    const orgId = this.authPro.organizationId();
+    if (!orgId) return;
+
+    const selectedIds = this.selectedDoctorsSubject.value;
+    const allDocs = this.doctorsSubject.value;
+    
+    // Trouver les externalPractitionerId des médecins sélectionnés
+    const selectedDocs = allDocs.filter(d => selectedIds.includes(d.id));
+    
+    let externalIds: number[] = [];
+    if (selectedDocs.length > 0) {
+      externalIds = selectedDocs
+        .map(d => d.externalPractitionerId)
+        .filter((id): id is number => typeof id === 'number');
+    } else {
+      // repli sur le praticien connecté
+      const myId = this.authPro.practitionerProfileId();
+      if (myId) {
+        externalIds = [myId];
+      } else if (allDocs.length > 0) {
+        externalIds = allDocs
+          .map(d => d.externalPractitionerId)
+          .filter((id): id is number => typeof id === 'number');
+      }
+    }
+
+    if (externalIds.length === 0) {
+      // Fallback si aucun ID de praticien trouvé
+      this.anchorHourSubject.next(8);
+      this.endHourSubject.next(19);
+      return;
+    }
+
+    const requests = externalIds.map(id =>
+      this.practitionerService.listLocations(id).pipe(
+        catchError(() => of([]))
+      )
+    );
+
+    forkJoin(requests).subscribe((locationsLists) => {
+      const allLocations = locationsLists.flat();
+      const allHoraires = allLocations.flatMap(loc => loc.horaires || []);
+
+      this.cabinetHorairesSubject.next(allHoraires);
+
+      let minHour = 8;
+      let maxHour = 19;
+
+      if (allHoraires.length > 0) {
+        let foundMin = 24;
+        let foundMax = 0;
+
+        for (const h of allHoraires) {
+          if (h.heureDebut) {
+            const parts = h.heureDebut.split(':');
+            const hh = parseInt(parts[0], 10);
+            if (!isNaN(hh) && hh < foundMin) {
+              foundMin = hh;
+            }
+          }
+          if (h.heureFin) {
+            const parts = h.heureFin.split(':');
+            const hh = parseInt(parts[0], 10);
+            const mm = parts[1] ? parseInt(parts[1], 10) : 0;
+            const finalH = mm > 0 ? hh + 1 : hh;
+            if (!isNaN(finalH) && finalH > foundMax) {
+              foundMax = finalH;
+            }
+          }
+        }
+
+        if (foundMin < 24) {
+          minHour = Math.max(0, foundMin);
+        }
+        if (foundMax > 0) {
+          maxHour = Math.min(24, foundMax);
+        }
+        if (minHour >= maxHour) {
+          minHour = 8;
+          maxHour = 19;
+        }
+      }
+
+      this.anchorHourSubject.next(minHour);
+      this.endHourSubject.next(maxHour);
+    });
+  }
+
   /** Charge les médecins, les types puis les préférences persistées, puis abonne le flux des rendez-vous. */
   private bootstrapDoctorsAndAppointments(): void {
-    this.fetchAppointmentTypes('initial')
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe();
+    // Fetch cabinet hours dynamically based on organizationId and selection changes.
+    combineLatest([
+      toObservable(this.authPro.organizationId),
+      this.selectedDoctorsSubject.asObservable(),
+      this.doctorsSubject.asObservable(),
+    ])
+      .pipe(debounceTime(50), takeUntilDestroyed(this.destroyRef))
+      .subscribe(([orgId]) => {
+        if (orgId) {
+          this.refreshCabinetHoraires();
+        }
+      });
+
+    this.appointmentTypesLoad$
+      .pipe(
+        debounceTime(25),
+        switchMap(() => this.loadAppointmentTypesForSelection()),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((types) => this.setAppointmentTypesFromApiResponse(types, 'refresh'));
 
     this.fetchDoctorsAndApplySelection('initial')
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe();
+
+    this.appointmentTypesLoad$.next();
 
     merge(
       combineLatest([
@@ -505,6 +726,7 @@ export class AgendaStateService {
   }
 
   loadAppointments(startDate: Date, endDate: Date): Observable<Appointment[]> {
+    this.loadingSubject.next(true);
     const params = new HttpParams()
       .set('start', startDate.toISOString())
       .set('end', endDate.toISOString());
@@ -516,11 +738,28 @@ export class AgendaStateService {
           this.handleHttpError(err);
           return of([]);
         }),
+        finalize(() => this.loadingSubject.next(false)),
       );
   }
 
-  private refreshAppointments(): void {
+  public refreshAppointments(): void {
     this.reload$.next();
+  }
+
+  public refreshAgendaData(): void {
+    this.loadingSubject.next(true);
+    this.fetchDoctorsAndApplySelection('refresh')
+      .pipe(take(1), takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.appointmentTypesLoad$.next();
+          this.reload$.next();
+        },
+        error: () => {
+          this.appointmentTypesLoad$.next();
+          this.reload$.next();
+        },
+      });
   }
 
   private setDoctorsFromApiResponse(docs: Doctor[], persistSource: 'initial' | 'refresh'): void {
@@ -532,6 +771,7 @@ export class AgendaStateService {
         : coerceDoctorIds(this.selectedDoctorsSubject.value, allIds);
     this.selectedDoctorsSubject.next(nextSel);
     this.persistUi();
+    this.appointmentTypesLoad$.next();
   }
 
   private setAppointmentTypesFromApiResponse(
@@ -549,6 +789,16 @@ export class AgendaStateService {
   }
 
   fetchAppointmentTypes(persistSource: 'initial' | 'refresh'): Observable<AppointmentType[]> {
+    return this.fetchCatalogAppointmentTypes().pipe(
+      tap((types) => this.setAppointmentTypesFromApiResponse(types, persistSource)),
+      catchError((err) => {
+        this.handleHttpError(err);
+        return of<AppointmentType[]>([]);
+      }),
+    );
+  }
+
+  private fetchCatalogAppointmentTypes(): Observable<AppointmentType[]> {
     return this.http.get<AppointmentTypeApiDto[]>(`${AGENDA_API_BASE_URL}/api/appointment-types`).pipe(
       map((list) =>
         list.map((t) => ({
@@ -559,12 +809,52 @@ export class AgendaStateService {
           defaultDurationMinutes: t.defaultDurationMinutes,
           displayOrder: t.displayOrder,
           active: t.active,
+          price: t.price ?? null,
+          priceVariable: Boolean(t.priceVariable),
+          sourcePractitionerId: t.sourcePractitionerId ?? null,
+          sourceActId: t.sourceActId ?? null,
         })),
       ),
-      tap((types) => this.setAppointmentTypesFromApiResponse(types, persistSource)),
+    );
+  }
+
+  private loadAppointmentTypesForSelection(): Observable<AppointmentType[]> {
+    const docs = this.doctorsSubject.value;
+    const selectedIds = this.selectedDoctorsSubject.value;
+    const selectedDocs = selectedIds.length > 0 ? docs.filter((d) => selectedIds.includes(d.id)) : docs;
+    const actDocs = selectedDocs.filter((d) => typeof d.externalPractitionerId === 'number');
+
+    if (!actDocs.length) {
+      return this.fetchCatalogAppointmentTypes();
+    }
+
+    const requests = actDocs.map((doc, docIndex) =>
+      this.practitionerService.getPublicActs(doc.externalPractitionerId!).pipe(
+        map((acts) =>
+          acts.map((act, actIndex) =>
+            mapPractitionerActToType(doc, act as PractitionerActApiDto, docIndex * 1000 + actIndex),
+          ),
+        ),
+        catchError(() => of<AppointmentType[]>([])),
+      ),
+    );
+
+    return forkJoin(requests).pipe(
+      map((groups) => groups.flat()),
+      map((types) => {
+        const unique = new Map<string, AppointmentType>();
+        for (const t of types) {
+          unique.set(t.code, t);
+        }
+        return [...unique.values()].sort((a, b) => {
+          const order = a.displayOrder - b.displayOrder;
+          return order !== 0 ? order : a.label.localeCompare(b.label, 'fr');
+        });
+      }),
+      switchMap((types) => (types.length ? of(types) : this.fetchCatalogAppointmentTypes())),
       catchError((err) => {
         this.handleHttpError(err);
-        return of<AppointmentType[]>([]);
+        return this.fetchCatalogAppointmentTypes();
       }),
     );
   }
@@ -579,6 +869,7 @@ export class AgendaStateService {
           photoUrl: d.photoUrl ?? '',
           appointmentCount: d.appointmentCount ?? 0,
           specialty: d.specialty?.trim() || undefined,
+          externalPractitionerId: d.externalPractitionerId ?? undefined,
         })),
       ),
       tap((docs) => this.setDoctorsFromApiResponse(docs, persistSource)),
@@ -607,6 +898,7 @@ export class AgendaStateService {
               colorCode: d.colorCode,
               photoUrl: d.photoUrl ?? '',
               specialty: d.specialty?.trim() || undefined,
+              externalPractitionerId: d.externalPractitionerId ?? undefined,
             })),
           ),
         ),
@@ -633,6 +925,7 @@ export class AgendaStateService {
               photoUrl: d.photoUrl ?? '',
               appointmentCount: d.appointmentCount ?? 0,
               specialty: d.specialty?.trim() || undefined,
+              externalPractitionerId: d.externalPractitionerId ?? undefined,
             })),
           ),
         ),
@@ -735,6 +1028,19 @@ export class AgendaStateService {
       );
   }
 
+  updateAppointmentStatus(id: string, status: AppointmentStatus): Observable<void> {
+    return this.http
+      .patch<void>(`${AGENDA_API_BASE_URL}/api/appointments/${encodeURIComponent(id)}/status`, { status })
+      .pipe(
+        tap(() => this.refreshAppointments()),
+        map(() => undefined),
+        catchError((err) => {
+          this.handleHttpError(err);
+          return EMPTY;
+        }),
+      );
+  }
+
   get selectedDate(): Date {
     return this.selectedDateSubject.value;
   }
@@ -755,6 +1061,10 @@ export class AgendaStateService {
     return this.appointmentTypesSubject.value;
   }
 
+  get doctors(): Doctor[] {
+    return this.doctorsSubject.value;
+  }
+
   readonly selectedDate$ = this.selectedDateSubject.asObservable();
 
   readonly currentView$ = this.currentViewSubject.asObservable();
@@ -769,12 +1079,18 @@ export class AgendaStateService {
 
   readonly mobileSidebarOpen$ = this.mobileSidebarOpenSubject.asObservable();
 
+  readonly hideCompletedOrAbsent$ = this.hideCompletedOrAbsentSubject.asObservable();
+
   get gridComfort(): GridComfortMode {
     return this.gridComfortSubject.value;
   }
 
   get dayShowsThreeDays(): boolean {
     return this.dayShowsThreeDaysSubject.value;
+  }
+
+  get hideCompletedOrAbsent(): boolean {
+    return this.hideCompletedOrAbsentSubject.value;
   }
 
   setDayShowsThreeDays(value: boolean): void {
@@ -794,6 +1110,7 @@ export class AgendaStateService {
   setSelectedDoctorIds(ids: string[]): void {
     this.selectedDoctorsSubject.next([...ids]);
     this.persistUi();
+    this.appointmentTypesLoad$.next();
   }
 
   toggleDoctor(id: string): void {
@@ -805,6 +1122,7 @@ export class AgendaStateService {
     }
     this.selectedDoctorsSubject.next([...next]);
     this.persistUi();
+    this.appointmentTypesLoad$.next();
   }
 
   setVisibleTypeCodes(codes: string[]): void {
@@ -832,6 +1150,11 @@ export class AgendaStateService {
     this.mobileSidebarOpenSubject.next(!this.mobileSidebarOpenSubject.value);
   }
 
+  setHideCompletedOrAbsent(value: boolean): void {
+    this.hideCompletedOrAbsentSubject.next(value);
+    this.persistUi();
+  }
+
   closeMobileSidebar(): void {
     this.mobileSidebarOpenSubject.next(false);
   }
@@ -844,6 +1167,7 @@ export class AgendaStateService {
       currentView: this.currentViewSubject.value,
       gridComfort: 'comfortable',
       dayShowsThreeDays: this.dayShowsThreeDaysSubject.value || undefined,
+      hideCompletedOrAbsent: this.hideCompletedOrAbsentSubject.value || undefined,
     });
   }
 

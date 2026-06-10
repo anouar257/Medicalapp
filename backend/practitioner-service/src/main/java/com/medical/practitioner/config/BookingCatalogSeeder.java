@@ -19,6 +19,8 @@ import org.springframework.context.annotation.Configuration;
 public class BookingCatalogSeeder {
 
   private static final Logger log = LoggerFactory.getLogger(BookingCatalogSeeder.class);
+  private static final String LABEL_CONSULTATION = "Consultation";
+  private static final String TYPE_SUIVI = "SUIVI";
 
   private record Row(SpecialtyBookingStep step, String code, String labelFr, int sort) {}
 
@@ -67,8 +69,8 @@ public class BookingCatalogSeeder {
     return new Row[] {
       new Row(SpecialtyBookingStep.PRIOR_CARE, "NON", "Non, première fois", 10),
       new Row(SpecialtyBookingStep.PRIOR_CARE, "OUI", "Oui, déjà suivi(e)", 20),
-      new Row(SpecialtyBookingStep.VISIT_REASON, "CONSULTATION", "Consultation", 10),
-      new Row(SpecialtyBookingStep.VISIT_REASON, "SUIVI", "Suivi / contrôle", 20),
+      new Row(SpecialtyBookingStep.VISIT_REASON, "CONSULTATION", LABEL_CONSULTATION, 10),
+      new Row(SpecialtyBookingStep.VISIT_REASON, TYPE_SUIVI, "Suivi / contrôle", 20),
       new Row(SpecialtyBookingStep.VISIT_REASON, "URGENCE", "Douleur / urgence", 30),
     };
   }
@@ -79,11 +81,11 @@ public class BookingCatalogSeeder {
       new Row(SpecialtyBookingStep.PRIOR_CARE, "CONTROLE_ANNUEL", "Contrôle annuel", 20),
       new Row(SpecialtyBookingStep.PRIOR_CARE, "DETARTRAGE", "Détartrage", 30),
       new Row(SpecialtyBookingStep.PRIOR_CARE, "BLANCHIMENT", "Blanchiment", 40),
-      new Row(SpecialtyBookingStep.PRIOR_CARE, "CONSULT", "Consultation", 50),
-      new Row(SpecialtyBookingStep.VISIT_REASON, "CONSULTATION", "Consultation", 10),
+      new Row(SpecialtyBookingStep.PRIOR_CARE, "CONSULT", LABEL_CONSULTATION, 50),
+      new Row(SpecialtyBookingStep.VISIT_REASON, "CONSULTATION", LABEL_CONSULTATION, 10),
       new Row(SpecialtyBookingStep.VISIT_REASON, "DOULEUR", "Douleur dentaire", 20),
       new Row(SpecialtyBookingStep.VISIT_REASON, "CASSURE", "Couronne / bridge / cassure", 30),
-      new Row(SpecialtyBookingStep.VISIT_REASON, "SUIVI", "Suivi post-traitement", 40),
+      new Row(SpecialtyBookingStep.VISIT_REASON, TYPE_SUIVI, "Suivi post-traitement", 40),
     };
   }
 
@@ -93,7 +95,7 @@ public class BookingCatalogSeeder {
       new Row(SpecialtyBookingStep.PRIOR_CARE, "OUI", "Oui, patient connu", 20),
       new Row(SpecialtyBookingStep.VISIT_REASON, "PREMIERE", "Première consultation", 10),
       new Row(SpecialtyBookingStep.VISIT_REASON, "BILAN", "Bilan auditif", 20),
-      new Row(SpecialtyBookingStep.VISIT_REASON, "SUIVI", "Consultation de suivi", 30),
+      new Row(SpecialtyBookingStep.VISIT_REASON, TYPE_SUIVI, "Consultation de suivi", 30),
       new Row(SpecialtyBookingStep.VISIT_REASON, "REGLAGE", "Consultation de réglage", 40),
       new Row(SpecialtyBookingStep.VISIT_REASON, "PANNE", "Audioprothèse en panne", 50),
       new Row(SpecialtyBookingStep.VISIT_REASON, "APPAREIL", "Appareillage / renouvellement", 60),

@@ -33,7 +33,9 @@ public class OtpService {
      * @return SID Twilio
      */
     public String sendOtp(String to, String channel) {
-        log.info("[OTP] Envoi via {} à {}", channel, mask(to));
+        if (log.isInfoEnabled()) {
+            log.info("[OTP] Envoi via {} à {}", channel, mask(to));
+        }
 
         try {
             Verification verification = Verification.creator(
@@ -55,11 +57,15 @@ public class OtpService {
      * Vérifie le code OTP saisi par l'utilisateur.
      */
     public boolean verifyOtp(String to, String code) {
-        log.info("[OTP] Vérification pour {}", mask(to));
+        if (log.isInfoEnabled()) {
+            log.info("[OTP] Vérification pour {}", mask(to));
+        }
 
         // PASS MAGIQUE : Permet de tester même sans SMS reçu (compte Trial Twilio)
         if ("000000".equals(code)) {
-            log.warn("⚠️ [OTP] Utilisation du PASS MAGIQUE (000000) pour {}", mask(to));
+            if (log.isWarnEnabled()) {
+                log.warn("⚠️ [OTP] Utilisation du PASS MAGIQUE (000000) pour {}", mask(to));
+            }
             return true;
         }
 

@@ -4,12 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { PreferencesService } from '../../services/preferences.service';
-import { AppPreferencesToolbarComponent } from '../../shared/app-preferences-toolbar.component';
+import { AppNavbarComponent } from '../../shared/app-navbar.component';
 
 @Component({
   selector: 'app-forgot-password',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, AppPreferencesToolbarComponent],
+  imports: [CommonModule, FormsModule, RouterLink, AppNavbarComponent],
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.scss'],
 })

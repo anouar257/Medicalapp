@@ -73,6 +73,15 @@ export const APP_ROUTES: Routes = [
           ),
       },
       { path: 'assistant', pathMatch: 'full', redirectTo: 'demandes' },
+      {
+        path: 'payments',
+        canActivate: [roleGuard(['PRATICIEN', 'ASSISTANT'])],
+        data: { pageTitleKey: 'docTitle.cabinetPayments' },
+        loadComponent: () =>
+          import('./cabinet/cabinet-payments/cabinet-payments.component').then(
+            (m) => m.CabinetPaymentsComponent,
+          ),
+      },
 
       {
         path: 'profile',
@@ -220,6 +229,8 @@ export const APP_ROUTES: Routes = [
   {
     path: 'patient',
     canActivate: [authGuard, patientEmailVerifiedGuard],
+    loadComponent: () =>
+      import('./patient/patient-shell.component').then(m => m.PatientShellComponent),
     children: [
       {
         path: 'prendre-rendez-vous',

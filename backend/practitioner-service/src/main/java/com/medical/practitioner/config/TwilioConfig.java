@@ -28,8 +28,10 @@ public class TwilioConfig {
     @PostConstruct
     public void initTwilio() {
         Twilio.init(accountSid, authToken);
-        log.info("[practitioner-service] Twilio SDK initialisé — SID : {}...",
-                accountSid.substring(0, Math.min(8, accountSid.length())));
+        if (log.isInfoEnabled()) {
+            log.info("[practitioner-service] Twilio SDK initialisé — SID : {}...",
+                    accountSid.substring(0, Math.min(8, accountSid.length())));
+        }
     }
 
     public String getVerifyServiceSid() {

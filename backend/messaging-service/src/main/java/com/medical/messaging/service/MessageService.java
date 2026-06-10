@@ -37,15 +37,20 @@ public class MessageService {
 
   private static final Logger log = LoggerFactory.getLogger(MessageService.class);
 
+  private static final String MIME_JPEG = "image/jpeg";
+  private static final String MIME_PNG = "image/png";
+  private static final String MIME_WEBP = "image/webp";
+  private static final String MIME_PDF = "application/pdf";
+
   private static final Set<String> ALLOWED_ATTACHMENT_MIMES =
-      Set.of("image/jpeg", "image/png", "image/webp", "application/pdf");
+      Set.of(MIME_JPEG, MIME_PNG, MIME_WEBP, MIME_PDF);
 
   private static final Map<String, Set<String>> ALLOWED_EXTENSIONS_BY_MIME =
       Map.of(
-          "image/jpeg", Set.of("jpg", "jpeg"),
-          "image/png", Set.of("png"),
-          "image/webp", Set.of("webp"),
-          "application/pdf", Set.of("pdf"));
+          MIME_JPEG, Set.of("jpg", "jpeg"),
+          MIME_PNG, Set.of("png"),
+          MIME_WEBP, Set.of("webp"),
+          MIME_PDF, Set.of("pdf"));
 
   private final MessageRepository messageRepository;
   private final AttachmentRepository attachmentRepository;
@@ -104,7 +109,7 @@ public class MessageService {
       long messageId, long attachmentId, MessagingPrincipal principal) {
     Attachment att =
         attachmentRepository
-            .findByIdAndMessage_Id(attachmentId, messageId)
+            .findByIdAndMessageId(attachmentId, messageId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pièce jointe introuvable"));
     Message m = att.getMessage();
     assertParticipantMayViewMessage(m, principal);
@@ -117,15 +122,12 @@ public class MessageService {
         messageRepository
             .findById(messageId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Message introuvable"));
-    if (principal instanceof MessagingPrincipal.MessagingPatient p) {
-      if (!Objects.equals(m.getReceiverPatientId(), p.patientId())) {
-        throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-      }
-    } else if (principal instanceof MessagingPrincipal.MessagingPractitioner pr) {
-      if (pr.practitionerProfileId() == null
-          || !Objects.equals(m.getReceiverPractitionerProfileId(), pr.practitionerProfileId())) {
-        throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-      }
+    if ((principal instanceof MessagingPrincipal.MessagingPatient p
+            && !Objects.equals(m.getReceiverPatientId(), p.patientId()))
+        || (principal instanceof MessagingPrincipal.MessagingPractitioner pr
+            && (pr.practitionerProfileId() == null
+                || !Objects.equals(m.getReceiverPractitionerProfileId(), pr.practitionerProfileId())))) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     }
     m.setRead(true);
     return enrichSingle(toDto(m));
@@ -152,8 +154,9 @@ public class MessageService {
     }
     Long ownerId = mp.patientId();
     assertCanRepresent(ownerId, req.getConcernedPersonId());
-    assertAgendaRelationship(req.getConcernedPersonId(), req.getReceiverPractitionerProfileId());
+    assertAgendaRelationship(ownerId, req.getReceiverPractitionerProfileId(), true);
     patientMessageSendRateLimiter.acquireOrThrow(ownerId);
+    validatePatientMessagingLimits(ownerId, req.getReceiverPractitionerProfileId());
 
     Message m = new Message();
     m.setSenderPatientId(ownerId);
@@ -178,7 +181,7 @@ public class MessageService {
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST, "concernedPersonId doit être identique au patient destinataire");
     }
-    assertAgendaRelationship(req.getReceiverPatientId(), pp.practitionerProfileId());
+    assertAgendaRelationship(req.getReceiverPatientId(), pp.practitionerProfileId(), false);
 
     Message m = new Message();
     m.setSenderPractitionerProfileId(pp.practitionerProfileId());
@@ -201,15 +204,48 @@ public class MessageService {
     }
   }
 
-  private void assertAgendaRelationship(Long patientId, Long externalPractitionerProfileId) {
+  private void assertAgendaRelationship(Long patientId, Long externalPractitionerProfileId, boolean completedOnly) {
     Boolean exists =
         agendaMessagingClient
-            .hasRelationship(patientId, externalPractitionerProfileId)
+            .hasRelationship(patientId, externalPractitionerProfileId, completedOnly)
             .get("exists");
     if (!Boolean.TRUE.equals(exists)) {
       throw new ResponseStatusException(
           HttpStatus.CONFLICT,
-          "Aucun rendez-vous actif entre ce patient et ce praticien — envoi de message refusé");
+          completedOnly
+              ? "Aucun rendez-vous terminé entre ce patient et ce praticien — envoi de message refusé"
+              : "Aucun rendez-vous actif entre ce patient et ce praticien — envoi de message refusé");
+    }
+  }
+
+  private void validatePatientMessagingLimits(Long patientId, Long practitionerId) {
+    List<Message> latest = messageRepository.findConversation(
+        patientId, practitionerId, org.springframework.data.domain.Limit.of(20));
+
+    // 1. Check consecutive limit (max 3 consecutive messages without doctor reply)
+    int consecutive = 0;
+    for (Message m : latest) {
+      if (m.getSenderPatientId() != null) {
+        consecutive++;
+      } else {
+        break;
+      }
+    }
+    if (consecutive >= 3) {
+      throw new ResponseStatusException(
+          HttpStatus.TOO_MANY_REQUESTS,
+          "Vous avez envoyé 3 messages consécutifs sans réponse de ce praticien. Veuillez attendre sa réponse avant d'envoyer un nouveau message.");
+    }
+
+    // 2. Check daily limit (max 10 messages in the last 24 hours)
+    java.time.Instant oneDayAgo = java.time.Instant.now().minus(24, java.time.temporal.ChronoUnit.HOURS);
+    long dailyCount = latest.stream()
+        .filter(m -> m.getSenderPatientId() != null && m.getSentAt().isAfter(oneDayAgo))
+        .count();
+    if (dailyCount >= 10) {
+      throw new ResponseStatusException(
+          HttpStatus.TOO_MANY_REQUESTS,
+          "Limite quotidienne atteinte : vous ne pouvez pas envoyer plus de 10 messages par 24 heures à ce praticien.");
     }
   }
 
@@ -298,7 +334,7 @@ public class MessageService {
 
   private static void assertDecodedBytesMatchDeclaredMime(byte[] data, String mime) {
     switch (mime) {
-      case "application/pdf":
+      case MIME_PDF:
         if (data.length < 5
             || !new String(Arrays.copyOfRange(data, 0, 5), StandardCharsets.US_ASCII).startsWith("%PDF")) {
           throw new ResponseStatusException(
@@ -306,7 +342,7 @@ public class MessageService {
               "Format de fichier non autorisé : le contenu ne correspond pas à un document PDF.");
         }
         break;
-      case "image/jpeg":
+      case MIME_JPEG:
         if (data.length < 3
             || (data[0] & 0xFF) != 0xFF
             || (data[1] & 0xFF) != 0xD8
@@ -316,7 +352,7 @@ public class MessageService {
               "Format de fichier non autorisé : le contenu ne correspond pas à une image JPEG.");
         }
         break;
-      case "image/png":
+      case MIME_PNG:
         if (data.length < 8
             || (data[0] & 0xFF) != 0x89
             || data[1] != 0x50
@@ -331,7 +367,7 @@ public class MessageService {
               "Format de fichier non autorisé : le contenu ne correspond pas à une image PNG.");
         }
         break;
-      case "image/webp":
+      case MIME_WEBP:
         if (data.length < 12
             || data[0] != 'R'
             || data[1] != 'I'

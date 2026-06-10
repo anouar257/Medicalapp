@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AttachmentRepository extends JpaRepository<Attachment, Long> {
 
-  Optional<Attachment> findByIdAndMessage_Id(Long attachmentId, Long messageId);
+  Optional<Attachment> findByIdAndMessageId(Long attachmentId, Long messageId);
 }

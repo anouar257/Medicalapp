@@ -25,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class PlatformStatsService {
 
   private static final Logger log = LoggerFactory.getLogger(PlatformStatsService.class);
+  private static final String X_PLATFORM_STATS_KEY = "X-Platform-Stats-Key";
 
   private final MedicalOrganizationRepository organizationRepository;
   private final PractitionerProfileRepository practitionerProfileRepository;
@@ -63,7 +64,7 @@ public class PlatformStatsService {
   private long fetchPatientCount() {
     try {
       HttpHeaders headers = new HttpHeaders();
-      headers.set("X-Platform-Stats-Key", platformStatsSecret);
+      headers.set(X_PLATFORM_STATS_KEY, platformStatsSecret);
       HttpEntity<Void> entity = new HttpEntity<>(headers);
       String base = patientBaseUrl.replaceAll("/$", "");
       ResponseEntity<Map<String, Object>> resp =
@@ -72,12 +73,13 @@ public class PlatformStatsService {
               HttpMethod.GET,
               entity,
               new ParameterizedTypeReference<Map<String, Object>>() {});
-      if (resp.getBody() == null) {
+      Map<String, Object> body = resp.getBody();
+      if (body == null) {
         return 0;
       }
-      Object n = resp.getBody().get("totalPatients");
-      if (n instanceof Number) {
-        return ((Number) n).longValue();
+      Object n = body.get("totalPatients");
+      if (n instanceof Number number) {
+        return number.longValue();
       }
       return 0;
     } catch (RestClientException e) {
@@ -89,7 +91,7 @@ public class PlatformStatsService {
   public List<Map<String, Object>> listPlatformPatients() {
     try {
       HttpHeaders headers = new HttpHeaders();
-      headers.set("X-Platform-Stats-Key", platformStatsSecret);
+      headers.set(X_PLATFORM_STATS_KEY, platformStatsSecret);
       HttpEntity<Void> entity = new HttpEntity<>(headers);
       String base = patientBaseUrl.replaceAll("/$", "");
       ResponseEntity<List<Map<String, Object>>> resp =
@@ -108,7 +110,7 @@ public class PlatformStatsService {
   public void togglePatientActive(Long patientId) {
     try {
       HttpHeaders headers = new HttpHeaders();
-      headers.set("X-Platform-Stats-Key", platformStatsSecret);
+      headers.set(X_PLATFORM_STATS_KEY, platformStatsSecret);
       HttpEntity<Void> entity = new HttpEntity<>(headers);
       String base = patientBaseUrl.replaceAll("/$", "");
       http.exchange(

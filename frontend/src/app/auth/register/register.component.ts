@@ -5,12 +5,12 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { RegisterRequest, Sexe } from '../../models/patient.model';
 import { PreferencesService } from '../../services/preferences.service';
-import { AppPreferencesToolbarComponent } from '../../shared/app-preferences-toolbar.component';
+import { AppNavbarComponent } from '../../shared/app-navbar.component';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, AppPreferencesToolbarComponent],
+  imports: [CommonModule, FormsModule, RouterLink, AppNavbarComponent],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
 })
@@ -28,6 +28,8 @@ export class RegisterComponent {
     cguAcceptees: false
   };
   confirmPassword = '';
+  showPassword = false;
+  showConfirmPassword = false;
   loading = false;
   errorMessage = '';
   successMessage = '';

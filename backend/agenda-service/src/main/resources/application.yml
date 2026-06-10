@@ -20,10 +20,6 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
 
-# Répertoire persistant pour les portraits uploadés (créé automatiquement).
-agenda:
-  doctor-photos:
-    directory: ${AGENDA_DOCTOR_PHOTOS_DIR:${user.home}/.agenda/doctor-photos}
 
 # JWT patient + pro (alignés sur patient-service / practitioner-service).
 jwt:

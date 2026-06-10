@@ -58,7 +58,7 @@ public class DataInitializer {
     }
 
     @Transactional
-    protected void seedSpecialtyCatalogue(SpecialtyRepository repository) {
+    public void seedSpecialtyCatalogue(SpecialtyRepository repository) {
         int inserted = 0;
         for (Specialty s : CATALOGUE) {
             if (!repository.existsByCode(s.getCode())) {
@@ -72,7 +72,7 @@ public class DataInitializer {
     }
 
     @Transactional
-    protected void seedBookingWizardChoices(SpecialtyRepository repository, SpecialtyBookingChoiceRepository choiceRepository) {
+    public void seedBookingWizardChoices(SpecialtyRepository repository, SpecialtyBookingChoiceRepository choiceRepository) {
         if (choiceRepository.count() > 0) return;
 
         log.info("[Wizard] Initialisation des questions de réservation par défaut...");

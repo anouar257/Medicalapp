@@ -25,7 +25,10 @@ import org.springframework.web.server.ResponseStatusException;
 public class CabinetService {
 
   private static final Logger log = LoggerFactory.getLogger(CabinetService.class);
-  private static final String PASSWORD_CHARS =
+  private static final String ERROR_MEDICAL_ORG_NOT_FOUND = "MedicalOrganization introuvable";
+  private static final String ERROR_USER_NOT_FOUND = "Utilisateur introuvable";
+  private static final String ERROR_FORBIDDEN_ACTION = "Action interdite sur ce compte";
+  private static final String ALLOWED_CHARS_FOR_GENERATION =
       "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$";
   private static final SecureRandom RANDOM = new SecureRandom();
 
@@ -50,7 +53,7 @@ public class CabinetService {
     MedicalOrganization org =
         organizationRepository
             .findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cabinet introuvable"));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ERROR_MEDICAL_ORG_NOT_FOUND));
     return MedicalOrganizationDTO.fromEntity(org);
   }
 
@@ -103,6 +106,20 @@ public class CabinetService {
     if (body.getPays() != null) {
       org.setPays(body.getPays());
     }
+
+    if (body.getHoraires() != null) {
+      org.getHoraires().clear();
+      for (com.medical.practitioner.dto.CabinetHoraireDTO hDto : body.getHoraires()) {
+        com.medical.practitioner.entity.CabinetHoraire h = new com.medical.practitioner.entity.CabinetHoraire();
+        h.setCabinet(org);
+        h.setJour(hDto.getJour());
+        h.setHeureDebut(hDto.getHeureDebut());
+        h.setHeureFin(hDto.getHeureFin());
+        h.setContinu(hDto.isContinu());
+        org.getHoraires().add(h);
+      }
+    }
+
     org = organizationRepository.save(org);
     return MedicalOrganizationDTO.fromEntity(org);
   }
@@ -136,7 +153,7 @@ public class CabinetService {
     MedicalOrganization org =
         organizationRepository
             .findById(organizationId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cabinet introuvable"));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ERROR_MEDICAL_ORG_NOT_FOUND));
 
     if (proUserRepository.existsByEmail(request.getEmail())) {
       throw new ResponseStatusException(HttpStatus.CONFLICT, "Email déjà utilisé");
@@ -177,12 +194,12 @@ public class CabinetService {
     ProUser target =
         proUserRepository
             .findById(userId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur introuvable"));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ERROR_USER_NOT_FOUND));
     if (AccessPolicies.isPlatformAdmin(target)) {
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Action interdite sur ce compte");
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, ERROR_FORBIDDEN_ACTION);
     }
     if (target.getOrganization() == null) {
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Action interdite sur ce compte");
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, ERROR_FORBIDDEN_ACTION);
     }
     Long orgId = target.getOrganization().getId();
     AccessPolicies.requirePlatformAdminOrCabinetPraticien(actor, orgId);
@@ -198,12 +215,12 @@ public class CabinetService {
     ProUser target =
         proUserRepository
             .findById(userId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur introuvable"));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ERROR_USER_NOT_FOUND));
     if (AccessPolicies.isPlatformAdmin(target)) {
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Action interdite sur ce compte");
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, ERROR_FORBIDDEN_ACTION);
     }
     if (target.getOrganization() == null) {
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Action interdite sur ce compte");
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, ERROR_FORBIDDEN_ACTION);
     }
     Long orgId = target.getOrganization().getId();
     AccessPolicies.requirePlatformAdminOrCabinetPraticien(actor, orgId);
@@ -216,7 +233,7 @@ public class CabinetService {
     ProUser target =
         proUserRepository
             .findById(userId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur introuvable"));
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ERROR_USER_NOT_FOUND));
     if (target.isActif()) {
       desactiverUser(actor, userId);
     } else {
@@ -227,7 +244,7 @@ public class CabinetService {
   private static String generateTemporaryPassword() {
     StringBuilder sb = new StringBuilder(12);
     for (int i = 0; i < 12; i++) {
-      sb.append(PASSWORD_CHARS.charAt(RANDOM.nextInt(PASSWORD_CHARS.length())));
+      sb.append(ALLOWED_CHARS_FOR_GENERATION.charAt(RANDOM.nextInt(ALLOWED_CHARS_FOR_GENERATION.length())));
     }
     return sb.toString();
   }

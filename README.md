@@ -1,6 +1,6 @@
-# 🏥 MediAgenda - Plateforme de Gestion Médicale Moderne
+# 🏥 Mediconnect - Plateforme de Gestion Médicale Moderne
 
-MediAgenda est une solution complète de gestion de cabinet médical et de prise de rendez-vous en ligne, conçue avec une architecture microservices robuste et une interface utilisateur réactive et haute performance.
+Mediconnect est une solution complète de gestion de cabinet médical et de prise de rendez-vous en ligne, conçue avec une architecture microservices robuste et une interface utilisateur réactive et haute performance.
 
 ## 🛠️ Stack Technique
 
@@ -38,10 +38,10 @@ Le projet utilise **4 bases de données distinctes** pour garantir l'isolation d
 
 ### 1. Démarrage du Backend (Ordre recommandé)
 
-Chaque service doit être lancé dans son dossier respectif dans `backend/` :
+Chaque service peut être lancé dans son dossier respectif dans `backend/` :
 
 ```bash
-# Pour chaque dossier (agenda-service, patient-service, practitioner-service, messaging-service) :
+# Pour chaque dossier (agenda-service, patient-service, practitioner-service, messaging-service, payment-service) :
 mvn clean install
 mvn spring-boot:run
 ```
@@ -51,6 +51,7 @@ mvn spring-boot:run
 - `patient-service` : **8082** (Gestion des patients & comptes)
 - `practitioner-service` : **8083** (Profils praticiens & authentification pro)
 - `messaging-service` : **8084** (Messagerie sécurisée inter-services)
+- `payment-service` : **8085** (Gestion des paiements)
 
 ### 2. Démarrage du Frontend
 
@@ -69,5 +70,15 @@ L'application sera accessible sur `http://localhost:4200`.
 - **Design Premium :** Support complet du **Mode Sombre**, accessibilité avancée et animations fluides.
 - **Zéro Rechargement (No F5) :** Gestion d'état moderne via **Angular Signals** pour une réactivité instantanée.
 
----
+## 🐳 Déploiement avec Docker
 
+Le projet contient une configuration complète pour déployer l'ensemble des services via **Docker Compose**.
+
+Pour tout lancer (bases de données, backend, frontend via Nginx) :
+
+```bash
+docker-compose up --build -d
+```
+L'application complète sera alors disponible sur `http://localhost:4200`.
+
+---

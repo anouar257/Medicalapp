@@ -54,7 +54,7 @@
                     >
                       <option value="" disabled>Choisir un type…</option>
                       @for (t of vm.types; track t.id) {
-                        <option [value]="t.id">{{ t.label }}</option>
+                        <option [value]="t.id">{{ formatTypeOption(t) }}</option>
                       }
                     </select>
                   </div>
@@ -123,15 +123,48 @@
 
                   <div class="grid gap-3 sm:grid-cols-2">
                     <div class="grid gap-1.5">
-                      <label class="text-sm font-medium text-slate-800 dark:text-slate-200" for="apt-duration">Durée (min)</label>
-                      <input
-                        id="apt-duration"
-                        type="number"
-                        min="1"
-                        step="1"
-                        formControlName="durationMinutes"
-                        class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm shadow-sm transition hover:border-slate-300 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/40 dark:border-slate-600 dark:bg-slate-800/90 dark:text-slate-100"
-                      />
+                      <label class="text-sm font-medium text-slate-800 dark:text-slate-200">Durée (min)</label>
+                      <div class="flex gap-1.5 flex-wrap">
+                        @for (m of [15, 20, 30]; track m) {
+                          <button
+                            type="button"
+                            (click)="setDuration(m)"
+                            class="rounded-xl border px-3 py-2 text-xs font-semibold tracking-wide transition duration-200 outline-none shadow-sm flex items-center justify-center min-w-[3.5rem]"
+                            [ngClass]="(!isCustomSelected() && form.controls.durationMinutes.value === m)
+                              ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800/50 ring-1 ring-blue-100 dark:ring-blue-950/30' 
+                              : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 hover:border-slate-300 dark:bg-slate-800/80 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-700/80'"
+                          >
+                            {{ m }} min
+                          </button>
+                        }
+                        <button
+                          type="button"
+                          (click)="selectCustomDuration()"
+                          class="rounded-xl border px-3.5 py-2 text-xs font-semibold tracking-wide transition duration-200 outline-none shadow-sm flex items-center justify-center"
+                          [ngClass]="isCustomSelected()
+                            ? 'bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800/50 ring-1 ring-blue-100 dark:ring-blue-950/30' 
+                            : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 hover:border-slate-300 dark:bg-slate-800/80 dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-700/80'"
+                        >
+                          Autre...
+                        </button>
+                      </div>
+
+                      @if (isCustomSelected()) {
+                        <div class="relative mt-2 flex items-center animate-in fade-in slide-in-from-top-2 duration-200">
+                          <input
+                            id="apt-duration"
+                            type="number"
+                            min="1"
+                            step="1"
+                            formControlName="durationMinutes"
+                            placeholder="Ex. 45, 60, 90..."
+                            class="w-full rounded-xl border border-slate-200 bg-white pl-3 pr-12 py-2.5 text-sm shadow-sm transition hover:border-slate-300 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/40 dark:border-slate-600 dark:bg-slate-800/90 dark:text-slate-100 dark:placeholder:text-slate-500"
+                          />
+                          <span class="absolute right-3.5 text-xs font-medium text-slate-400 dark:text-slate-500 select-none">
+                            minutes
+                          </span>
+                        </div>
+                      }
                     </div>
                     <div class="grid gap-1.5">
                       <label class="text-sm font-medium text-slate-800 dark:text-slate-200" for="apt-end-time">Fin</label>
@@ -172,6 +205,30 @@
               <div
                 class="mt-6 flex shrink-0 flex-wrap justify-end gap-3 border-t border-slate-100 pt-5 dark:border-slate-700"
               >
+                @if (appointmentToEdit()?.status === 'CONFIRMED') {
+                  <div class="mr-auto flex items-center gap-2">
+                    <button
+                      type="button"
+                      class="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50/80 px-4 py-2.5 text-sm font-medium text-emerald-700 hover:bg-emerald-100 dark:border-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-400 dark:hover:bg-emerald-950/50 transition shadow-sm"
+                      (click)="markAsCompleted()"
+                    >
+                      <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                      Honoré
+                    </button>
+                    <button
+                      type="button"
+                      class="inline-flex items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50/80 px-4 py-2.5 text-sm font-medium text-rose-700 hover:bg-rose-100 dark:border-rose-800 dark:bg-rose-950/30 dark:text-rose-400 dark:hover:bg-rose-950/50 transition shadow-sm"
+                      (click)="markAsNoShow()"
+                    >
+                      <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                      Absent
+                    </button>
+                  </div>
+                }
                 <button
                   type="button"
                   class="rounded-full border border-slate-200 bg-white px-6 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"

@@ -1,5 +1,7 @@
 package com.medical.agenda.dto;
 
+import java.math.BigDecimal;
+
 /**
  * Contrat JSON public du catalogue de types de visite (table {@code appointment_types}).
  */
@@ -12,6 +14,10 @@ public class AppointmentTypeDTO {
   private Integer defaultDurationMinutes;
   private Integer displayOrder;
   private boolean active;
+  private BigDecimal price;
+  private boolean priceVariable;
+  private Long sourcePractitionerId;
+  private Long sourceActId;
 
   public Long getId() {
     return id;
@@ -67,5 +73,37 @@ public class AppointmentTypeDTO {
 
   public void setActive(boolean active) {
     this.active = active;
+  }
+
+  public BigDecimal getPrice() {
+    return price;
+  }
+
+  public void setPrice(BigDecimal price) {
+    this.price = price;
+  }
+
+  public boolean isPriceVariable() {
+    return priceVariable;
+  }
+
+  public void setPriceVariable(boolean priceVariable) {
+    this.priceVariable = priceVariable;
+  }
+
+  public Long getSourcePractitionerId() {
+    return sourcePractitionerId;
+  }
+
+  public void setSourcePractitionerId(Long sourcePractitionerId) {
+    this.sourcePractitionerId = sourcePractitionerId;
+  }
+
+  public Long getSourceActId() {
+    return sourceActId;
+  }
+
+  public void setSourceActId(Long sourceActId) {
+    this.sourceActId = sourceActId;
   }
 }

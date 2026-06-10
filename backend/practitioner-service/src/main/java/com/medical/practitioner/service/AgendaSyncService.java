@@ -43,8 +43,8 @@ public class AgendaSyncService {
     private final String agendaSyncSecret;
 
     public AgendaSyncService(RestTemplate practitionerRestTemplate,
-                             @Value("${agenda.base-url}") String agendaBaseUrl,
-                             @Value("${agenda.sync-enabled}") boolean syncEnabled,
+                             @Value("${agenda.base-url:http://localhost:8081}") String agendaBaseUrl,
+                             @Value("${agenda.sync-enabled:true}") boolean syncEnabled,
                              @Value("${agenda.sync-secret:}") String agendaSyncSecret) {
         this.restTemplate = practitionerRestTemplate;
         this.agendaBaseUrl = agendaBaseUrl;
@@ -112,13 +112,23 @@ public class AgendaSyncService {
         }
     }
 
+    private String resolveTitre(PractitionerProfile p) {
+        if (p.getTitre() == null) {
+            return "";
+        } else if ("DR".equals(p.getTitre().name())) {
+            return "Dr. ";
+        } else if ("PR".equals(p.getTitre().name())) {
+            return "Pr. ";
+        }
+        return "";
+    }
+
     private String buildFullName(PractitionerProfile p) {
         String prenom = p.getProUser() != null && p.getProUser().getPrenom() != null
                 ? p.getProUser().getPrenom() : "";
         String nom = p.getProUser() != null && p.getProUser().getNom() != null
                 ? p.getProUser().getNom() : "";
-        String titre = p.getTitre() != null && p.getTitre().name().equals("DR") ? "Dr. "
-                : p.getTitre() != null && p.getTitre().name().equals("PR") ? "Pr. " : "";
+        String titre = resolveTitre(p);
         return (titre + prenom + " " + nom).trim();
     }
 
@@ -126,7 +136,11 @@ public class AgendaSyncService {
         if (p.getSpecialites() == null || p.getSpecialites().isEmpty()) {
             return "Médecine générale";
         }
-        return p.getSpecialites().iterator().next().getLibelle();
+        return p.getSpecialites().stream()
+                .map(Specialty::getLibelle)
+                .filter(lib -> lib != null && !lib.isBlank())
+                .reduce((a, b) -> a + " / " + b)
+                .orElse("Médecine générale");
     }
 
     private String buildPrimarySpecialtyCode(PractitionerProfile p) {

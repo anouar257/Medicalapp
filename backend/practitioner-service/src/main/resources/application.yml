@@ -68,3 +68,8 @@ agenda:
   base-url: ${AGENDA_BASE_URL:http://localhost:8081}
   sync-enabled: ${AGENDA_SYNC_ENABLED:true}
   sync-secret: ${AGENDA_SYNC_SECRET:dev-agenda-sync-secret-change-me}
+
+# Répertoire persistant pour les photos de profil praticien uploadées.
+practitioner:
+  photos:
+    directory: ${PRACTITIONER_PHOTOS_DIR:${user.home}/.practitioner/photos}

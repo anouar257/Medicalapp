@@ -50,6 +50,7 @@ public class DualJwtParser {
       }
       return Optional.of(new MessagingPrincipal.MessagingPatient(patientId));
     } catch (Exception ignored) {
+      // Exception ignorée volontairement : le token n'est pas de type patient, on poursuit vers la tentative pro.
     }
     return Optional.empty();
   }
@@ -70,6 +71,7 @@ public class DualJwtParser {
           new MessagingPrincipal.MessagingPractitioner(
               userId, practitionerProfileId, role != null ? role : ""));
     } catch (Exception ignored) {
+      // Exception ignorée volontairement : le token n'est pas de type pro ou signature invalide, renvoie empty.
     }
     return Optional.empty();
   }

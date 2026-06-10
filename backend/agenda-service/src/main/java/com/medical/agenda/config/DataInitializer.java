@@ -1,39 +1,28 @@
 package com.medical.agenda.config;
 
-import com.medical.agenda.entity.AppointmentType;
 import com.medical.agenda.entity.Doctor;
-import com.medical.agenda.repository.AppointmentTypeRepository;
 import com.medical.agenda.repository.DoctorRepository;
 import com.medical.agenda.service.DoctorService;
 import java.util.List;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Initialisation technique du module agenda : catalogue des types de visite (référentiel) et
- * compléments non destructifs sur les données existantes (photos, spécialités manquantes).
+ * Initialisation technique du module agenda : compléments non destructifs sur les données
+ * existantes (schéma, photos, spécialités manquantes).
  *
- * <p>Aucun compte patient, praticien ni rendez-vous fictif n’est créé ici — uniquement des données
- * de configuration métier lorsque la base est vide sur ces référentiels.
+ * <p>Aucun type générique n'est recréé ici : le catalogue doit désormais provenir uniquement des
+ * actes médicaux synchronisés depuis les profils praticiens.
  */
 @Configuration
 public class DataInitializer {
 
-  /**
-   * Les trois types « métier » du cabinet — libellés FR, couleurs et ordre d’affichage alignés
-   * sidebar / formulaires.
-   */
-  private static final CatalogType[] VISIT_TYPES = {
-    new CatalogType("CONSULTATION", "Consultation", "#ef4444", 15, 10),
-    new CatalogType("SURGERY", "Chirurgie", "#a855f7", 45, 15),
-    new CatalogType("AUDIO_SESSION", "Séance longue (audioprothèse, bilan)", "#14b8a6", 45, 12),
-  };
-
   /** Renseigne une spécialité par défaut si la colonne existe mais est vide (migration). */
   @Transactional
-  void backfillDoctorSpecialty(DoctorRepository doctorRepository) {
+  public void backfillDoctorSpecialty(DoctorRepository doctorRepository) {
     List<Doctor> docs = doctorRepository.findAll();
     boolean dirty = false;
     for (Doctor d : docs) {
@@ -47,40 +36,58 @@ public class DataInitializer {
     }
   }
 
-  private record CatalogType(
-      String code, String label, String colorCode, int defaultDurationMinutes, int displayOrder) {}
-
   @Bean
-  CommandLineRunner seedAgenda(
-      DoctorRepository doctorRepository, AppointmentTypeRepository typeRepository) {
+  CommandLineRunner seedAgenda(JdbcTemplate jdbcTemplate, DoctorRepository doctorRepository) {
     return args -> {
-      syncVisitTypeCatalog(typeRepository);
+      ensureAppointmentTypesSchema(jdbcTemplate);
+      removeUnreferencedLegacyAppointmentTypes(jdbcTemplate);
       backfillDoctorPhotos(doctorRepository);
       backfillDoctorSpecialty(doctorRepository);
     };
   }
 
-  /** Insère les trois types canoniques s’ils manquent (sans écraser les réglages admin ultérieurs). */
-  @Transactional
-  void syncVisitTypeCatalog(AppointmentTypeRepository typeRepository) {
-    for (CatalogType def : VISIT_TYPES) {
-      if (typeRepository.existsByCode(def.code())) {
-        continue;
-      }
-      AppointmentType t = new AppointmentType();
-      t.setCode(def.code());
-      t.setLabel(def.label());
-      t.setColorCode(def.colorCode());
-      t.setDefaultDurationMinutes(def.defaultDurationMinutes());
-      t.setDisplayOrder(def.displayOrder());
-      t.setActive(true);
-      typeRepository.save(t);
-    }
+  /**
+   * Les vieux volumes Docker conservent parfois une table {@code appointment_types} incomplète.
+   * On ajoute ici les colonnes attendues par la version courante avant les premières requêtes métier.
+   */
+  public void ensureAppointmentTypesSchema(JdbcTemplate jdbcTemplate) {
+    jdbcTemplate.execute(
+        "ALTER TABLE appointment_types ADD COLUMN IF NOT EXISTS price NUMERIC(10,2)");
+    jdbcTemplate.execute(
+        "ALTER TABLE appointment_types ADD COLUMN IF NOT EXISTS price_variable BOOLEAN DEFAULT FALSE");
+    jdbcTemplate.execute(
+        "ALTER TABLE appointment_types ADD COLUMN IF NOT EXISTS source_practitioner_id BIGINT");
+    jdbcTemplate.execute(
+        "ALTER TABLE appointment_types ADD COLUMN IF NOT EXISTS source_act_id BIGINT");
+    jdbcTemplate.execute(
+        "UPDATE appointment_types SET price_variable = FALSE WHERE price_variable IS NULL");
+    jdbcTemplate.execute(
+        "ALTER TABLE appointment_types ALTER COLUMN price_variable SET DEFAULT FALSE");
+    jdbcTemplate.execute(
+        "ALTER TABLE appointment_types ALTER COLUMN price_variable SET NOT NULL");
   }
 
-  /** Remplit la photo des médecins existants qui n’en ont pas. */
+  /**
+   * Nettoie les anciens types génériques non référencés. Les types encore utilisés seront remappés
+   * progressivement lors de la synchronisation des actes puis supprimés dès qu'ils deviennent orphelins.
+   */
+  public void removeUnreferencedLegacyAppointmentTypes(JdbcTemplate jdbcTemplate) {
+    jdbcTemplate.execute(
+        """
+        DELETE FROM appointment_types t
+        WHERE t.source_act_id IS NULL
+          AND t.source_practitioner_id IS NULL
+          AND NOT EXISTS (
+            SELECT 1
+            FROM appointments a
+            WHERE a.appointment_type_id = t.id
+          )
+        """);
+  }
+
+  /** Remplit la photo des médecins existants qui n'en ont pas. */
   @Transactional
-  void backfillDoctorPhotos(DoctorRepository doctorRepository) {
+  public void backfillDoctorPhotos(DoctorRepository doctorRepository) {
     List<Doctor> docs = doctorRepository.findAll();
     boolean dirty = false;
     for (Doctor d : docs) {

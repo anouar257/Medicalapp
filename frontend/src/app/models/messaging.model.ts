@@ -45,3 +45,21 @@ export interface MessageResponseDto {
   read: boolean;
   attachments: MessagingAttachmentSummary[];
 }
+
+// ---- Modèles ajoutés pour l'interface de messagerie style Chat WhatsApp ----
+
+export interface AttachmentPayload {
+  fileName: string;
+  fileType: string;
+  base64Data: string;
+}
+
+export interface ChatConversation {
+  id: string; // Un identifiant unique pour regrouper (ex: 'patient_1_practitioner_2')
+  contactName: string; // Nom de la personne avec qui on discute
+  contactId: number; // L'ID du contact (patientId pour le docteur, practitionerProfileId pour le patient)
+  concernedPersonId: number; // L'ID de la personne concernée par les soins
+  messages: MessageResponseDto[]; // Liste triée de tous les messages de la conversation
+  lastMessage: MessageResponseDto; // Le message le plus récent (pour l'aperçu)
+  unreadCount: number; // Nombre de messages non lus
+}

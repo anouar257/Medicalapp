@@ -10,6 +10,7 @@ import {
   StatutPraticien,
   Titre,
 } from '../../models/practitioner.model';
+import { AppNavbarComponent } from '../../shared/app-navbar.component';
 
 /**
  * Inscription self-service d'un praticien (ou remplaçant).
@@ -26,7 +27,7 @@ import {
 @Component({
   selector: 'app-register-practitioner',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, AppNavbarComponent],
   templateUrl: './register-practitioner.component.html',
   styleUrls: ['./register-practitioner.component.scss'],
 })
@@ -55,6 +56,8 @@ export class RegisterPractitionerComponent implements OnInit {
   };
 
   confirmPassword = '';
+  showPassword = false;
+  showConfirmPassword = false;
   loading = false;
   loadingSpecialties = false;
   errorMessage = '';

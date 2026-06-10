@@ -80,9 +80,16 @@
             class="rounded-2xl border border-slate-100 dark:border-slate-700/80 bg-slate-50/80 dark:bg-slate-800/40 p-5 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4"
           >
             <div class="space-y-1 min-w-0 flex-1">
-              <p class="text-lg font-bold text-slate-900 dark:text-white truncate">
-                {{ patientLabel(row) }}
-              </p>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-lg font-bold text-slate-900 dark:text-white">
+                  {{ patientLabel(row) }}
+                </span>
+                @if (row.locationMode === 'REMOTE') {
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-semibold text-emerald-700 bg-emerald-50 rounded-full dark:bg-emerald-500/10 dark:text-emerald-400">
+                    🎥 Téléconsultation
+                  </span>
+                }
+              </div>
               <p class="text-sm text-slate-600 dark:text-slate-300">
                 <span class="font-semibold">{{ prefs.translate('assistant.pending.date') }}:</span>
                 {{ formatWhen(row.startTime) }}

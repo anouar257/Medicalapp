@@ -107,15 +107,144 @@
                 </div>
               </div>
               <div class="row">
-                <div class="form-group">
-                  <label>{{ prefs.translate('profile.label.photoUrl') }}</label>
-                  <input type="url" [(ngModel)]="profile.photoUrl" placeholder="https://..."/>
+                <div class="photo-section">
+                  <div class="photo-preview-container">
+                    <img [src]="getPhotoUrl(profile.photoUrl)" alt="Profile Photo" class="photo-preview-image"/>
+                  </div>
+                  <div class="photo-controls">
+                    <label>{{ prefs.translate('profile.label.photoUrl') }}</label>
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                      <button type="button" class="btn-secondary" (click)="fileInput.click()">
+                        Choisir une photo
+                      </button>
+                      <input type="file" (change)="onPhotoSelected($event)" accept="image/*" #fileInput hidden/>
+                    </div>
+                    <span class="muted" style="margin: 0; font-size: 0.75rem;">Formats acceptés : JPEG, PNG, WebP, GIF (max. 4MB)</span>
+                  </div>
                 </div>
                 <div class="form-group">
                   <label>{{ prefs.translate('profile.label.color') }}</label>
-                  <input type="color" [(ngModel)]="profile.colorCode"/>
+                  <input type="color" [(ngModel)]="profile.colorCode" style="padding: 0; height: 46px; width: 80px; cursor: pointer;"/>
                 </div>
               </div>
+              <div class="row">
+                <div class="form-group">
+                  <label>{{ prefs.translate('profile.label.consultationFee') }}</label>
+                  <input type="number" min="0" step="1" [(ngModel)]="profile.consultationFee" placeholder="400"/>
+                </div>
+                <div class="form-group">
+                  <label>{{ prefs.translate('profile.label.rating') }}</label>
+                  <div class="rating-summary">
+                    <div class="rating-stars">
+                      @for (star of ratingStars; track star) {
+                        <span [class.active]="star <= filledRating(profile.globalRating)">★</span>
+                      }
+                    </div>
+                    <div class="rating-meta">
+                      <strong>{{ (profile.globalRating ?? 0).toFixed(1) }}</strong>
+                      <span>({{ profile.reviewCount ?? 0 }} avis)</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="card wide">
+              <h2>Actes médicaux et Tarification</h2>
+              <p class="muted">Gérez les actes médicaux que vous proposez ainsi que leurs tarifs et durées associés.</p>
+
+              <!-- List of Acts -->
+              <div style="margin-bottom: 2rem; overflow-x: auto;">
+                <table class="acts-table" style="width: 100%; border-collapse: collapse; min-width: 600px;">
+                  <thead>
+                    <tr style="border-bottom: 2px solid var(--border); text-align: left;">
+                      <th style="padding: 12px 16px; font-weight: 600; color: var(--text-secondary);">Nom de l'acte</th>
+                      <th style="padding: 12px 16px; font-weight: 600; color: var(--text-secondary);">Durée</th>
+                      <th style="padding: 12px 16px; font-weight: 600; color: var(--text-secondary);">Tarif</th>
+                      <th style="padding: 12px 16px; font-weight: 600; color: var(--text-secondary); text-align: right;">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (act of acts; track act.id) {
+                      <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 16px; font-weight: 500;">{{ act.name }}</td>
+                        <td style="padding: 16px;">{{ act.durationMinutes }} min</td>
+                        <td style="padding: 16px; font-weight: 600; color: var(--primary);">
+                          {{ act.isPriceVariable ? 'À discuter' : (act.price != null ? (act.price | number:'1.0-0') + ' DH' : 'À discuter') }}
+                        </td>
+                        <td style="padding: 16px; text-align: right; display: flex; gap: 0.5rem; justify-content: flex-end;">
+                          <button type="button" class="btn-secondary" (click)="editAct(act)">
+                            Modifier
+                          </button>
+                          <button type="button" class="btn-secondary" style="color: var(--error); border-color: var(--error);" (click)="deleteAct(act.id)">
+                            Supprimer
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                    @if (acts.length === 0) {
+                      <tr>
+                        <td colspan="4" style="padding: 24px; text-align: center; color: var(--text-muted);">
+                          Aucun acte configuré. Cliquez sur le bouton ci-dessous pour ajouter votre premier acte médical.
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Add Act Button -->
+              @if (!showActForm) {
+                <button type="button" class="btn-primary" (click)="addNewAct()">
+                  + Ajouter un acte médical
+                </button>
+              }
+
+              <!-- Act Form (Inline Card) -->
+              @if (showActForm && editingAct) {
+                <div style="background: var(--bg-dark); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-top: 1rem;">
+                  <h3 style="font-size: 1rem; font-weight: bold; margin-bottom: 1rem;">
+                    {{ editingAct.id ? 'Modifier l\'acte médical' : 'Ajouter un nouvel acte médical' }}
+                  </h3>
+                  
+                  <div class="row">
+                    <div class="form-group">
+                      <label>Nom de l'acte</label>
+                      <input type="text" [(ngModel)]="editingAct.name" placeholder="ex: Consultation de pédiatrie, Chirurgie mineure..."/>
+                    </div>
+                    <div class="form-group">
+                      <label>Durée par défaut</label>
+                      <select [(ngModel)]="editingAct.durationMinutes">
+                        <option [ngValue]="15">15 min</option>
+                        <option [ngValue]="30">30 min</option>
+                        <option [ngValue]="45">45 min</option>
+                        <option [ngValue]="60">60 min</option>
+                        <option [ngValue]="90">90 min</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="row" style="align-items: center;">
+                    <div class="form-group">
+                      <label>Tarif (DH)</label>
+                      <input type="number" min="0" step="10" [(ngModel)]="editingAct.price" [disabled]="editingAct.isPriceVariable" placeholder="ex: 400"/>
+                    </div>
+                    <div class="form-group" style="flex-direction: row; align-items: center; gap: 0.5rem; margin-top: 1.25rem;">
+                      <input type="checkbox" id="priceVariableCheckbox" [(ngModel)]="editingAct.isPriceVariable" style="width: auto; cursor: pointer;"/>
+                      <label for="priceVariableCheckbox" style="cursor: pointer; font-weight: 500;">Prix variable / À discuter</label>
+                    </div>
+                  </div>
+
+                  <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1rem;">
+                    <button type="button" class="btn-secondary" (click)="cancelActEdit()">
+                      Annuler
+                    </button>
+                    <button type="button" class="btn-primary" (click)="saveAct()">
+                      Enregistrer
+                    </button>
+                  </div>
+                </div>
+              }
             </section>
 
             <section class="card">

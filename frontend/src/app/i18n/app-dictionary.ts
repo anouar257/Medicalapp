@@ -53,6 +53,8 @@ export const APP_DICTIONARY: Record<string, Record<I18nLang, string>> = {
     en: 'No practitioners found.',
     ar: 'لم يتم العثور على أطباء.',
   },
+  'Choisir une ville': { fr: 'Choisir une ville', en: 'Choose a city', ar: 'اختر مدينة' },
+  'Aucune ville trouvée': { fr: 'Aucune ville trouvée', en: 'No city found', ar: 'لم يتم العثور على مدينة' },
   'Ajustez les critères.': {
     fr: 'Ajustez un ou plusieurs critères et réessayez.',
     en: 'Adjust one or more filters and try again.',
@@ -94,6 +96,18 @@ export const APP_DICTIONARY: Record<string, Record<I18nLang, string>> = {
   Spécialité: { fr: 'Spécialité', en: 'Specialty', ar: 'التخصص' },
   Thème: { fr: 'Thème clair ou sombre', en: 'Theme', ar: 'المظهر' },
   Déconnexion: { fr: 'Déconnexion', en: 'Log out', ar: 'تسجيل الخروج' },
+  'À venir': { fr: 'À venir', en: 'Upcoming', ar: 'المواعيد القادمة' },
+  'Passés & Annulés': { fr: 'Passés & Annulés', en: 'Past & Cancelled', ar: 'المواعيد السابقة والملغاة' },
+  Tous: { fr: 'Tous', en: 'All', ar: 'الكل' },
+  'Aucun rendez-vous à venir.': { fr: 'Aucun rendez-vous à venir.', en: 'No upcoming appointments.', ar: 'لا توجد مواعيد قادمة.' },
+  'Aucun rendez-vous passé.': { fr: 'Aucun rendez-vous passé.', en: 'No past appointments.', ar: 'لا توجد مواعيد سابقة.' },
+  'Précédent': { fr: 'Précédent', en: 'Previous', ar: 'السابق' },
+  'Suivant': { fr: 'Suivant', en: 'Next', ar: 'التالي' },
+  'Page': { fr: 'Page', en: 'Page', ar: 'صفحة' },
+  'sur': { fr: 'sur', en: 'of', ar: 'من' },
+  'Affichage de': { fr: 'Affichage de', en: 'Showing', ar: 'عرض' },
+  'à': { fr: 'à', en: 'to', ar: 'إلى' },
+  'rendez-vous': { fr: 'rendez-vous', en: 'appointments', ar: 'موعد' },
 
   // ── Auth patient ───────────────────────────────────────────────────────
   'auth.login.title': { fr: 'Bon retour', en: 'Welcome back', ar: 'مرحبًا بعودتك' },
@@ -281,6 +295,8 @@ export const APP_DICTIONARY: Record<string, Record<I18nLang, string>> = {
   'profile.label.youtube': { fr: 'Lien YouTube', en: 'YouTube link', ar: 'رابط يوتيوب' },
   'profile.label.photoUrl': { fr: 'Photo (URL)', en: 'Photo (URL)', ar: 'الصورة (رابط)' },
   'profile.label.color': { fr: 'Couleur agenda', en: 'Calendar color', ar: 'لون الأجندة' },
+  'profile.label.consultationFee': { fr: 'Tarif consultation', en: 'Consultation fee', ar: 'سعر الاستشارة' },
+  'profile.label.rating': { fr: 'Note & avis', en: 'Rating & reviews', ar: 'التقييم والآراء' },
   'profile.bioPlaceholder': {
     fr: 'Présentez-vous en quelques lignes…',
     en: 'Introduce yourself in a few lines…',
@@ -640,7 +656,7 @@ export const APP_DICTIONARY: Record<string, Record<I18nLang, string>> = {
     en: 'All specialties',
     ar: 'جميع التخصصات',
   },
-  'patient.booking.continue': { fr: 'Continuer', en: 'Continue', ar: 'متابعة' },
+  'patient.booking.continue': { fr: 'Suivant', en: 'Continue', ar: 'متابعة' },
   'patient.booking.back': { fr: 'Retour', en: 'Back', ar: 'رجوع' },
   'patient.booking.noResults': {
     fr: 'Aucun praticien ne correspond à votre recherche.',
@@ -863,6 +879,7 @@ export const APP_DICTIONARY: Record<string, Record<I18nLang, string>> = {
   'docTitle.patientProches': { fr: 'Mes proches', en: 'My contacts', ar: 'أقربائي' },
   'docTitle.patientMessages': { fr: 'Messagerie patient', en: 'Patient messaging', ar: 'رسائل المريض' },
   'docTitle.cabinetMessages': { fr: 'Messagerie cabinet', en: 'Practice messaging', ar: 'رسائل العيادة' },
+  'docTitle.cabinetPayments': { fr: 'Paiements', en: 'Payments', ar: 'المدفوعات' },
   'nav.messages': { fr: 'Messages', en: 'Messages', ar: 'الرسائل' },
   'messaging.patient.pageTitle': {
     fr: 'Vos messages',
@@ -886,9 +903,19 @@ export const APP_DICTIONARY: Record<string, Record<I18nLang, string>> = {
     ar: 'اختر طبيبًا قمت بزيارته',
   },
   'messaging.step2.empty': {
-    fr: 'Aucun praticien éligible. Prenez d’abord un rendez-vous.',
-    en: 'No eligible practitioner. Book an appointment first.',
-    ar: 'لا يوجد طبيب مؤهل. احجز موعدًا أولاً.',
+    fr: 'Vous devez avoir effectué au moins un rendez-vous terminé avec un praticien pour pouvoir lui envoyer un message.',
+    en: 'You must have completed at least one appointment with a practitioner to send them a message.',
+    ar: 'يجب أن تكون قد أكملت موعدًا واحدًا على الأقل مع الطبيب لتتمكن من إرسال رسالة إليه.',
+  },
+  'messaging.step2.noPractitioners': {
+    fr: 'Vous devez avoir effectué au moins un rendez-vous terminé avec un praticien pour pouvoir lui envoyer un message.',
+    en: 'You must have completed at least one appointment with a practitioner to send them a message.',
+    ar: 'يجب أن تكون قد أكملت موعدًا واحدًا على الأقل مع الطبيب لتتمكن من إرسال رسالة إليه.',
+  },
+  'messaging.compose': {
+    fr: 'Nouveau message',
+    en: 'New message',
+    ar: 'رسالة جديدة',
   },
   'messaging.step3.title': { fr: 'Objet du message', en: 'Subject', ar: 'موضوع الرسالة' },
   'messaging.step4.title': { fr: 'Message et pièces jointes', en: 'Message and attachments', ar: 'النص والمرفقات' },
@@ -998,6 +1025,21 @@ export const APP_DICTIONARY: Record<string, Record<I18nLang, string>> = {
     fr: 'Écrivez à un praticien que vous avez consulté.',
     en: 'Write to a practitioner you have seen.',
     ar: 'اكتب لطبيب قمت باستشارته.',
+  },
+  'messaging.limits.noCompletedAppointment': {
+    fr: 'Vous devez avoir effectué au moins un rendez-vous terminé avec ce praticien pour lui envoyer un message.',
+    en: 'You must have had at least one completed appointment with this practitioner to send them a message.',
+    ar: 'يجب أن يكون لديك موعد مكتمل واحد على الأقل مع هذا الطبيب لإرسال رسالة إليه.',
+  },
+  'messaging.limits.consecutiveBlocked': {
+    fr: "Vous avez envoyé 3 messages consécutifs sans réponse de ce praticien. Veuillez attendre sa réponse.",
+    en: 'You have sent 3 consecutive messages without a response from this practitioner. Please wait for their reply.',
+    ar: 'لقد أرسلت 3 رسائل متتالية دون رد من هذا الطبيب. يرجى انتظار رده.',
+  },
+  'messaging.limits.dailyLimitReached': {
+    fr: 'Limite quotidienne atteinte : maximum 10 messages par 24 heures.',
+    en: 'Daily limit reached: maximum 10 messages per 24 hours.',
+    ar: 'تم الوصول إلى الحد اليومي الأقصى: 10 رسائل كحد أقصى كل 24 ساعة.',
   },
 
   'cabinet.dashboard.h1': {

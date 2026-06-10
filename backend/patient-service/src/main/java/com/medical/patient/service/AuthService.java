@@ -25,6 +25,7 @@ import java.util.UUID;
 public class AuthService {
 
     private static final Logger log = LoggerFactory.getLogger(AuthService.class);
+    private static final String CHANNEL_EMAIL = "email";
 
     private final PatientRepository patientRepository;
     private final PasswordEncoder passwordEncoder;
@@ -38,7 +39,7 @@ public class AuthService {
     @Value("${app.password-reset.base-url}")
     private String resetBaseUrl;
 
-    @Value("${spring.mail.username:noreply@mediagenda.com}")
+    @Value("${spring.mail.username:noreply@mediconnect.com}")
     private String fromEmail;
 
     public AuthService(PatientRepository patientRepository,
@@ -92,13 +93,14 @@ public class AuthService {
         patient.setMotDePasse(passwordEncoder.encode(request.getMotDePasse()));
         patient.setCguAcceptees(true);
         patient.setDateInscription(Instant.now());
+        patient.setVille(request.getVille());
 
         Patient saved = patientRepository.save(patient);
         log.info("Patient inscrit avec succès — ID: {}, Email: {}", saved.getId(), saved.getEmail());
 
         // Envoyer OTP par email et SMS pour vérification
         try {
-            otpService.sendOtp(saved.getEmail(), "email");
+            otpService.sendOtp(saved.getEmail(), CHANNEL_EMAIL);
         } catch (Exception e) {
             log.warn("Impossible d'envoyer l'OTP email à {} : {}", saved.getEmail(), e.getMessage());
         }
@@ -121,7 +123,7 @@ public class AuthService {
         boolean verified = otpService.verifyOtp(request.getTo(), request.getCode());
 
         if (verified) {
-            if ("email".equalsIgnoreCase(request.getChannel())) {
+            if (CHANNEL_EMAIL.equalsIgnoreCase(request.getChannel())) {
                 Optional<Patient> patientOpt = patientRepository.findByEmail(request.getTo());
                 patientOpt.ifPresent(p -> {
                     p.setEmailVerifie(true);
@@ -162,7 +164,7 @@ public class AuthService {
         if (patient == null) {
             return Optional.empty();
         }
-        if ("email".equalsIgnoreCase(request.getChannel())) {
+        if (CHANNEL_EMAIL.equalsIgnoreCase(request.getChannel())) {
             if (!patient.getEmail().equalsIgnoreCase(request.getTo())) {
                 return Optional.empty();
             }
@@ -178,17 +180,19 @@ public class AuthService {
     }
 
     private AuthResponse toAuthResponse(Patient patient, String token) {
-        return new AuthResponse(
-                token,
-                patient.getId(),
-                patient.getEmail(),
-                patient.getPrenom(),
-                patient.getNom(),
-                patient.getSexe(),
-                patient.getDateNaissance(),
-                patient.getTelephone(),
-                patient.isEmailVerifie(),
-                patient.isTelephoneVerifie());
+        return AuthResponse.builder()
+                .token(token)
+                .patientId(patient.getId())
+                .email(patient.getEmail())
+                .prenom(patient.getPrenom())
+                .nom(patient.getNom())
+                .sexe(patient.getSexe())
+                .dateNaissance(patient.getDateNaissance())
+                .telephone(patient.getTelephone())
+                .emailVerifie(patient.isEmailVerifie())
+                .telephoneVerifie(patient.isTelephoneVerifie())
+                .ville(patient.getVille())
+                .build();
     }
 
     /**
@@ -239,7 +243,7 @@ public class AuthService {
     public void forgotPassword(ForgotPasswordRequest request) {
         Optional<Patient> patientOpt;
 
-        if ("email".equalsIgnoreCase(request.getChannel())) {
+        if (CHANNEL_EMAIL.equalsIgnoreCase(request.getChannel())) {
             patientOpt = patientRepository.findByEmail(request.getIdentifiant());
         } else {
             patientOpt = patientRepository.findByTelephone(request.getIdentifiant());
@@ -248,7 +252,7 @@ public class AuthService {
         Patient patient = patientOpt
                 .orElseThrow(() -> new IllegalArgumentException("Aucun compte trouvé avec cet identifiant"));
 
-        if ("email".equalsIgnoreCase(request.getChannel())) {
+        if (CHANNEL_EMAIL.equalsIgnoreCase(request.getChannel())) {
             // Générer un token unique et envoyer par email
             String resetToken = UUID.randomUUID().toString();
             patient.setResetToken(resetToken);
@@ -292,7 +296,7 @@ public class AuthService {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(fromEmail);
         message.setTo(to);
-        message.setSubject("MediAgenda — Réinitialisation de votre mot de passe");
+        message.setSubject("Mediconnect — Réinitialisation de votre mot de passe");
         message.setText(
             "Bonjour,\n\n" +
             "Vous avez demandé la réinitialisation de votre mot de passe.\n\n" +
@@ -300,7 +304,7 @@ public class AuthService {
             resetLink + "\n\n" +
             "Ce lien expire dans " + resetTokenExpirationMinutes + " minutes.\n\n" +
             "Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.\n\n" +
-            "L'équipe MediAgenda"
+            "L'équipe Mediconnect"
         );
 
         mailSender.send(message);

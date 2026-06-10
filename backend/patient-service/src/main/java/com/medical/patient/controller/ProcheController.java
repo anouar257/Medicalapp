@@ -19,6 +19,10 @@ import java.util.Map;
 @RequestMapping("/api/proches")
 public class ProcheController {
 
+    private static final String ERROR_KEY = "error";
+    private static final String NON_AUTHENTIFIE = "Non authentifié";
+    private static final String MESSAGE_KEY = "message";
+
     private final ProcheService procheService;
 
     public ProcheController(ProcheService procheService) {
@@ -29,9 +33,9 @@ public class ProcheController {
      * Liste tous les proches du patient authentifié.
      */
     @GetMapping
-    public ResponseEntity<?> getMyProches(@AuthenticationPrincipal Patient patient) {
+    public ResponseEntity<Object> getMyProches(@AuthenticationPrincipal Patient patient) {
         if (patient == null) {
-            return ResponseEntity.status(401).body(Map.of("error", "Non authentifié"));
+            return ResponseEntity.status(401).body(Map.of(ERROR_KEY, NON_AUTHENTIFIE));
         }
         List<Proche> proches = procheService.findByPatientId(patient.getId());
         return ResponseEntity.ok(proches);
@@ -41,16 +45,16 @@ public class ProcheController {
      * Récupère un proche par son ID.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<?> getProche(@AuthenticationPrincipal Patient patient,
+    public ResponseEntity<Object> getProche(@AuthenticationPrincipal Patient patient,
                                         @PathVariable Long id) {
         if (patient == null) {
-            return ResponseEntity.status(401).body(Map.of("error", "Non authentifié"));
+            return ResponseEntity.status(401).body(Map.of(ERROR_KEY, NON_AUTHENTIFIE));
         }
         try {
             Proche proche = procheService.findByIdAndPatientId(id, patient.getId());
             return ResponseEntity.ok(proche);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(ERROR_KEY, e.getMessage()));
         }
     }
 
@@ -58,16 +62,16 @@ public class ProcheController {
      * Crée un nouveau proche pour le patient authentifié.
      */
     @PostMapping
-    public ResponseEntity<?> createProche(@AuthenticationPrincipal Patient patient,
+    public ResponseEntity<Object> createProche(@AuthenticationPrincipal Patient patient,
                                            @Valid @RequestBody Proche proche) {
         if (patient == null) {
-            return ResponseEntity.status(401).body(Map.of("error", "Non authentifié"));
+            return ResponseEntity.status(401).body(Map.of(ERROR_KEY, NON_AUTHENTIFIE));
         }
         try {
             Proche created = procheService.create(patient.getId(), proche);
             return ResponseEntity.status(HttpStatus.CREATED).body(created);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+            return ResponseEntity.badRequest().body(Map.of(ERROR_KEY, e.getMessage()));
         }
     }
 
@@ -75,17 +79,17 @@ public class ProcheController {
      * Met à jour un proche existant.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateProche(@AuthenticationPrincipal Patient patient,
+    public ResponseEntity<Object> updateProche(@AuthenticationPrincipal Patient patient,
                                            @PathVariable Long id,
                                            @Valid @RequestBody Proche updates) {
         if (patient == null) {
-            return ResponseEntity.status(401).body(Map.of("error", "Non authentifié"));
+            return ResponseEntity.status(401).body(Map.of(ERROR_KEY, NON_AUTHENTIFIE));
         }
         try {
             Proche updated = procheService.update(id, patient.getId(), updates);
             return ResponseEntity.ok(updated);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+            return ResponseEntity.badRequest().body(Map.of(ERROR_KEY, e.getMessage()));
         }
     }
 
@@ -93,16 +97,16 @@ public class ProcheController {
      * Supprime un proche.
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteProche(@AuthenticationPrincipal Patient patient,
+    public ResponseEntity<Map<String, Object>> deleteProche(@AuthenticationPrincipal Patient patient,
                                            @PathVariable Long id) {
         if (patient == null) {
-            return ResponseEntity.status(401).body(Map.of("error", "Non authentifié"));
+            return ResponseEntity.status(401).body(Map.of(ERROR_KEY, NON_AUTHENTIFIE));
         }
         try {
             procheService.delete(id, patient.getId());
-            return ResponseEntity.ok(Map.of("message", "Proche supprimé avec succès"));
+            return ResponseEntity.ok(Map.of(MESSAGE_KEY, "Proche supprimé avec succès"));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+            return ResponseEntity.badRequest().body(Map.of(ERROR_KEY, e.getMessage()));
         }
     }
 }

@@ -44,6 +44,9 @@ public final class AccessPolicies {
     if (isPlatformAdmin(actor)) {
       return;
     }
+    if (actor == null) {
+      throw forbidden();
+    }
     if (actor.getRole() != ProUserRole.PRATICIEN) {
       throw forbidden();
     }

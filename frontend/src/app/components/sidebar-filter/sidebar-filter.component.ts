@@ -181,4 +181,11 @@ export class SidebarFilterComponent {
     }
     this.agenda.setVisibleTypeCodes([...next]);
   }
+
+  formatTariff(price: number | null | undefined, isVariable?: boolean): string {
+    if (isVariable || price == null || Number.isNaN(Number(price))) {
+      return 'À discuter';
+    }
+    return `${Math.round(Number(price)).toLocaleString('fr-FR')} DH`;
+  }
 }

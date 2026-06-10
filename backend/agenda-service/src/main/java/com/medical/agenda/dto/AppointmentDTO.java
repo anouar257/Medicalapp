@@ -51,6 +51,9 @@ public class AppointmentDTO {
 
   private AppointmentStatus status;
 
+  /** Le mode de consultation (ex: REMOTE, CABINET, CLINIC) */
+  private String locationMode;
+
   public Long getId() {
     return id;
   }
@@ -209,5 +212,13 @@ public class AppointmentDTO {
 
   public void setStatus(AppointmentStatus status) {
     this.status = status;
+  }
+
+  public String getLocationMode() {
+    return locationMode;
+  }
+
+  public void setLocationMode(String locationMode) {
+    this.locationMode = locationMode;
   }
 }

@@ -1,5 +1,6 @@
 package com.medical.agenda.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.Instant;
 
@@ -75,6 +77,12 @@ public class Appointment {
 
   @Column(name = "visit_reason_code", length = 64)
   private String visitReasonCode;
+
+  @OneToOne(mappedBy = "appointment", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+  private MedicalRecord medicalRecord;
+
+  @Column(name = "location_mode", length = 32)
+  private String locationMode;
 
   public Long getId() {
     return id;
@@ -187,5 +195,21 @@ public class Appointment {
 
   public void setVisitReasonCode(String visitReasonCode) {
     this.visitReasonCode = visitReasonCode;
+  }
+
+  public MedicalRecord getMedicalRecord() {
+    return medicalRecord;
+  }
+
+  public void setMedicalRecord(MedicalRecord medicalRecord) {
+    this.medicalRecord = medicalRecord;
+  }
+
+  public String getLocationMode() {
+    return locationMode;
+  }
+
+  public void setLocationMode(String locationMode) {
+    this.locationMode = locationMode;
   }
 }

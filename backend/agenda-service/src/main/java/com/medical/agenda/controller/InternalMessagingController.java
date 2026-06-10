@@ -36,15 +36,20 @@ public class InternalMessagingController {
   public Map<String, Boolean> hasRelationship(
       @RequestParam("patientId") Long patientId,
       @RequestParam("externalPractitionerId") Long externalPractitionerId,
+      @RequestParam(value = "completedOnly", required = false, defaultValue = "false") boolean completedOnly,
       @RequestHeader(value = "X-Messaging-Secret", required = false) String secret) {
     requireSecret(secret);
     if (patientId == null || externalPractitionerId == null) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "patientId et externalPractitionerId requis");
     }
-    boolean exists =
-        appointmentRepository.countActiveRelationBetweenPatientAndPractitionerProfile(
-                patientId, externalPractitionerId)
-            > 0;
+    boolean exists;
+    if (completedOnly) {
+      exists = appointmentRepository.countCompletedRelationBetweenPatientAndPractitionerProfile(
+          patientId, externalPractitionerId) > 0;
+    } else {
+      exists = appointmentRepository.countActiveRelationBetweenPatientAndPractitionerProfile(
+          patientId, externalPractitionerId) > 0;
+    }
     return Map.of("exists", exists);
   }
 

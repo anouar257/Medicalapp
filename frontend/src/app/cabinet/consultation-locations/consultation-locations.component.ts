@@ -108,10 +108,37 @@ export class ConsultationLocationsComponent {
 
   addHoraire() {
     if (!this.editing) return;
+    
+    let nextDay: JourSemaine = 'LUNDI';
+    let nextStart = '09:00';
+    let nextEnd = '12:00';
+    
+    const count = this.editing.horaires.length;
+    if (count > 0) {
+      const last = this.editing.horaires[count - 1];
+      nextDay = last.jour;
+      
+      // Compter le nombre de plages déjà existantes pour ce jour spécifique
+      const daySlots = this.editing.horaires.filter((h) => h.jour === nextDay);
+      if (daySlots.length === 1) {
+        // S'il existe déjà une plage (le matin), la nouvelle se pré-remplit automatiquement avec 14:00 - 18:00
+        nextStart = '14:00';
+        nextEnd = '18:00';
+      } else {
+        // Sinon, on passe au jour de la semaine suivant et on pré-remplit avec 09:00 - 12:00
+        const dayIndex = this.jours.indexOf(last.jour);
+        if (dayIndex !== -1 && dayIndex < this.jours.length - 1) {
+          nextDay = this.jours[dayIndex + 1];
+        }
+        nextStart = '09:00';
+        nextEnd = '12:00';
+      }
+    }
+    
     this.editing.horaires.push({
-      jour: 'LUNDI',
-      heureDebut: '09:00',
-      heureFin: '12:00',
+      jour: nextDay,
+      heureDebut: nextStart,
+      heureFin: nextEnd,
       continu: false,
     } as HoraireDTO);
   }

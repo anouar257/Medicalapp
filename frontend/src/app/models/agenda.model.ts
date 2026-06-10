@@ -8,6 +8,8 @@ export interface Doctor {
   specialty?: string;
   /** Nombre de RDV en base (API liste médecins). */
   appointmentCount?: number;
+  /** Identifiant unique du praticien dans practitioner-service. */
+  externalPractitionerId?: number;
 }
 
 /**
@@ -23,9 +25,14 @@ export interface AppointmentType {
   defaultDurationMinutes: number;
   displayOrder: number;
   active: boolean;
+  price?: number | null;
+  priceVariable?: boolean;
+  sourcePractitionerId?: number | null;
+  sourceActId?: number | null;
+  doctorName?: string;
 }
 
-export type AppointmentStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED';
+export type AppointmentStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED' | 'NO_SHOW';
 
 export interface Appointment {
   id: string;
@@ -42,10 +49,14 @@ export interface Appointment {
   endTime: Date;
   durationMinutes: number;
   description: string;
+  /** Motif dynamique choisi dans le wizard patient (souvent le vrai acte praticien). */
+  visitReasonCode?: string;
   doctorId: string;
   color: string;
   /** Utile surtout pour RDV annulés (barré dans le calendrier). */
   status?: AppointmentStatus;
+  /** Mode de consultation */
+  locationMode?: 'CABINET' | 'CLINIC' | 'REMOTE' | string;
 }
 
 /** Vue affichée par le calendrier — détermine la fenêtre temporelle autour de `selectedDate`. */

@@ -41,16 +41,17 @@ public interface PractitionerProfileRepository extends JpaRepository<Practitione
   @Query("""
       SELECT DISTINCT p
       FROM PractitionerProfile p
-      JOIN p.proUser u
+      JOIN FETCH p.proUser u
+      LEFT JOIN FETCH u.organization o
       LEFT JOIN p.specialites s
       LEFT JOIN p.lieuxConsultation l
       WHERE p.disponible = true
-        AND (:name IS NULL OR LOWER(u.nom) LIKE LOWER(CONCAT('%', :name, '%')) OR LOWER(u.prenom) LIKE LOWER(CONCAT('%', :name, '%')))
-        AND (:ville IS NULL OR LOWER(l.ville) LIKE LOWER(CONCAT('%', :ville, '%')))
+        AND (:name IS NULL OR LOWER(u.nom) LIKE :name OR LOWER(u.prenom) LIKE :name)
+        AND (:ville IS NULL OR LOWER(l.ville) LIKE :ville OR LOWER(o.ville) LIKE :ville)
         AND (
              :specialty IS NULL
-             OR LOWER(s.libelle) LIKE LOWER(CONCAT('%', :specialty, '%'))
-             OR LOWER(s.code) LIKE LOWER(CONCAT('%', :specialty, '%'))
+             OR LOWER(s.libelle) LIKE :specialty
+             OR LOWER(s.code) LIKE :specialty
         )
       """)
   List<PractitionerProfile> searchPublic(

@@ -22,7 +22,9 @@ public class AuthProResponse {
     /** Identifiant du profil praticien (null si l'utilisateur n'est pas un PRATICIEN). */
     private Long practitionerProfileId;
 
-    public AuthProResponse() {}
+    public AuthProResponse() {
+        // Constructeur vide requis pour la sérialisation JSON (Jackson)
+    }
 
     public String getToken() { return token; }
     public void setToken(String token) { this.token = token; }

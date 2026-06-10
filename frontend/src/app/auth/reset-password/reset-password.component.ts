@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AppNavbarComponent } from '../../shared/app-navbar.component';
 
 @Component({
   selector: 'app-reset-password',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, AppNavbarComponent],
   templateUrl: './reset-password.component.html',
   styleUrls: ['./reset-password.component.scss'],
 })
@@ -16,6 +17,8 @@ export class ResetPasswordComponent implements OnInit {
   token = '';
   password = '';
   confirm = '';
+  showPassword = false;
+  showConfirmPassword = false;
   loading = false;
   err = '';
   success = '';

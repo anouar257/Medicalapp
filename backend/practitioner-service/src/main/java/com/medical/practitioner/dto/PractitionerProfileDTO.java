@@ -7,6 +7,7 @@ import com.medical.practitioner.entity.StatutPraticien;
 import com.medical.practitioner.entity.Titre;
 import com.medical.practitioner.entity.VerificationStatus;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
@@ -37,10 +38,13 @@ public class PractitionerProfileDTO {
     private VerificationStatus verifIdentiteStatus;
     private VerificationStatus verifDroitExercerStatus;
     private boolean disponible;
+    private BigDecimal consultationFee;
     private Set<SpecialtyDTO> specialites;
     private List<DiplomaDTO> diplomes;
     private Long organizationId;
     private String organizationNom;
+    private Double globalRating;
+    private Integer reviewCount;
 
     public static PractitionerProfileDTO fromEntity(PractitionerProfile p) {
         PractitionerProfileDTO dto = new PractitionerProfileDTO();
@@ -70,6 +74,9 @@ public class PractitionerProfileDTO {
         dto.verifIdentiteStatus = p.getVerifIdentiteStatus();
         dto.verifDroitExercerStatus = p.getVerifDroitExercerStatus();
         dto.disponible = p.isDisponible();
+        dto.consultationFee = p.getConsultationFee();
+        dto.globalRating = p.getGlobalRating();
+        dto.reviewCount = p.getReviewCount();
         if (p.getSpecialites() != null) {
             dto.specialites = p.getSpecialites().stream()
                     .map(s -> new SpecialtyDTO(s.getId(), s.getCode(), s.getLibelle()))
@@ -141,6 +148,9 @@ public class PractitionerProfileDTO {
     public boolean isDisponible() { return disponible; }
     public void setDisponible(boolean disponible) { this.disponible = disponible; }
 
+    public BigDecimal getConsultationFee() { return consultationFee; }
+    public void setConsultationFee(BigDecimal consultationFee) { this.consultationFee = consultationFee; }
+
     public Set<SpecialtyDTO> getSpecialites() { return specialites; }
     public void setSpecialites(Set<SpecialtyDTO> specialites) { this.specialites = specialites; }
 
@@ -152,4 +162,10 @@ public class PractitionerProfileDTO {
 
     public String getOrganizationNom() { return organizationNom; }
     public void setOrganizationNom(String organizationNom) { this.organizationNom = organizationNom; }
+
+    public Double getGlobalRating() { return globalRating; }
+    public void setGlobalRating(Double globalRating) { this.globalRating = globalRating; }
+
+    public Integer getReviewCount() { return reviewCount; }
+    public void setReviewCount(Integer reviewCount) { this.reviewCount = reviewCount; }
 }

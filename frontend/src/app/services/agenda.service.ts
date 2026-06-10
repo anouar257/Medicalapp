@@ -4,7 +4,7 @@ import { Observable, map } from 'rxjs';
 
 import { environment } from '../../environments/environment';
 
-export type AppointmentStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED';
+export type AppointmentStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED' | 'NO_SHOW';
 
 export interface AppointmentTypeDTO {
   id: number;
@@ -67,6 +67,24 @@ export interface AppointmentPatientDTO {
   status?: AppointmentStatus;
 }
 
+export interface DoctorReviewDTO {
+  id: number;
+  appointmentId: number;
+  externalPractitionerId: number;
+  patientDisplayName: string;
+  rating: number;
+  punctualityRating: number;
+  comment: string;
+  createdAt: string;
+}
+
+export interface DoctorReviewRequestDTO {
+  appointmentId: number;
+  rating: number;
+  punctualityRating: number;
+  comment: string;
+}
+
 /** Liste cabinet — demandes PENDING (JWT pro). */
 export interface AppointmentCabinetPendingDTO {
   id: number;
@@ -85,6 +103,7 @@ export interface AppointmentCabinetPendingDTO {
   doctorSpecialty?: string | null;
   status?: AppointmentStatus;
   description?: string | null;
+  locationMode?: 'CABINET' | 'CLINIC' | 'REMOTE' | string;
 }
 
 /** GET `/api/admin/global-stats` (administration plateforme : JWT ADMIN sans cabinet). */
@@ -139,6 +158,23 @@ export class AgendaService {
     return this.http.post<AppointmentPatientDTO>(`${this.base}/api/appointments/patient-booking`, body);
   }
 
+  createDoctorReview(body: DoctorReviewRequestDTO): Observable<DoctorReviewDTO> {
+    return this.http.post<DoctorReviewDTO>(`${this.base}/api/reviews`, body);
+  }
+
+  listDoctorReviews(externalPractitionerId: number): Observable<DoctorReviewDTO[]> {
+    return this.http.get<DoctorReviewDTO[]>(
+      `${this.base}/api/reviews/practitioner/${externalPractitionerId}`,
+    );
+  }
+
+  getAvailableSlots(doctorId: number, date: string, durationMinutes: number): Observable<{ cabinetHours: string[], availableSlots: string[] }> {
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return this.http.get<{ cabinetHours: string[], availableSlots: string[] }>(`${this.base}/api/appointments/available-slots`, {
+      params: { doctorId, date, durationMinutes, timezone },
+    });
+  }
+
   /** Demandes PENDING pour le cabinet (JWT pro requis). */
   listCabinetPending(): Observable<AppointmentCabinetPendingDTO[]> {
     return this.http.get<AppointmentCabinetPendingDTO[]>(`${this.base}/api/appointments/cabinet/pending`);
@@ -146,7 +182,7 @@ export class AgendaService {
 
   patchAppointmentStatus(
     id: number,
-    status: Extract<AppointmentStatus, 'CONFIRMED' | 'CANCELLED'>,
+    status: AppointmentStatus,
   ): Observable<AppointmentPatientDTO> {
     return this.http.patch<AppointmentPatientDTO>(`${this.base}/api/appointments/${id}/status`, {
       status,
@@ -163,4 +199,3 @@ export class AgendaService {
     return this.http.get<GlobalPlatformStatsDTO>(`${this.base}/api/admin/global-stats`);
   }
 }
-

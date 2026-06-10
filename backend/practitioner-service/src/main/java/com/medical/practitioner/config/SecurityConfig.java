@@ -36,9 +36,13 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/pro/auth/**").permitAll()
                 .requestMatchers("/api/pro/specialties/public/**").permitAll()
-                .requestMatchers("/api/pro/practitioners/search").permitAll()
+                .requestMatchers("/api/pro/public/practitioners/search").permitAll()
+                .requestMatchers("/api/pro/public/practitioners/*/locations").permitAll()
+                .requestMatchers("/api/pro/public/booking/**").permitAll()
                 .requestMatchers("/api/pro/public/**").permitAll()
                 .requestMatchers("/api/internal/messaging/**").permitAll()
+                .requestMatchers("/api/internal/reviews/**").permitAll()
+                .requestMatchers("/error").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

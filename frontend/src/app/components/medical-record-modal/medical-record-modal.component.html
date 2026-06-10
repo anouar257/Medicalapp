@@ -1,0 +1,185 @@
+@if (open()) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="medical-record-modal-title"
+  >
+    <button
+      type="button"
+      class="absolute inset-0 bg-slate-950/55 backdrop-blur-sm transition hover:bg-slate-950/65 dark:bg-black/60 dark:hover:bg-black/70"
+      aria-label="Fermer"
+      (click)="onCancel()"
+    ></button>
+
+    <div
+      class="relative z-10 flex w-full max-w-5xl flex-col max-h-[90vh] overflow-hidden rounded-[1.75rem] border border-slate-200/80 bg-white shadow-[0_24px_80px_-32px_rgba(15,23,42,0.55)] ring-1 ring-slate-100 dark:border-slate-600/70 dark:bg-slate-900 dark:ring-slate-700/80"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- Header -->
+      <div class="shrink-0 border-b border-slate-100 px-6 py-5 dark:border-slate-700">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h2
+              id="medical-record-modal-title"
+              class="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100"
+            >
+              Dossier de Consultation Clinique
+            </h2>
+            @if (appointment(); as apt) {
+              <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                Rendez-vous : <span class="font-semibold text-slate-700 dark:text-slate-300">{{ apt.title }}</span> avec le {{ getDoctorName() }}
+              </p>
+            }
+          </div>
+          <button
+            type="button"
+            class="flex size-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-base text-slate-500 transition hover:border-slate-300 hover:bg-white hover:text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-400/70 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+            (click)="onCancel()"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="flex-1 overflow-y-auto px-6 py-5 scrollbar-calendar">
+        @if (isLoading()) {
+          <div class="flex flex-col items-center justify-center py-12">
+            <div class="h-8 w-8 animate-spin rounded-full border-4 border-slate-300 border-t-blue-600"></div>
+            <p class="mt-3 text-sm text-slate-500 dark:text-slate-400">Chargement du dossier médical...</p>
+          </div>
+        } @else {
+          @if (errorMessage(); as msg) {
+            <div class="mb-4 rounded-xl bg-red-50 p-4 text-sm text-red-800 dark:bg-red-950/30 dark:text-red-400">
+              {{ msg }}
+            </div>
+          }
+
+          <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-6">
+            <div class="grid gap-6 md:grid-cols-2">
+              <!-- Colonne Gauche : Diagnostic & Clinique -->
+              <div class="space-y-4">
+                <div class="grid gap-1.5">
+                  <label class="text-sm font-semibold text-slate-800 dark:text-slate-200" for="med-symptomes">
+                    Symptômes / Motifs
+                  </label>
+                  <textarea
+                    id="med-symptomes"
+                    formControlName="symptomes"
+                    rows="3"
+                    class="w-full resize-none rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm transition hover:border-slate-300 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/40 dark:border-slate-600 dark:bg-slate-800/90 dark:text-slate-100"
+                    placeholder="Saisir les symptômes observés ou décrits..."
+                  ></textarea>
+                </div>
+
+                <div class="grid gap-1.5">
+                  <label class="text-sm font-semibold text-slate-800 dark:text-slate-200" for="med-antecedents">
+                    Antécédents
+                  </label>
+                  <textarea
+                    id="med-antecedents"
+                    formControlName="antecedents"
+                    rows="3"
+                    class="w-full resize-none rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm transition hover:border-slate-300 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/40 dark:border-slate-600 dark:bg-slate-800/90 dark:text-slate-100"
+                    placeholder="Historique médical du patient..."
+                  ></textarea>
+                </div>
+
+                <div class="grid gap-1.5">
+                  <label class="text-sm font-semibold text-slate-800 dark:text-slate-200" for="med-consultation">
+                    Observations de Consultation
+                  </label>
+                  <textarea
+                    id="med-consultation"
+                    formControlName="consultation"
+                    rows="4"
+                    class="w-full resize-none rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm transition hover:border-slate-300 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/40 dark:border-slate-600 dark:bg-slate-800/90 dark:text-slate-100"
+                    placeholder="Notes prises pendant l'entretien..."
+                  ></textarea>
+                </div>
+
+                <div class="grid gap-1.5">
+                  <label class="text-sm font-semibold text-slate-800 dark:text-slate-200" for="med-diagnostique">
+                    Diagnostic
+                  </label>
+                  <textarea
+                    id="med-diagnostique"
+                    formControlName="diagnostique"
+                    rows="3"
+                    class="w-full resize-none rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm transition hover:border-slate-300 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/40 dark:border-slate-600 dark:bg-slate-800/90 dark:text-slate-100"
+                    placeholder="Diagnostic formulé..."
+                  ></textarea>
+                </div>
+              </div>
+
+              <!-- Colonne Droite : Actes & Logistique -->
+              <div class="space-y-4">
+                <div class="grid gap-1.5">
+                  <label class="text-sm font-semibold text-slate-800 dark:text-slate-200" for="med-acte">
+                    Acte Médical
+                  </label>
+                  <textarea
+                    id="med-acte"
+                    formControlName="acte"
+                    rows="3"
+                    class="w-full resize-none rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm transition hover:border-slate-300 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/40 dark:border-slate-600 dark:bg-slate-800/90 dark:text-slate-100"
+                    placeholder="Actes réalisés..."
+                  ></textarea>
+                </div>
+
+                <div class="grid gap-1.5">
+                  <label class="text-sm font-semibold text-slate-800 dark:text-slate-200" for="med-consommable">
+                    Consommables Utilisés
+                  </label>
+                  <textarea
+                    id="med-consommable"
+                    formControlName="consommable"
+                    rows="3"
+                    class="w-full resize-none rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm transition hover:border-slate-300 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/40 dark:border-slate-600 dark:bg-slate-800/90 dark:text-slate-100"
+                    placeholder="Matériaux, médicaments ou consommables médicaux..."
+                  ></textarea>
+                </div>
+
+                <div class="grid gap-1.5">
+                  <label class="text-sm font-semibold text-slate-800 dark:text-slate-200" for="med-radiologie">
+                    Radiographie / Imagerie
+                  </label>
+                  <textarea
+                    id="med-radiologie"
+                    formControlName="radiologie"
+                    rows="4"
+                    class="w-full resize-none rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm transition hover:border-slate-300 focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400/40 dark:border-slate-600 dark:bg-slate-800/90 dark:text-slate-100"
+                    placeholder="Compte-rendu d'imagerie médicale ou examens complémentaires..."
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- Footer Buttons -->
+            <div class="flex justify-end gap-3 border-t border-slate-100 pt-5 dark:border-slate-700">
+              <button
+                type="button"
+                class="rounded-full border border-slate-200 bg-white px-6 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                (click)="onCancel()"
+                [disabled]="isSaving()"
+              >
+                Annuler
+              </button>
+              <button
+                type="submit"
+                class="rounded-full bg-blue-600 px-8 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-slate-900 disabled:cursor-not-allowed disabled:opacity-50 flex items-center gap-2"
+                [disabled]="isSaving()"
+              >
+                @if (isSaving()) {
+                  <span class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                }
+                Enregistrer
+              </button>
+            </div>
+          </form>
+        }
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,151 @@
+version: '3.8'
+
+services:
+  # Base de données PostgreSQL unique pour tous les services
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: odoo
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d
+    networks:
+      - mediconnect-network
+    restart: always
+
+  # Microservice Agenda
+  agenda-service:
+    build:
+      context: ./backend/agenda-service
+      dockerfile: Dockerfile
+    container_name: agenda-service
+    expose:
+      - "8081"
+    environment:
+      - SERVER_PORT=8081
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/agenda_medical
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=odoo
+      - PRACTITIONER_BASE_URL=http://practitioner-service:8083
+    depends_on:
+      - postgres-db
+    volumes:
+      - agenda_doctor_photos:/root/.agenda/doctor-photos
+    networks:
+      - mediconnect-network
+    restart: always
+
+  # Microservice Patient
+  patient-service:
+    build:
+      context: ./backend/patient-service
+      dockerfile: Dockerfile
+    container_name: patient-service
+    expose:
+      - "8082"
+    environment:
+      - SERVER_PORT=8082
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/patient_medical
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=odoo
+    depends_on:
+      - postgres-db
+    networks:
+      - mediconnect-network
+    restart: always
+
+  # Microservice Praticien
+  practitioner-service:
+    build:
+      context: ./backend/practitioner-service
+      dockerfile: Dockerfile
+    container_name: practitioner-service
+    expose:
+      - "8083"
+    environment:
+      - SERVER_PORT=8083
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/practitioner_medical
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=odoo
+      - PATIENT_BASE_URL=http://patient-service:8082
+      - AGENDA_BASE_URL=http://agenda-service:8081
+    depends_on:
+      - postgres-db
+    volumes:
+      - practitioner_photos:/root/.practitioner/photos
+    networks:
+      - mediconnect-network
+    restart: always
+
+  # Microservice Messagerie
+  messaging-service:
+    build:
+      context: ./backend/messaging-service
+      dockerfile: Dockerfile
+    container_name: messaging-service
+    expose:
+      - "8084"
+    environment:
+      - SERVER_PORT=8084
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/messaging_medical
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=odoo
+      - AGENDA_BASE_URL=http://agenda-service:8081
+      - PATIENT_BASE_URL=http://patient-service:8082
+      - PRACTITIONER_BASE_URL=http://practitioner-service:8083
+    depends_on:
+      - postgres-db
+    networks:
+      - mediconnect-network
+    restart: always
+
+  # Microservice Paiement
+  payment-service:
+    build:
+      context: ./backend/payment-service
+      dockerfile: Dockerfile
+    container_name: payment-service
+    expose:
+      - "8085"
+    environment:
+      - SERVER_PORT=8085
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/payment_medical
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=odoo
+      - AGENDA_BASE_URL=http://agenda-service:8081
+    depends_on:
+      - postgres-db
+    networks:
+      - mediconnect-network
+    restart: always
+
+  # Application Frontend Angular + Nginx (Reverse Proxy)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "4200:80" # Mappe le port 4200 de l'hôte vers le port 80 de Nginx
+    depends_on:
+      - agenda-service
+      - patient-service
+      - practitioner-service
+      - messaging-service
+      - payment-service
+    networks:
+      - mediconnect-network
+    restart: always
+
+volumes:
+  postgres_data:
+  agenda_doctor_photos:
+  practitioner_photos:
+
+networks:
+  mediconnect-network:
+    driver: bridge

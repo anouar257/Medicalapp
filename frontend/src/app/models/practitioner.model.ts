@@ -132,6 +132,15 @@ export interface DiplomaDTO {
   documentUrl?: string;
 }
 
+export interface PractitionerActDTO {
+  id?: number;
+  name: string;
+  durationMinutes: number;
+  price: number | null;
+  isPriceVariable: boolean;
+  agendaTypeCode?: string;
+}
+
 export interface PractitionerProfileDTO {
   id: number;
   proUserId: number;
@@ -153,10 +162,14 @@ export interface PractitionerProfileDTO {
   verifIdentiteStatus: VerificationStatus;
   verifDroitExercerStatus: VerificationStatus;
   disponible: boolean;
+  consultationFee?: number | null;
   specialites: SpecialtyDTO[];
   diplomes: DiplomaDTO[];
+  actes?: PractitionerActDTO[];
   organizationId?: number;
   organizationNom?: string;
+  globalRating?: number;
+  reviewCount?: number;
 }
 
 // ── Lieux de consultation ─────────────────────────────────────────────────
@@ -179,6 +192,7 @@ export interface ConsultationLocationDTO {
   pays?: string;
   telephoneBureau?: string;
   fax?: string;
+  consultationFee?: number | null;
   ascenseur: boolean;
   entreeAccessible: boolean;
   etage?: string;
@@ -213,6 +227,7 @@ export interface MedicalOrganizationDTO {
   codePostal?: string;
   pays?: string;
   actif: boolean;
+  horaires?: HoraireDTO[];
 }
 
 export interface ProUserDTO {

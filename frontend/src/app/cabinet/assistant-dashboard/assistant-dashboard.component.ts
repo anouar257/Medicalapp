@@ -4,6 +4,7 @@ import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { distinctUntilChanged, take } from 'rxjs';
 import { AuthProService } from '../../services/auth-pro.service';
 import { AgendaService, AppointmentCabinetPendingDTO, AppointmentStatus } from '../../services/agenda.service';
+import { AgendaStateService } from '../../services/agenda-state.service';
 import { PreferencesService } from '../../services/preferences.service';
 
 @Component({
@@ -15,6 +16,7 @@ import { PreferencesService } from '../../services/preferences.service';
 export class AssistantDashboardComponent {
   readonly prefs = inject(PreferencesService);
   private readonly agenda = inject(AgendaService);
+  private readonly agendaState = inject(AgendaStateService);
   private readonly authPro = inject(AuthProService);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -78,12 +80,13 @@ export class AssistantDashboardComponent {
     this.patch(row.id, 'CANCELLED');
   }
 
-  private patch(id: number, status: Extract<AppointmentStatus, 'CONFIRMED' | 'CANCELLED'>): void {
+  private patch(id: number, status: AppointmentStatus): void {
     this.actionError = '';
     this.busyId = id;
     this.agenda.patchAppointmentStatus(id, status).subscribe({
       next: () => {
         this.pending = this.pending.filter((p) => p.id !== id);
+        this.agendaState.refreshAppointments();
         this.busyId = null;
       },
       error: () => {

@@ -33,6 +33,13 @@ public class ConsultationLocationService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<ConsultationLocationDTO> findActiveByPractitioner(Long practitionerId) {
+        return repository.findByPractitionerIdAndActifTrue(practitionerId).stream()
+                .map(ConsultationLocationDTO::fromEntity)
+                .toList();
+    }
+
     @Transactional
     public ConsultationLocationDTO create(Long practitionerId, ConsultationLocationDTO body) {
         PractitionerProfile prat = practitionerRepository.findById(practitionerId)
@@ -67,19 +74,20 @@ public class ConsultationLocationService {
     }
 
     private ConsultationLocation applyToEntity(ConsultationLocation l, ConsultationLocationDTO body) {
-        if (body.getNomEtablissement() != null) l.setNomEtablissement(body.getNomEtablissement());
-        if (body.getAdresse() != null) l.setAdresse(body.getAdresse());
-        if (body.getVille() != null) l.setVille(body.getVille());
-        if (body.getCodePostal() != null) l.setCodePostal(body.getCodePostal());
-        if (body.getPays() != null) l.setPays(body.getPays());
-        if (body.getTelephoneBureau() != null) l.setTelephoneBureau(body.getTelephoneBureau());
-        if (body.getFax() != null) l.setFax(body.getFax());
+        l.setNomEtablissement(body.getNomEtablissement());
+        l.setAdresse(body.getAdresse());
+        l.setVille(body.getVille());
+        l.setCodePostal(body.getCodePostal());
+        l.setPays(body.getPays());
+        l.setTelephoneBureau(body.getTelephoneBureau());
+        l.setFax(body.getFax());
+        l.setConsultationFee(body.getConsultationFee());
         l.setAscenseur(body.isAscenseur());
         l.setEntreeAccessible(body.isEntreeAccessible());
-        if (body.getEtage() != null) l.setEtage(body.getEtage());
-        if (body.getParking() != null) l.setParking(body.getParking());
-        if (body.getContactUrgenceType() != null) l.setContactUrgenceType(body.getContactUrgenceType());
-        if (body.getTelephoneUrgence() != null) l.setTelephoneUrgence(body.getTelephoneUrgence());
+        l.setEtage(body.getEtage());
+        l.setParking(body.getParking());
+        l.setContactUrgenceType(body.getContactUrgenceType());
+        l.setTelephoneUrgence(body.getTelephoneUrgence());
         l.setActif(body.isActif());
         return l;
     }
@@ -88,13 +96,13 @@ public class ConsultationLocationService {
         List<HoraireOuverture> out = new ArrayList<>();
         if (body.getHoraires() == null) return out;
         for (var h : body.getHoraires()) {
-            if (h.jour == null || h.heureDebut == null || h.heureFin == null) continue;
+            if (h.getJour() == null || h.getHeureDebut() == null || h.getHeureFin() == null) continue;
             HoraireOuverture entity = new HoraireOuverture();
             entity.setLieu(lieu);
-            entity.setJour(h.jour);
-            entity.setHeureDebut(h.heureDebut);
-            entity.setHeureFin(h.heureFin);
-            entity.setContinu(h.continu);
+            entity.setJour(h.getJour());
+            entity.setHeureDebut(h.getHeureDebut());
+            entity.setHeureFin(h.getHeureFin());
+            entity.setContinu(h.isContinu());
             out.add(entity);
         }
         return out;

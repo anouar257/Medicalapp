@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs';
 import { AuthProService } from '../../services/auth-pro.service';
 import { LoginProRequest } from '../../models/practitioner.model';
 import { PreferencesService } from '../../services/preferences.service';
-import { AppPreferencesToolbarComponent } from '../../shared/app-preferences-toolbar.component';
+import { AppNavbarComponent } from '../../shared/app-navbar.component';
 
 /**
  * Connexion pro — aucun choix de rôle.
@@ -18,7 +18,7 @@ import { AppPreferencesToolbarComponent } from '../../shared/app-preferences-too
 @Component({
   selector: 'app-login-pro',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, AppPreferencesToolbarComponent],
+  imports: [CommonModule, FormsModule, RouterLink, AppNavbarComponent],
   templateUrl: './login-pro.component.html',
   styleUrls: ['./login-pro.component.scss'],
 })
@@ -32,6 +32,7 @@ export class LoginProComponent implements OnInit, OnDestroy {
   loading = false;
   err = '';
   assistantMode = false;
+  showPassword = false;
   private sub?: Subscription;
 
   ngOnInit(): void {

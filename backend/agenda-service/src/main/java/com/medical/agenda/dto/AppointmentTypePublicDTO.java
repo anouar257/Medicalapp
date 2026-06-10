@@ -1,5 +1,7 @@
 package com.medical.agenda.dto;
 
+import java.math.BigDecimal;
+
 public class AppointmentTypePublicDTO {
 
   private Long id;
@@ -9,6 +11,10 @@ public class AppointmentTypePublicDTO {
   private int defaultDurationMinutes;
   private int displayOrder;
   private boolean active;
+  private BigDecimal price;
+  private boolean priceVariable;
+  private Long sourcePractitionerId;
+  private Long sourceActId;
 
   public Long getId() {
     return id;
@@ -64,5 +70,37 @@ public class AppointmentTypePublicDTO {
 
   public void setActive(boolean active) {
     this.active = active;
+  }
+
+  public BigDecimal getPrice() {
+    return price;
+  }
+
+  public void setPrice(BigDecimal price) {
+    this.price = price;
+  }
+
+  public boolean isPriceVariable() {
+    return priceVariable;
+  }
+
+  public void setPriceVariable(boolean priceVariable) {
+    this.priceVariable = priceVariable;
+  }
+
+  public Long getSourcePractitionerId() {
+    return sourcePractitionerId;
+  }
+
+  public void setSourcePractitionerId(Long sourcePractitionerId) {
+    this.sourcePractitionerId = sourcePractitionerId;
+  }
+
+  public Long getSourceActId() {
+    return sourceActId;
+  }
+
+  public void setSourceActId(Long sourceActId) {
+    this.sourceActId = sourceActId;
   }
 }

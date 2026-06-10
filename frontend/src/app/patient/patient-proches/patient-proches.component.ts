@@ -68,9 +68,33 @@ export class PatientProchesComponent implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
 
+    const submissionData = { ...this.formData };
+    const optionalFields: (keyof Proche)[] = [
+      'civilite',
+      'paysNaissance',
+      'villeNaissance',
+      'telephoneMobile',
+      'email',
+      'adresse',
+      'codePostal',
+      'ville',
+      'ancienNomFamille',
+      'telephoneFixe',
+      'assurance',
+      'remarque',
+      'provenance',
+      'profession',
+      'medecinTraitant'
+    ];
+    optionalFields.forEach(field => {
+      if (submissionData[field] === '') {
+        (submissionData as any)[field] = null;
+      }
+    });
+
     const action$ = this.editingId
-      ? this.procheService.updateProche(this.editingId, this.formData)
-      : this.procheService.createProche(this.formData);
+      ? this.procheService.updateProche(this.editingId, submissionData)
+      : this.procheService.createProche(submissionData);
 
     action$.subscribe({
       next: () => {
@@ -87,7 +111,31 @@ export class PatientProchesComponent implements OnInit {
   }
 
   editProche(proche: Proche) {
-    this.formData = { ...proche };
+    const editData = { ...proche };
+    const optionalFields: (keyof Proche)[] = [
+      'civilite',
+      'paysNaissance',
+      'villeNaissance',
+      'telephoneMobile',
+      'email',
+      'adresse',
+      'codePostal',
+      'ville',
+      'ancienNomFamille',
+      'telephoneFixe',
+      'assurance',
+      'remarque',
+      'provenance',
+      'profession',
+      'medecinTraitant'
+    ];
+    optionalFields.forEach(field => {
+      if (editData[field] === null || editData[field] === undefined) {
+        (editData as any)[field] = '';
+      }
+    });
+
+    this.formData = editData;
     this.editingId = proche.id || null;
     this.showForm = true;
   }

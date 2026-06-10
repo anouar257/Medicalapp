@@ -28,7 +28,9 @@ public class TwilioConfig {
     @PostConstruct
     public void initTwilio() {
         Twilio.init(accountSid, authToken);
-        log.info("Twilio SDK initialisé avec le compte SID : {}...", accountSid.substring(0, Math.min(8, accountSid.length())));
+        if (log.isInfoEnabled()) {
+            log.info("Twilio SDK initialisé avec le compte SID : {}...", accountSid.substring(0, Math.min(8, accountSid.length())));
+        }
     }
 
     public String getVerifyServiceSid() {

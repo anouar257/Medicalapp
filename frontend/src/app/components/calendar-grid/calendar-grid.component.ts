@@ -1,6 +1,6 @@
 import { DragDropModule, CdkDragEnd, CdkDragMove } from '@angular/cdk/drag-drop';
 import { AsyncPipe, NgClass, DOCUMENT } from '@angular/common';
-import { Component, inject, output, Renderer2 } from '@angular/core';
+import { Component, inject, output, Renderer2, HostListener } from '@angular/core';
 import { combineLatest, map } from 'rxjs';
 
 import type { AgendaView, Appointment, AppointmentStatus, Doctor } from '../../models/agenda.model';
@@ -18,31 +18,25 @@ const CALENDAR_MATRIX_WEEKDAYS = ['Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa', 'Di'] as c
 const MAX_CHIPS_MONTH_VIEW = 5;
 const MAX_CHIPS_YEAR_MINI_DAY = 2;
 
-/** Fenêtre affichée : 08:00 → 19:00 (11 h = 660 min). */
-const ANCHOR_HOUR = 8;
-const END_HOUR = 19;
-const HOURS_SPAN = END_HOUR - ANCHOR_HOUR;
-const TOTAL_MINUTES = HOURS_SPAN * 60;
+/** 15 minutes en ms — référence pour hauteur minimale lisible et pour les lanes. */
+const FIFTEEN_MIN_MS = 15 * 60 * 1000;
 
 /**
  * Hauteur de la timeline : 280 px/h (confort) ou 140 px/h (compact).
  * Très courts RDV : hauteur d’affichage ≥ 1 créneau de 15 min (lisibilité), le haut de carte reste à l’heure de début.
  * Ex. confort : 15 min ≈ 70 px par créneau quart d’heure.
  */
-function gridBodyHeightPx(mode: GridComfortMode): number {
+function gridBodyHeightPx(mode: GridComfortMode, hoursSpan: number): number {
   const pxPerHour = mode === 'comfortable' ? 280 : 140;
-  return HOURS_SPAN * pxPerHour;
+  return hoursSpan * pxPerHour;
 }
-
-/** 15 minutes en ms — référence pour hauteur minimale lisible et pour les lanes. */
-const FIFTEEN_MIN_MS = 15 * 60 * 1000;
 
 /**
  * Hauteur d’un créneau de 15 min sur la timeline (les RDV plus courts utilisent au moins cette hauteur
  * pour afficher badge + horaire + titre + médecin, tout en gardant le haut de carte aligné sur l’heure exacte).
  */
-function oneQuarterSlotHeightPx(bodyHeightPx: number): number {
-  return (15 / TOTAL_MINUTES) * bodyHeightPx;
+function oneQuarterSlotHeightPx(bodyHeightPx: number, totalMinutes: number): number {
+  return (15 / totalMinutes) * bodyHeightPx;
 }
 
 function startOfDay(d: Date): Date {
@@ -125,13 +119,13 @@ function sameCalendarDay(a: Date, b: Date): boolean {
   );
 }
 
-function minutesFromAnchor(d: Date): number {
-  return d.getHours() * 60 + d.getMinutes() + d.getSeconds() / 60 - ANCHOR_HOUR * 60;
+function minutesFromAnchor(d: Date, anchorHour: number): number {
+  return d.getHours() * 60 + d.getMinutes() + d.getSeconds() / 60 - anchorHour * 60;
 }
 
-function clampMinutesToGrid(m: number): number {
+function clampMinutesToGrid(m: number, totalMinutes: number): number {
   if (Number.isNaN(m)) return 0;
-  return Math.max(0, Math.min(TOTAL_MINUTES, m));
+  return Math.max(0, Math.min(totalMinutes, m));
 }
 
 interface TimeAxisTickVm {
@@ -141,16 +135,16 @@ interface TimeAxisTickVm {
   tier: 'hour' | 'quarter';
 }
 
-function buildQuarterAxisTicks(): TimeAxisTickVm[] {
+function buildQuarterAxisTicks(anchorHour: number, totalMinutes: number): TimeAxisTickVm[] {
   const ticks: TimeAxisTickVm[] = [];
-  for (let m = 0; m <= TOTAL_MINUTES; m += 15) {
-    const totalMinDay = ANCHOR_HOUR * 60 + m;
+  for (let m = 0; m <= totalMinutes; m += 15) {
+    const totalMinDay = anchorHour * 60 + m;
     const hh24 = Math.floor(totalMinDay / 60);
     const mmPart = totalMinDay % 60;
     const isHour = mmPart === 0;
     ticks.push({
       key: `q-${m}`,
-      topPct: (m / TOTAL_MINUTES) * 100,
+      topPct: (m / totalMinutes) * 100,
       label: `${String(hh24).padStart(2, '0')}:${String(mmPart).padStart(2, '0')}`,
       tier: isHour ? 'hour' : 'quarter',
     });
@@ -188,6 +182,7 @@ interface PlacedAppointment {
   durationMinutes: number;
   startTimeMs: number;
   status?: AppointmentStatus;
+  locationMode?: string;
 }
 
 interface MatrixAppointmentChipVm {
@@ -199,6 +194,7 @@ interface MatrixAppointmentChipVm {
   typeLabel: string;
   typeColor: string;
   status?: AppointmentStatus;
+  locationMode?: string;
 }
 
 interface MonthMatrixCellVm {
@@ -225,6 +221,7 @@ interface CalendarVm {
   title: string;
   viewMeta: string;
   calendarSubtitle: string;
+  totalEventsCount?: number;
   timelineHasEvents?: boolean;
   dayShowsThreeDays?: boolean;
   columnDays?: Date[];
@@ -267,6 +264,7 @@ function buildAppointmentChipsForDay(
     typeLabel: a.typeLabel ?? a.typeCode ?? '—',
     typeColor: (a.typeColor ?? '').trim() || DEFAULT_APPOINTMENT_HEX,
     status: a.status,
+    locationMode: a.locationMode,
   }));
   return { chips, overflowCount: Math.max(0, list.length - maxChips) };
 }
@@ -382,6 +380,8 @@ function placeAppointmentsForColumn(
   appointments: Appointment[],
   doctorsById: Map<string, Doctor>,
   bodyHeightPx: number,
+  anchorHour: number,
+  totalMinutes: number,
 ): PlacedAppointment[] {
   const dayApps = appointments
     .filter((a) => sameCalendarDay(a.startTime, columnDay))
@@ -404,17 +404,17 @@ function placeAppointmentsForColumn(
 
   return dayApps
     .map((a) => {
-      const s = minutesFromAnchor(a.startTime);
-      const e = minutesFromAnchor(a.endTime);
-      const visS = clampMinutesToGrid(s);
-      const visE = clampMinutesToGrid(e);
+      const s = minutesFromAnchor(a.startTime, anchorHour);
+      const e = minutesFromAnchor(a.endTime, anchorHour);
+      const visS = clampMinutesToGrid(s, totalMinutes);
+      const visE = clampMinutesToGrid(e, totalMinutes);
       if (visE <= visS) {
         return null;
       }
 
-      const rawHeightPx = ((visE - visS) / TOTAL_MINUTES) * bodyHeightPx;
-      const topPx = (visS / TOTAL_MINUTES) * bodyHeightPx;
-      const minReadablePx = oneQuarterSlotHeightPx(bodyHeightPx);
+      const rawHeightPx = ((visE - visS) / totalMinutes) * bodyHeightPx;
+      const topPx = (visS / totalMinutes) * bodyHeightPx;
+      const minReadablePx = oneQuarterSlotHeightPx(bodyHeightPx, totalMinutes);
       const heightPx = Math.max(rawHeightPx, minReadablePx);
 
       const laneInfo = lanes.get(a.id)!;
@@ -455,6 +455,7 @@ function placeAppointmentsForColumn(
         durationMinutes: a.durationMinutes,
         startTimeMs: a.startTime.getTime(),
         status: a.status,
+        locationMode: a.locationMode,
       };
     })
     .filter(Boolean) as PlacedAppointment[];
@@ -484,6 +485,8 @@ export class CalendarGridComponent {
   protected readonly matrixWeekdays: readonly string[] = CALENDAR_MATRIX_WEEKDAYS;
 
   private readonly agenda = inject(AgendaStateService);
+  protected currentAnchorHour = 8;
+  protected currentTotalMinutes = 660;
   private readonly theme = inject(ThemeService);
   private readonly renderer = inject(Renderer2);
   private readonly document = inject(DOCUMENT);
@@ -582,6 +585,13 @@ export class CalendarGridComponent {
   }
 
   readonly appointmentOpened = output<Appointment>();
+  readonly medicalRecordOpened = output<Appointment>();
+
+  // Context Menu state
+  protected contextMenuVisible = false;
+  protected contextMenuX = 0;
+  protected contextMenuY = 0;
+  protected contextMenuAppointmentId: string | null = null;
 
   private suppressCardClickUntil = 0;
 
@@ -603,7 +613,7 @@ export class CalendarGridComponent {
     }
     const apt = this.agenda.getAppointmentById(appointmentId);
     if (apt) {
-      this.appointmentOpened.emit(apt);
+      this.medicalRecordOpened.emit(apt);
     }
   }
 
@@ -614,7 +624,46 @@ export class CalendarGridComponent {
     }
     const apt = this.agenda.getAppointmentById(appointmentId);
     if (apt) {
+      this.medicalRecordOpened.emit(apt);
+    }
+  }
+
+  onAppointmentCardRightClick(event: MouseEvent, appointmentId: string): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.contextMenuVisible = true;
+    this.contextMenuX = event.clientX;
+    this.contextMenuY = event.clientY;
+    this.contextMenuAppointmentId = appointmentId;
+  }
+
+  onAppointmentChipRightClick(event: MouseEvent, appointmentId: string): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.contextMenuVisible = true;
+    this.contextMenuX = event.clientX;
+    this.contextMenuY = event.clientY;
+    this.contextMenuAppointmentId = appointmentId;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    this.contextMenuVisible = false;
+  }
+
+  modifyAppointmentFromMenu(appointmentId: string): void {
+    this.contextMenuVisible = false;
+    const apt = this.agenda.getAppointmentById(appointmentId);
+    if (apt) {
       this.appointmentOpened.emit(apt);
+    }
+  }
+
+  deleteAppointmentFromMenu(appointmentId: string): void {
+    this.contextMenuVisible = false;
+    const ok = window.confirm('Confirmez-vous la suppression de ce rendez-vous ?');
+    if (ok) {
+      this.agenda.deleteAppointment(appointmentId).subscribe();
     }
   }
 
@@ -626,7 +675,7 @@ export class CalendarGridComponent {
     }
     const apt = this.agenda.getAppointmentById(appointmentId);
     if (apt) {
-      this.appointmentOpened.emit(apt);
+      this.medicalRecordOpened.emit(apt);
     }
   }
 
@@ -641,16 +690,16 @@ export class CalendarGridComponent {
       return;
     }
 
-    let offsetMin = resolved.ratio * TOTAL_MINUTES;
-    offsetMin = Math.max(0, Math.min(TOTAL_MINUTES, offsetMin));
+    let offsetMin = resolved.ratio * this.currentTotalMinutes;
+    offsetMin = Math.max(0, Math.min(this.currentTotalMinutes, offsetMin));
     offsetMin = Math.round(offsetMin / 15) * 15;
 
-    const maxStartOffset = Math.max(0, TOTAL_MINUTES - apt.durationMinutes);
+    const maxStartOffset = Math.max(0, this.currentTotalMinutes - apt.durationMinutes);
     offsetMin = Math.min(offsetMin, maxStartOffset);
 
     const dayMidnight = dateFromColumnKey(resolved.key);
     const newStart = new Date(dayMidnight);
-    newStart.setHours(ANCHOR_HOUR, 0, 0, 0);
+    newStart.setHours(this.currentAnchorHour, 0, 0, 0);
     newStart.setMinutes(newStart.getMinutes() + offsetMin);
 
     const prevMs = apt.startTimeMs;
@@ -675,7 +724,7 @@ export class CalendarGridComponent {
   private formatConfirmLabel(columnKey: string, offsetMinutesFromAnchor: number): string {
     const dayMidnight = dateFromColumnKey(columnKey);
     const start = new Date(dayMidnight);
-    start.setHours(ANCHOR_HOUR, 0, 0, 0);
+    start.setHours(this.currentAnchorHour, 0, 0, 0);
     start.setMinutes(start.getMinutes() + offsetMinutesFromAnchor);
     return new Intl.DateTimeFormat('fr-FR', {
       weekday: 'long',
@@ -716,9 +765,11 @@ export class CalendarGridComponent {
     doctors: this.agenda.doctors$,
     gridComfort: this.agenda.gridComfort$,
     dayShowsThreeDays: this.agenda.dayShowsThreeDays$,
+    anchorHour: this.agenda.anchorHour$,
+    endHour: this.agenda.endHour$,
   }).pipe(
-    map(({ appointments, view, selectedDate, doctors, gridComfort, dayShowsThreeDays }) =>
-      this.buildVm(appointments, view, selectedDate, doctors, gridComfort, dayShowsThreeDays),
+    map(({ appointments, view, selectedDate, doctors, gridComfort, dayShowsThreeDays, anchorHour, endHour }) =>
+      this.buildVm(appointments, view, selectedDate, doctors, gridComfort, dayShowsThreeDays, anchorHour, endHour),
     ),
   );
 
@@ -729,6 +780,8 @@ export class CalendarGridComponent {
     doctors: Doctor[],
     gridComfort: GridComfortMode,
     dayShowsThreeDays: boolean,
+    anchorHour: number,
+    endHour: number,
   ): CalendarVm {
     const y = selectedDate.getFullYear();
     const m0 = selectedDate.getMonth();
@@ -750,8 +803,9 @@ export class CalendarGridComponent {
         layoutMode: 'monthMatrix',
         view,
         title: new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'numeric' }).format(selectedDate),
-        viewMeta: `${inMonthCount} rendez-vous ce mois (après filtres)`,
+        viewMeta: `Vue mensuelle`,
         calendarSubtitle: VIEW_HINTS.month,
+        totalEventsCount: inMonthCount,
         monthWeekRows,
       };
     }
@@ -778,16 +832,22 @@ export class CalendarGridComponent {
         layoutMode: 'yearMatrix',
         view,
         title: String(y),
-        viewMeta: `${appointments.length} rendez-vous sur cette année (après filtres)`,
+        viewMeta: `Vue annuelle`,
         calendarSubtitle: VIEW_HINTS.year,
+        totalEventsCount: appointments.length,
         yearMiniMonths,
       };
     }
 
-    const bodyHeightPx = gridBodyHeightPx(gridComfort);
+    const hoursSpan = endHour - anchorHour;
+    const totalMinutes = hoursSpan * 60;
+    this.currentAnchorHour = anchorHour;
+    this.currentTotalMinutes = totalMinutes;
+
+    const bodyHeightPx = gridBodyHeightPx(gridComfort, hoursSpan);
     const doctorsById = new Map(doctors.map((d) => [d.id, d]));
     const columnDays = enumerateColumnDays(selectedDate, view, dayShowsThreeDays);
-    const quarterTicks = buildQuarterAxisTicks();
+    const quarterTicks = buildQuarterAxisTicks(anchorHour, totalMinutes);
 
     const dateFmt = new Intl.DateTimeFormat('fr-FR', { weekday: 'short' });
     const headerFmt = new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'short' });
@@ -796,7 +856,7 @@ export class CalendarGridComponent {
       key: `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`,
       sub: dateFmt.format(d).replace('.', ''),
       header: headerFmt.format(d).replace('.', ''),
-      appointments: placeAppointmentsForColumn(d, appointments, doctorsById, bodyHeightPx),
+      appointments: placeAppointmentsForColumn(d, appointments, doctorsById, bodyHeightPx, anchorHour, totalMinutes),
     }));
 
     const n = columnDays.length;
@@ -837,9 +897,12 @@ export class CalendarGridComponent {
       title = new Intl.DateTimeFormat('fr-FR', { dateStyle: 'full' }).format(selectedDate);
     }
     const timelineHasEvents = columns.some((c) => c.appointments.length > 0);
+    const totalEventsCount = columns.reduce((acc, c) => acc + c.appointments.length, 0);
     const colsLabel =
       view === 'day' ? (dayShowsThreeDays ? `3 jours` : `1 jour`) : `${columnDays.length} jour(s)`;
-    const viewMeta = `${colsLabel} · repères 15 min · 08:00–19:00`;
+    const startStr = `${String(anchorHour).padStart(2, '0')}:00`;
+    const endStr = `${String(endHour).padStart(2, '0')}:00`;
+    const viewMeta = `${colsLabel} · repères 15 min · ${startStr}–${endStr}`;
     const calendarSubtitle =
       view === 'day'
         ? dayShowsThreeDays
@@ -855,6 +918,7 @@ export class CalendarGridComponent {
       quarterTicks,
       gridTemplateColumns,
       title,
+      totalEventsCount,
       timelineHasEvents,
       dayShowsThreeDays: view === 'day' ? dayShowsThreeDays : false,
       bodyHeightPx,
@@ -891,16 +955,20 @@ export class CalendarGridComponent {
 
   resizingAptId: string | null = null;
 
-  /** Styles RDV : annulé (barré / atténué). */
+  /** Styles RDV : annulé (barré / atténué), honoré, ou absent. */
   appointmentCardStatusNgClass(apt: PlacedAppointment): Record<string, boolean> {
     return {
       'opacity-[0.72]': apt.status === 'CANCELLED',
+      'opacity-[0.78]': apt.status === 'COMPLETED',
+      'opacity-[0.65] bg-slate-100 text-slate-400 border-slate-300 dark:bg-slate-800/80 dark:text-slate-500 dark:border-slate-700': apt.status === 'NO_SHOW',
     };
   }
 
   matrixChipStatusNgClass(chip: MatrixAppointmentChipVm): Record<string, boolean> {
     return {
       'opacity-80': chip.status === 'CANCELLED',
+      'opacity-[0.78]': chip.status === 'COMPLETED',
+      'opacity-[0.65] line-through bg-slate-100 dark:bg-slate-800/80 text-slate-400 dark:text-slate-500 border-slate-300 dark:border-slate-700': chip.status === 'NO_SHOW',
     };
   }
 
@@ -923,11 +991,11 @@ export class CalendarGridComponent {
     if (!bodyHeightPx) return;
 
     const newTopPx = apt.topPx + event.distance.y;
-    const deltaMinutes = (newTopPx / bodyHeightPx) * TOTAL_MINUTES;
-    let startMinutesMidnight = ANCHOR_HOUR * 60 + deltaMinutes;
+    const deltaMinutes = (newTopPx / bodyHeightPx) * this.currentTotalMinutes;
+    let startMinutesMidnight = this.currentAnchorHour * 60 + deltaMinutes;
     startMinutesMidnight = Math.round(startMinutesMidnight / 15) * 15;
-    const minStart = ANCHOR_HOUR * 60;
-    const maxStart = minStart + Math.max(0, TOTAL_MINUTES - apt.durationMinutes);
+    const minStart = this.currentAnchorHour * 60;
+    const maxStart = minStart + Math.max(0, this.currentTotalMinutes - apt.durationMinutes);
     startMinutesMidnight = Math.max(minStart, Math.min(maxStart, startMinutesMidnight));
 
     const startStr = formatTimeFromMinutesSinceMidnight(startMinutesMidnight);
@@ -956,7 +1024,7 @@ export class CalendarGridComponent {
       const currentY = e instanceof MouseEvent ? e.clientY : (e as TouchEvent).touches[0].clientY;
       const deltaY = currentY - startY;
 
-      const deltaMinutes = (deltaY / bodyHeightPx) * TOTAL_MINUTES;
+      const deltaMinutes = (deltaY / bodyHeightPx) * this.currentTotalMinutes;
       let newDuration = initialDuration + deltaMinutes;
       newDuration = Math.round(newDuration / 15) * 15;
       if (newDuration < 15) newDuration = 15;
@@ -976,7 +1044,7 @@ export class CalendarGridComponent {
       const endY = e instanceof MouseEvent ? e.clientY : (e as TouchEvent).changedTouches[0].clientY;
       const deltaY = endY - startY;
 
-      const deltaMinutes = (deltaY / bodyHeightPx) * TOTAL_MINUTES;
+      const deltaMinutes = (deltaY / bodyHeightPx) * this.currentTotalMinutes;
       let newDuration = initialDuration + deltaMinutes;
       newDuration = Math.round(newDuration / 15) * 15;
 

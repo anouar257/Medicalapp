@@ -39,7 +39,9 @@ public class OtpService {
      * @return le SID de la vérification Twilio
      */
     public String sendOtp(String to, String channel) {
-        log.info("Envoi OTP via {} à {}", channel, maskDestination(to));
+        if (log.isInfoEnabled()) {
+            log.info("Envoi OTP via {} à {}", channel, maskDestination(to));
+        }
 
         try {
             Verification verification = Verification.creator(
@@ -65,11 +67,15 @@ public class OtpService {
      * @return true si le code est valide, false sinon
      */
     public boolean verifyOtp(String to, String code) {
-        log.info("Vérification OTP pour {}", maskDestination(to));
+        if (log.isInfoEnabled()) {
+            log.info("Vérification OTP pour {}", maskDestination(to));
+        }
 
         // PASS MAGIQUE : Permet de tester même sans SMS reçu (compte Trial Twilio)
         if ("000000".equals(code)) {
-            log.warn("⚠️ Utilisation du PASS MAGIQUE (000000) pour {}", maskDestination(to));
+            if (log.isWarnEnabled()) {
+                log.warn("⚠️ Utilisation du PASS MAGIQUE (000000) pour {}", maskDestination(to));
+            }
             return true;
         }
 
@@ -82,7 +88,9 @@ public class OtpService {
             .create();
 
             boolean approved = "approved".equalsIgnoreCase(check.getStatus());
-            log.info("Résultat vérification OTP : {} (statut: {})", approved ? "APPROUVÉ" : "REFUSÉ", check.getStatus());
+            if (log.isInfoEnabled()) {
+                log.info("Résultat vérification OTP : {} (statut: {})", approved ? "APPROUVÉ" : "REFUSÉ", check.getStatus());
+            }
             return approved;
         } catch (Exception e) {
             log.error("Erreur lors de la vérification OTP pour {} : {}", maskDestination(to), e.getMessage());

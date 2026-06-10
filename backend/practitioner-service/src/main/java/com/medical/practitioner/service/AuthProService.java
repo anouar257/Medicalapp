@@ -53,6 +53,7 @@ import java.util.UUID;
 public class AuthProService {
 
     private static final Logger log = LoggerFactory.getLogger(AuthProService.class);
+    private static final String CHANNEL_EMAIL = "email";
 
     private final ProUserRepository proUserRepository;
     private final MedicalOrganizationRepository organizationRepository;
@@ -70,7 +71,7 @@ public class AuthProService {
     @Value("${app.password-reset.base-url}")
     private String resetBaseUrl;
 
-    @Value("${spring.mail.username:noreply@mediagenda.com}")
+    @Value("${spring.mail.username:noreply@mediconnect.com}")
     private String fromEmail;
 
     public AuthProService(ProUserRepository proUserRepository,
@@ -234,7 +235,7 @@ public class AuthProService {
 
     private void sendOtpsBestEffort(ProUser user) {
         try {
-            otpService.sendOtp(user.getEmail(), "email");
+            otpService.sendOtp(user.getEmail(), CHANNEL_EMAIL);
         } catch (Exception e) {
             log.warn("OTP email échoué : {}", e.getMessage());
         }
@@ -256,7 +257,7 @@ public class AuthProService {
         boolean ok = otpService.verifyOtp(req.getTo(), req.getCode());
         if (!ok) return false;
 
-        if ("email".equalsIgnoreCase(req.getChannel())) {
+        if (CHANNEL_EMAIL.equalsIgnoreCase(req.getChannel())) {
             proUserRepository.findByEmail(req.getTo()).ifPresent(u -> {
                 u.setEmailVerifie(true);
                 proUserRepository.save(u);
@@ -291,7 +292,7 @@ public class AuthProService {
         if (user == null) {
             return Optional.empty();
         }
-        if ("email".equalsIgnoreCase(request.getChannel())) {
+        if (CHANNEL_EMAIL.equalsIgnoreCase(request.getChannel())) {
             if (!user.getEmail().equalsIgnoreCase(request.getTo())) {
                 return Optional.empty();
             }
@@ -388,7 +389,7 @@ public class AuthProService {
     @Transactional
     public void forgotPassword(ForgotPasswordRequest req) {
         Optional<ProUser> userOpt;
-        if ("email".equalsIgnoreCase(req.getChannel())) {
+        if (CHANNEL_EMAIL.equalsIgnoreCase(req.getChannel())) {
             userOpt = proUserRepository.findByEmail(req.getIdentifiant());
         } else {
             userOpt = proUserRepository.findByTelephone(req.getIdentifiant());
@@ -396,11 +397,13 @@ public class AuthProService {
         ProUser user = userOpt.orElseThrow(() ->
                 new IllegalArgumentException("Aucun compte trouvé avec cet identifiant"));
 
-        if ("email".equalsIgnoreCase(req.getChannel())) {
+        if (CHANNEL_EMAIL.equalsIgnoreCase(req.getChannel())) {
             String token = UUID.randomUUID().toString();
             user.setResetToken(token);
             user.setResetTokenExpiry(Instant.now().plus(resetTokenExpirationMinutes, ChronoUnit.MINUTES));
             proUserRepository.save(user);
+            log.info("[PasswordReset] Token de réinitialisation généré pour {} : {}", user.getEmail(), token);
+            log.info("[PasswordReset] Lien de réinitialisation : {}?token={}", resetBaseUrl, token);
             sendResetEmail(user.getEmail(), token);
         } else {
             otpService.sendOtp(user.getTelephone(), "sms");
@@ -427,7 +430,7 @@ public class AuthProService {
             SimpleMailMessage msg = new SimpleMailMessage();
             msg.setFrom(fromEmail);
             msg.setTo(to);
-            msg.setSubject("MediAgenda Pro — Réinitialisation de votre mot de passe");
+            msg.setSubject("Mediconnect Pro — Réinitialisation de votre mot de passe");
             msg.setText("""
                     Bonjour,
 
@@ -442,7 +445,7 @@ public class AuthProService {
 
                     Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.
 
-                    L'équipe MediAgenda Pro
+                    L'équipe Mediconnect Pro
                     """);
             mailSender.send(msg);
         } catch (Exception e) {

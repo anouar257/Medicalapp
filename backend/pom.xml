@@ -11,10 +11,17 @@
   <name>agenda-backend</name>
   <description>Agrégateur Maven — agenda, patient, practitioner, messaging (mvn -pl &lt;module&gt; spring-boot:run)</description>
 
+  <properties>
+    <sonar.host.url>http://localhost:9000</sonar.host.url>
+    <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+    <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+  </properties>
+
   <modules>
     <module>agenda-service</module>
     <module>patient-service</module>
     <module>practitioner-service</module>
     <module>messaging-service</module>
+    <module>payment-service</module>
   </modules>
 </project>

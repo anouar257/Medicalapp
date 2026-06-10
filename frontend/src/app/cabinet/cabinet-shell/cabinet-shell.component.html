@@ -16,9 +16,9 @@
         <nav class="nav-list">
           @for (item of visibleNavItems(); track item.path) {
             <a
-              [routerLink]="item.path"
-              routerLinkActive="active"
-              [routerLinkActiveOptions]="{ exact: item.exact }"
+              [href]="item.path.startsWith('/') ? item.path : '/cabinet/' + item.path"
+              [class.active]="isActive(item)"
+              (click)="handleMenuClick($event, item)"
               class="nav-item group"
             >
               <span class="nav-icon shrink-0">{{ item.icon }}</span>
@@ -28,7 +28,11 @@
         </nav>
 
         <div class="user-block">
-          <div class="user-avatar shrink-0">{{ initials() }}</div>
+          @if (userPhoto()) {
+            <img [src]="userPhoto()" class="user-avatar shrink-0 object-cover" alt="Avatar">
+          } @else {
+            <div class="user-avatar shrink-0">{{ initials() }}</div>
+          }
           <div class="user-info min-w-0">
             <strong class="truncate">{{ userName() }}</strong>
             <small class="truncate">{{ userEmail() }}</small>

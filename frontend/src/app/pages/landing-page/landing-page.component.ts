@@ -1,8 +1,9 @@
-import { Component, HostListener, OnInit, ElementRef, inject } from '@angular/core';
+import { Component, HostListener, OnInit, OnDestroy, ElementRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import {
   Subject,
+  Subscription,
   catchError,
   debounceTime,
   distinctUntilChanged,
@@ -10,30 +11,30 @@ import {
   forkJoin,
   map,
   of,
-  shareReplay,
   switchMap,
-  type Observable,
 } from 'rxjs';
 import { ThemeService } from '../../services/theme.service';
 import { PractitionerService } from '../../services/practitioner.service';
 import { AgendaService } from '../../services/agenda.service';
 import { PreferencesService, AppLanguage, ZoomLevel } from '../../services/preferences.service';
 import { APP_DICTIONARY } from '../../i18n/app-dictionary';
+import { AppNavbarComponent } from '../../shared/app-navbar.component';
 import type { SpecialtyDTO } from '../../models/practitioner.model';
 import {
   type CombinedPractitionerOption,
   filterCombinedOptions,
   mergePractitionerSearchResults,
 } from '../../patient/patient-search-merge';
+import { resolveDoctorPhotoUrl, getDynamicAvatar } from '../../utils/media-url';
 
 @Component({
   selector: 'app-landing-page',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, AppNavbarComponent],
   templateUrl: './landing-page.component.html',
   styleUrls: ['./landing-page.component.scss'],
 })
-export class LandingPageComponent implements OnInit {
+export class LandingPageComponent implements OnInit, OnDestroy {
   readonly theme = inject(ThemeService);
   readonly prefs = inject(PreferencesService);
   private readonly practitionerService = inject(PractitionerService);
@@ -52,32 +53,34 @@ export class LandingPageComponent implements OnInit {
   practitionerName = '';
   city = '';
 
+  isCityDropdownOpen = false;
+  cityFilterText = '';
+  cities: string[] = ['Casablanca', 'Rabat', 'Marrakech', 'Fès', 'Tanger', 'Agadir', 'Meknès', 'Oujda', 'Kénitra', 'Tétouan'];
+  filteredCities: string[] = [...this.cities];
+
   private readonly searchSubject = new Subject<{ name: string; city: string; specialty: string }>();
   isSearching = false;
   showSearchResults = false;
+  results: CombinedPractitionerOption[] = [];
+  private searchSub?: Subscription;
 
-  readonly combinedResults$: Observable<CombinedPractitionerOption[]> = this.searchSubject.pipe(
-    debounceTime(300),
-    distinctUntilChanged(
-      (a, b) => a.name === b.name && a.city === b.city && a.specialty === b.specialty,
-    ),
-    switchMap((q) => {
-      this.isSearching = true;
-      return forkJoin({
-        pros: this.practitionerService
-          .searchPublic({ name: '', city: '', specialty: '' })
-          .pipe(catchError(() => of([]))),
-        doctors: this.agendaService.listDoctors().pipe(catchError(() => of([]))),
-      }).pipe(
-        map(({ pros, doctors }) => {
-          const merged = mergePractitionerSearchResults(pros, doctors);
-          return filterCombinedOptions(merged, q.name, q.city, q.specialty);
-        }),
-        finalize(() => (this.isSearching = false)),
-      );
-    }),
-    shareReplay({ bufferSize: 1, refCount: true }),
-  );
+  resolvePhoto(url: string | undefined | null, name?: string): string {
+    return resolveDoctorPhotoUrl(url, name);
+  }
+
+  onImageError(event: Event, name: string) {
+    const img = event.target as HTMLImageElement;
+    img.src = getDynamicAvatar(name);
+  }
+
+  starsFilled(rating: number | null | undefined): number {
+    if (rating == null) return 0;
+    return Math.round(rating);
+  }
+
+  profileStars(): number[] {
+    return [1, 2, 3, 4, 5];
+  }
 
   /** Textes propres à la page d’accueil ; fusion avec le dictionnaire global dans translate(). */
   private readonly dictionary: Record<string, Record<AppLanguage, string>> = {
@@ -88,7 +91,7 @@ export class LandingPageComponent implements OnInit {
     'Simple, rapide et sécurisé. Votre santé à portée de clic.': {
       fr: 'Simple, rapide et sécurisé. Votre santé à portée de clic.',
       en: 'Simple, fast, and secure. Your health just a click away.',
-      ar: 'بسيط وسريع وآمن. صحتك على بعد نقرة واحدة.',
+      ar: 'بسيط وسريع وآمن. صحتك sur la pointe des doigts.',
     },
     'Nom du praticien...': { fr: 'Nom du praticien...', en: 'Doctor name...', ar: 'اسم الطبيب...' },
     'Spécialité': { fr: 'Spécialité', en: 'Specialty', ar: 'التخصص' },
@@ -96,7 +99,7 @@ export class LandingPageComponent implements OnInit {
     Rechercher: { fr: 'Rechercher', en: 'Search', ar: 'بحث' },
     'Actualités & Prévention': { fr: 'Actualités & Prévention', en: 'News & Prevention', ar: 'أخبار ووقاية' },
     PRÉVENTION: { fr: 'PRÉVENTION', en: 'PREVENTION', ar: 'وقاية' },
-    'Campagne de vaccination': { fr: 'Campagne de vaccination grippe', en: 'Flu Vaccination Campaign', ar: 'حملة التطعيم ضد الإنفلونزا' },
+    'Campagne de vaccination': { fr: 'Campagne de vaccination grippe', en: 'Flu Vaccination Campaign', ar: 'حملة التطعion ضد الإنفلونزا' },
     'Prenez rendez-vous facilement près de chez vous pour vous protéger.': {
       fr: 'Prenez rendez-vous facilement près de chez vous pour vous protéger.',
       en: 'Easily book an appointment near you to protect yourself.',
@@ -154,9 +157,9 @@ export class LandingPageComponent implements OnInit {
     'Vous êtes professionnel de santé ? Équipez votre cabinet avec notre solution.': {
       fr: 'Vous êtes professionnel de santé ? Équipez votre cabinet avec notre solution.',
       en: 'Are you a healthcare professional? Equip your practice with our solution.',
-      ar: 'هل أنت أخصائي رعاية صحية؟ جهز عيادتك بحلنا.',
+      ar: 'هل أنت أخصائي رعاية صحية? جهز عيادتك بحلنا.',
     },
-    'Inscrire mon cabinet': { fr: 'Inscrire mon cabinet', en: 'Register my practice', ar: 'تسجيل عيادتي' },
+    'Inscrire mon cabinet': { fr: 'Inscrire mon cabinet', en: 'Register my practice', ar: 'تسجيل عiادتي' },
     'Aucun praticien trouvé.': { fr: 'Aucun praticien trouvé.', en: 'No practitioners found.', ar: 'لم يتم العثور على أطباء.' },
     'Prendre RDV': { fr: 'Prendre RDV', en: 'Book appointment', ar: 'حجز موعد' },
     'Tous droits réservés.': { fr: 'Tous droits réservés.', en: 'All rights reserved.', ar: 'كل الحقوق محفوظة.' },
@@ -167,6 +170,9 @@ export class LandingPageComponent implements OnInit {
       ar: 'قلل مكالماتك بنسبة 30% من خلال أجندتنا الذكية.' 
     },
     'Découvrir la solution': { fr: 'Découvrir la solution', en: 'Discover the solution', ar: 'اكتشف الحل' },
+    avis: { fr: 'avis', en: 'reviews', ar: 'تقييمات' },
+    Consultation: { fr: 'Consultation', en: 'Consultation', ar: 'استشارة' },
+    'Tarif à confirmer': { fr: 'Tarif à confirmer', en: 'Fee to be confirmed', ar: 'السعر سيتم تأكيده' },
   };
 
   ngOnInit(): void {
@@ -175,7 +181,57 @@ export class LandingPageComponent implements OnInit {
       error: () => (this.specialtyCatalog = []),
     });
 
+    this.practitionerService.listPublicCities().subscribe({
+      next: (list) => {
+        if (list && list.length > 0) {
+          this.cities = list;
+          this.filteredCities = [...this.cities];
+        }
+      },
+      error: () => {}
+    });
+
+    this.searchSub = this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(
+        (a, b) => a.name === b.name && a.city === b.city && a.specialty === b.specialty,
+      ),
+      switchMap((q) => {
+        this.isSearching = true;
+        return forkJoin({
+          pros: this.practitionerService
+            .searchPublic({ name: q.name, city: q.city, specialty: q.specialty })
+            .pipe(catchError(() => of([]))),
+          doctors: this.agendaService.listDoctors().pipe(catchError(() => of([]))),
+        }).pipe(
+          map(({ pros, doctors }) => {
+            const merged = mergePractitionerSearchResults(pros, doctors);
+            return filterCombinedOptions(merged, q.name, q.city, q.specialty);
+          }),
+          finalize(() => (this.isSearching = false)),
+        );
+      })
+    ).subscribe({
+      next: (res) => {
+        this.results = res;
+        this.isSearching = false;
+      },
+      error: () => {
+        this.results = [];
+        this.isSearching = false;
+      }
+    });
+
     this.startCarouselAutoPlay();
+  }
+
+  ngOnDestroy(): void {
+    if (this.searchSub) {
+      this.searchSub.unsubscribe();
+    }
+    if (this.carouselInterval) {
+      clearInterval(this.carouselInterval);
+    }
   }
 
   private startCarouselAutoPlay(): void {
@@ -243,9 +299,27 @@ export class LandingPageComponent implements OnInit {
     this.triggerSearch();
   }
 
-  onCityInput(event: Event) {
+  openCityDropdown(): void {
+    this.isCityDropdownOpen = !this.isCityDropdownOpen;
+    this.isSpecialtyDropdownOpen = false;
+  }
+
+  onCityInput(event: Event): void {
     const input = event.target as HTMLInputElement;
-    this.city = input.value;
+    this.cityFilterText = input.value;
+    if (this.cityFilterText.trim() === '') {
+      this.filteredCities = [...this.cities];
+    } else {
+      const q = this.cityFilterText.toLowerCase();
+      this.filteredCities = this.cities.filter(c => c.toLowerCase().includes(q));
+    }
+  }
+
+  selectCity(c: string | null): void {
+    this.city = c || '';
+    this.cityFilterText = '';
+    this.filteredCities = [...this.cities];
+    this.isCityDropdownOpen = false;
     this.showSearchResults = true;
     this.triggerSearch();
   }
@@ -254,6 +328,7 @@ export class LandingPageComponent implements OnInit {
   clickout(event: Event) {
     if (!this.eRef.nativeElement.contains(event.target)) {
       this.isSpecialtyDropdownOpen = false;
+      this.isCityDropdownOpen = false;
     }
   }
 

@@ -109,6 +109,7 @@ export class AuthService {
       telephone: body.telephone ?? cur?.telephone ?? '',
       emailVerifie: body.emailVerifie ?? true,
       telephoneVerifie: body.telephoneVerifie ?? cur?.telephoneVerifie ?? false,
+      ville: cur?.ville ?? '',
     };
     localStorage.setItem(this.TOKEN_KEY, next.token);
     localStorage.setItem(this.PATIENT_KEY, JSON.stringify(next));

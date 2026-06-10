@@ -61,6 +61,9 @@ public class MedicalOrganization {
     @OneToMany(mappedBy = "organization", orphanRemoval = false)
     private List<ProUser> proUsers = new ArrayList<>();
 
+    @OneToMany(mappedBy = "cabinet", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
+    private List<CabinetHoraire> horaires = new ArrayList<>();
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -96,4 +99,7 @@ public class MedicalOrganization {
 
     public List<ProUser> getProUsers() { return proUsers; }
     public void setProUsers(List<ProUser> proUsers) { this.proUsers = proUsers; }
+
+    public List<CabinetHoraire> getHoraires() { return horaires; }
+    public void setHoraires(List<CabinetHoraire> horaires) { this.horaires = horaires; }
 }

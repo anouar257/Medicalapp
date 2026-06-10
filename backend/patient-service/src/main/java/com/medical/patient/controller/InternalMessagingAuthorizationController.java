@@ -56,7 +56,7 @@ public class InternalMessagingAuthorizationController {
     if (ownerPatientId.equals(concernedPersonId)) {
       return Map.of("allowed", true);
     }
-    boolean allowed = procheRepository.existsByIdAndPatient_Id(concernedPersonId, ownerPatientId);
+    boolean allowed = procheRepository.existsByIdAndPatientId(concernedPersonId, ownerPatientId);
     return Map.of("allowed", allowed);
   }
 
@@ -71,22 +71,20 @@ public class InternalMessagingAuthorizationController {
     Set<Long> uniq = new LinkedHashSet<>(ids);
     Map<Long, String> out = new HashMap<>();
     for (Long id : uniq) {
-      if (id == null) {
-        continue;
+      if (id != null) {
+        patientRepository
+            .findById(id)
+            .map(InternalMessagingAuthorizationController::formatPatientName)
+            .filter(s -> !s.isBlank())
+            .ifPresent(name -> out.put(id, name));
+        if (!out.containsKey(id)) {
+          procheRepository
+              .findById(id)
+              .map(InternalMessagingAuthorizationController::formatProcheName)
+              .filter(s -> !s.isBlank())
+              .ifPresent(name -> out.put(id, name));
+        }
       }
-      patientRepository
-          .findById(id)
-          .map(InternalMessagingAuthorizationController::formatPatientName)
-          .filter(s -> !s.isBlank())
-          .ifPresent(name -> out.put(id, name));
-      if (out.containsKey(id)) {
-        continue;
-      }
-      procheRepository
-          .findById(id)
-          .map(InternalMessagingAuthorizationController::formatProcheName)
-          .filter(s -> !s.isBlank())
-          .ifPresent(name -> out.put(id, name));
     }
     return out;
   }

@@ -76,6 +76,9 @@ public class ConsultationLocation {
     @Column(nullable = false, length = 10)
     private ParkingType parking = ParkingType.AUCUN;
 
+    @Column(name = "consultation_fee", precision = 10, scale = 2)
+    private java.math.BigDecimal consultationFee;
+
     /** Type de contact d'urgence (cf. cahier : SECRETARIAT / SOS_MEDECINS / NUMERO_PERSONNEL / NUMERO_DIRECT). */
     @Enumerated(EnumType.STRING)
     @Column(name = "contact_urgence_type", length = 30)
@@ -129,6 +132,9 @@ public class ConsultationLocation {
 
     public ParkingType getParking() { return parking; }
     public void setParking(ParkingType parking) { this.parking = parking; }
+
+    public java.math.BigDecimal getConsultationFee() { return consultationFee; }
+    public void setConsultationFee(java.math.BigDecimal consultationFee) { this.consultationFee = consultationFee; }
 
     public ContactUrgenceType getContactUrgenceType() { return contactUrgenceType; }
     public void setContactUrgenceType(ContactUrgenceType contactUrgenceType) { this.contactUrgenceType = contactUrgenceType; }

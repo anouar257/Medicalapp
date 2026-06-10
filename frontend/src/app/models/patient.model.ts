@@ -13,6 +13,7 @@ export interface Patient {
   cguAcceptees: boolean;
   actif: boolean;
   dateInscription: string;
+  ville?: string;
 }
 
 export interface RegisterRequest {
@@ -24,6 +25,7 @@ export interface RegisterRequest {
   telephone: string;
   motDePasse: string;
   cguAcceptees: boolean;
+  ville?: string;
 }
 
 export interface LoginRequest {
@@ -42,6 +44,7 @@ export interface AuthResponse {
   telephone: string;
   emailVerifie: boolean;
   telephoneVerifie: boolean;
+  ville?: string;
 }
 
 /** Réponse POST `/api/auth/verify-otp` (champs session optionnels si Bearer présent). */

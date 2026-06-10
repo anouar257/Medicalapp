@@ -1,0 +1,25 @@
+server:
+  port: ${SERVER_PORT:8085}
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/payment_medical
+    username: postgres
+    password: odoo
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+# JWT pro (aligné sur practitioner-service pour les accès professionnels).
+jwt:
+  pro-secret: ${JWT_PRO_SECRET:MEDICAL-PRACTITIONER-SERVICE-JWT-SECRET-KEY-256-BITS-CHANGE-IN-PROD-9876543210}
+
+# Appels inter-services si nécessaire
+integration:
+  agenda-base-url: ${AGENDA_BASE_URL:http://localhost:8081}

@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class BookingWizardService {
+  private static final String DEFAULT_CODE = "DEFAULT";
 
   private final SpecialtyBookingChoiceRepository choiceRepository;
 
@@ -20,12 +21,12 @@ public class BookingWizardService {
 
   @Transactional(readOnly = true)
   public BookingWizardOptionsDTO optionsForSpecialtyCode(String rawCode) {
-    String requested = rawCode == null || rawCode.isBlank() ? "DEFAULT" : rawCode.trim().toUpperCase();
+    String requested = rawCode == null || rawCode.isBlank() ? DEFAULT_CODE : rawCode.trim().toUpperCase();
     List<SpecialtyBookingChoice> rows = choiceRepository.findBySpecialtyCode(requested);
     String resolved = requested;
-    if (rows.isEmpty() && !"DEFAULT".equals(requested)) {
-      rows = choiceRepository.findBySpecialtyCode("DEFAULT");
-      resolved = "DEFAULT";
+    if (rows.isEmpty() && !DEFAULT_CODE.equals(requested)) {
+      rows = choiceRepository.findBySpecialtyCode(DEFAULT_CODE);
+      resolved = DEFAULT_CODE;
     }
     if (rows.isEmpty()) {
       rows = choiceRepository.findBySpecialtyCode("MEDECINE_GENERALE");

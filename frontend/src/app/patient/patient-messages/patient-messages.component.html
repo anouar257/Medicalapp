@@ -1,298 +1,504 @@
-
-<div class="min-h-screen bg-gradient-to-br from-slate-100 via-indigo-50/40 to-slate-200 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-slate-900 dark:text-white transition-colors duration-300">
-  <nav class="sticky top-0 z-50 glass-nav border-b border-white/30 dark:border-slate-700/50">
-    <div class="max-w-6xl mx-auto flex items-center justify-between px-4 py-3 gap-3">
-      <div class="flex items-center gap-3 min-w-0">
-        <a routerLink="/patient/dashboard" class="glass-pill px-3 py-1.5 text-sm font-bold shrink-0 text-slate-800 dark:text-slate-100">
-          {{ prefs.translate('messaging.backDashboard') }}
-        </a>
-        <h1 class="text-lg font-black truncate bg-gradient-to-r from-indigo-600 to-violet-600 bg-clip-text text-transparent">
-          {{ prefs.translate('messaging.patient.pageTitle') }}
-        </h1>
-      </div>
-      <div class="flex items-center gap-2 shrink-0" [class.flex-row-reverse]="prefs.language() === 'ar'">
-        <app-preferences-toolbar />
+<div class="patient-msgs text-slate-900 dark:text-slate-100 flex flex-col h-full overflow-hidden">
+  <!-- Page sub-header (back button + title + compose button) -->
+  <div class="border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex flex-wrap items-center justify-between gap-4 shrink-0 bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm">
+    <div class="flex items-center gap-4 min-w-0">
+      <a routerLink="/patient/dashboard" class="flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-600 dark:text-slate-300" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+        </svg>
+      </a>
+      <div class="min-w-0">
+        <h1 class="text-xl font-extrabold tracking-tight truncate">{{ prefs.translate('messaging.patient.pageTitle') }}</h1>
+        <p class="text-sm text-slate-500 dark:text-slate-400 font-medium">{{ prefs.translate('messaging.patient.subtitle') }}</p>
       </div>
     </div>
-  </nav>
-
-  <main class="max-w-6xl mx-auto px-4 py-8 space-y-6">
-    <p class="text-sm text-slate-600 dark:text-slate-400 text-center sm:text-start">
-      {{ prefs.translate('messaging.patient.subtitle') }}
-    </p>
-
-    @if (loadWarnings.length > 0) {
-      <div
-        class="rounded-2xl border border-amber-300/80 dark:border-amber-700/50 bg-amber-50 dark:bg-amber-950/40 px-4 py-3 text-sm text-amber-950 dark:text-amber-100 space-y-1"
-        role="status"
-      >
-        @for (w of loadWarnings; track $index) {
-          <p class="leading-snug">{{ w }}</p>
-        }
-      </div>
-    }
-
-    @if (loading) {
-      <div class="glass-card p-10 text-center animate-pulse font-bold text-slate-700 dark:text-slate-200">
-        {{ prefs.translate('Chargement') }}
-      </div>
-    } @else {
-      <div class="flex flex-wrap gap-3 justify-center sm:justify-start">
-        <button
-          type="button"
-          (click)="view = 'history'"
-          class="pm-tab"
-          [class.pm-tab-active]="view === 'history'"
-        >
-          {{ prefs.translate('messaging.history') }}
+    <div class="flex items-center gap-4">
+      @if (view === 'chat') {
+        <button type="button" (click)="openCompose()" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold shadow-md shadow-indigo-500/20 transition-all">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+          </svg>
+          <span class="hidden sm:inline">{{ prefs.translate('messaging.compose') }}</span>
         </button>
-        <button
-          type="button"
-          (click)="openCompose()"
-          class="pm-tab"
-          [class.pm-tab-active]="view === 'compose'"
-        >
-          {{ prefs.translate('messaging.newMessage') }}
-        </button>
-      </div>
+      }
+    </div>
+  </div>
 
-      @if (view === 'history') {
-        <section class="glass-card p-6 space-y-4 text-slate-800 dark:text-slate-100">
-          <h2 class="text-xl font-black">{{ prefs.translate('messaging.history') }}</h2>
-          @if (messages.length === 0) {
-            <p class="text-sm text-slate-600 dark:text-slate-400">{{ prefs.translate('messaging.history.empty') }}</p>
-          } @else {
-            <div class="space-y-3">
-              @for (m of messages; track m.id) {
-                <article
-                  class="rounded-2xl border border-slate-200/90 dark:border-slate-600/80 bg-white/70 dark:bg-slate-900/60 p-4 shadow-sm cursor-pointer hover:border-indigo-400 hover:shadow-md transition-all"
-                  (click)="onOpenMessage(m)"
-                >
-                  <div class="flex flex-wrap items-start justify-between gap-2">
-                    <div>
-                      <div class="text-xs font-bold uppercase tracking-wide text-indigo-600 dark:text-indigo-300">
-                        {{ flowLabel(m) }} · {{ doctorNameFor(m) }}
-                      </div>
-                      <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                        {{ prefs.translate('messaging.concerned') }} : {{ concernedLabel(m) }}
-                      </div>
-                      <div class="mt-2 font-bold">{{ subjectLabel(m.subject) }}</div>
-                      <p class="text-sm mt-2 whitespace-pre-wrap text-slate-700 dark:text-slate-200">{{ m.content }}</p>
-                    </div>
-                    <div class="text-end text-xs text-slate-500 shrink-0" [class.text-start]="prefs.language() === 'ar'">
-                      <div>{{ m.sentAt | date: 'short' }}</div>
-                      @if (!m.read && m.receiverPatientId === patient?.patientId) {
-                        <span class="inline-block mt-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200 text-[10px] font-black">
-                          {{ prefs.translate('messaging.unread') }}
-                        </span>
-                      }
-                    </div>
-                  </div>
-                </article>
-              }
-            </div>
-          }
-        </section>
-      } @else {
-        <section
-          class="glass-card p-6 sm:p-8 flex flex-col min-h-0 max-h-[min(85dvh,calc(100dvh-9rem))] text-slate-800 dark:text-slate-100"
-        >
-          <div class="shrink-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-            <h2 class="text-xl font-black">{{ prefs.translate('messaging.newMessage') }}</h2>
-            <nav class="pm-stepper" aria-label="Étapes">
-              @for (s of [1, 2, 3, 4]; track s) {
-                <span
-                  class="pm-step-dot"
-                  [class.pm-step-dot-active]="wizardStep === s"
-                  [class.pm-step-dot-done]="wizardStep > s"
-                >
-                  {{ s }}
-                </span>
-              }
-            </nav>
+  @if (loading) {
+    <div class="flex-1 flex items-center justify-center p-10 overflow-auto">
+      <div class="flex flex-col items-center gap-4 text-indigo-600 dark:text-indigo-400">
+        <svg class="animate-spin h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span class="font-bold text-sm tracking-wide uppercase">{{ prefs.translate('Chargement') }}...</span>
+      </div>
+    </div>
+  } @else {
+    @if (view === 'chat') {
+      <div class="flex-1 flex overflow-hidden min-h-0">
+        <!-- Sidebar / List of Conversations -->
+        <aside class="w-full lg:w-1/3 xl:w-1/4 border-e border-slate-200 dark:border-slate-800 bg-white/40 dark:bg-slate-900/40 backdrop-blur-md flex flex-col h-full overflow-hidden shrink-0">
+          <div class="p-4 border-b border-slate-200 dark:border-slate-800 shrink-0 bg-slate-50 dark:bg-slate-900/50">
+            <h2 class="font-extrabold text-lg flex items-center justify-between">
+              Discussions
+              <span class="text-xs bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 py-1 px-2 rounded-full">{{ conversations.length }}</span>
+            </h2>
           </div>
-
-          @if (sendError) {
-            <div
-              class="shrink-0 mb-4 rounded-xl border border-rose-300/80 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/50 px-3 py-2 text-sm text-rose-900 dark:text-rose-100"
-            >
-              {{ sendError }}
-            </div>
-          }
-
-          <div class="flex-1 min-h-0 overflow-y-auto overscroll-contain space-y-6 pr-1">
-          @if (wizardStep < 4 && !canAdvanceFromCurrentStep()) {
-            <p class="text-xs text-slate-500 dark:text-slate-400">{{ prefs.translate('messaging.wizard.fillStep') }}</p>
-          }
-          @if (wizardStep === 4 && !messageContent.trim() && !sending) {
-            <p class="text-xs text-slate-500 dark:text-slate-400">{{ prefs.translate('messaging.wizard.fillStep') }}</p>
-          }
-
-          @if (wizardStep === 1) {
-            <div class="space-y-3">
-              <h3 class="text-base font-bold text-slate-800 dark:text-white">{{ prefs.translate('messaging.step1.title') }}</h3>
-              <div class="grid sm:grid-cols-2 gap-4">
-                <button
-                  type="button"
-                  (click)="pickMe()"
-                  class="pm-choice"
-                  [class.pm-choice-selected]="concernTargetType === 'SELF'"
-                >
-                  <span class="pm-choice-icon" aria-hidden="true">🙋</span>
-                  <span class="pm-choice-title">{{ prefs.translate('messaging.step1.me') }}</span>
-                  <span class="pm-choice-hint">{{ prefs.translate('messaging.concerned.me') }}</span>
-                </button>
-                @for (pr of proches; track trackProche($index, pr)) {
-                  <button
-                    type="button"
-                    (click)="pickProche(pr)"
-                    class="pm-choice"
-                    [class.pm-choice-selected]="concernTargetType === 'PROCHE' && concernTargetId === pr.id"
-                  >
-                    <span class="pm-choice-icon" aria-hidden="true">👤</span>
-                    <span class="pm-choice-title">{{ pr.prenom }} {{ pr.nom }}</span>
-                    <span class="pm-choice-hint">{{ prefs.translate('messaging.step1.relative') }}</span>
-                  </button>
-                }
-              </div>
-            </div>
-          }
-
-          @if (wizardStep === 2) {
-            <div class="space-y-3">
-              <h3 class="text-base font-bold text-slate-800 dark:text-white">{{ prefs.translate('messaging.step2.title') }}</h3>
-              @if (consultablePractitioners.length === 0) {
-                <p class="text-sm text-amber-800 dark:text-amber-200 bg-amber-50/90 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl px-4 py-3">
-                  {{ prefs.translate('messaging.step2.empty') }}
-                </p>
-              } @else {
-                <div class="grid sm:grid-cols-2 gap-4">
-                  @for (doc of consultablePractitioners; track doc.externalId) {
-                    <button
-                      type="button"
-                      (click)="pickPractitioner(doc.externalId)"
-                      class="pm-choice text-start"
-                      [class.pm-choice-selected]="selectedPractitionerExternalId === doc.externalId"
-                    >
-                      <span class="pm-choice-title">{{ doc.name }}</span>
-                      <span class="pm-choice-hint">{{ doc.specialty }}</span>
-                    </button>
-                  }
+          
+          <div class="flex-1 overflow-y-auto p-3 space-y-2">
+            @if (conversations.length === 0) {
+              <div class="text-center py-10 px-4">
+                <div class="w-12 h-12 mx-auto mb-3 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
                 </div>
-              }
-            </div>
-          }
-
-          @if (wizardStep === 3) {
-            <div class="space-y-3">
-              <h3 class="text-base font-bold text-slate-800 dark:text-white">{{ prefs.translate('messaging.step3.title') }}</h3>
-              <div class="flex flex-col gap-2">
-                @for (sk of subjectKeys; track sk) {
-                  <button
-                    type="button"
-                    (click)="pickSubject(sk)"
-                    class="pm-subject"
-                    [class.pm-subject-selected]="selectedSubject === sk"
-                  >
-                    {{ subjectLabel(sk) }}
-                  </button>
-                }
+                <p class="text-sm font-medium text-slate-500">Aucune discussion active</p>
+                <p class="text-xs text-slate-400 mt-2">Cliquez sur "Nouveau Message" pour contacter un praticien.</p>
               </div>
-
-              @if (selectedSubject === 'AUTRE') {
-                <div class="mt-4">
-                  <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
-                    Précisez le sujet de votre message
-                  </label>
-                  <input
-                    type="text"
-                    [(ngModel)]="customSubject"
-                    class="pm-textarea py-3"
-                    placeholder="Veuillez décrire brièvement l'objet de votre message..."
-                  />
-                </div>
-              }
-            </div>
-          }
-
-          @if (wizardStep === 4) {
-            <div class="space-y-4">
-              <h3 class="text-base font-bold text-slate-800 dark:text-white">{{ prefs.translate('messaging.step4.title') }}</h3>
-              <textarea
-                rows="6"
-                class="pm-textarea"
-                [(ngModel)]="messageContent"
-                [placeholder]="prefs.translate('messaging.content.placeholder')"
-              ></textarea>
-              <div>
-                <span class="block text-xs font-bold mb-2 text-slate-700 dark:text-slate-300">{{
-                  prefs.translate('messaging.attachments')
-                }}</span>
-                <div class="flex flex-wrap items-center gap-3">
-                  <input #fileInput type="file" multiple class="sr-only" (change)="onFiles($event)" />
-                  <button type="button" class="pm-btn-secondary" (click)="fileInput.click()">
-                    {{ prefs.translate('messaging.attachments') }}
-                  </button>
-                  @if (selectedFiles.length) {
-                    <span class="text-xs text-slate-600 dark:text-slate-400">
-                      {{ filesCountLabel() }}
+            }
+            @for (c of conversations; track c.id) {
+              <button
+                type="button"
+                (click)="selectConversation(c)"
+                [ngClass]="{
+                  'bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800': activeConversation?.id !== c.id,
+                  'bg-indigo-50 dark:bg-indigo-900/30 ring-1 ring-indigo-500/50 shadow-sm': activeConversation?.id === c.id
+                }"
+                class="w-full text-start p-3 rounded-2xl transition-all duration-200 flex gap-3 relative group border border-transparent"
+              >
+                <div class="relative shrink-0 mt-1">
+                  <div class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 font-bold text-lg border border-slate-200 dark:border-slate-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </div>
+                  @if (c.unreadCount > 0) {
+                    <span class="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white ring-2 ring-white dark:ring-slate-900">
+                      {{ c.unreadCount }}
                     </span>
                   }
                 </div>
-                @if (selectedFiles.length) {
-                  <ul class="mt-3 text-sm space-y-2 border border-slate-200 dark:border-slate-600 rounded-xl p-3 bg-white/60 dark:bg-slate-900/50">
-                    @for (f of selectedFiles; track $index) {
-                      <li class="flex justify-between items-center gap-2">
-                        <span class="truncate text-slate-800 dark:text-slate-100">{{ f.name }}</span>
-                        <button
-                          type="button"
-                          class="pm-remove-file"
-                          (click)="removeFile($index)"
-                          [attr.aria-label]="prefs.translate('messaging.removeFile')"
-                        >
-                          ×
-                        </button>
-                      </li>
+                
+                <div class="min-w-0 flex-1 flex flex-col justify-center">
+                  <div class="flex justify-between items-baseline mb-0.5">
+                    <span class="font-bold text-slate-900 dark:text-white truncate pr-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                      {{ c.contactName }}
+                    </span>
+                    <span class="text-xs font-medium text-slate-400 shrink-0">{{ c.lastMessage.sentAt | date: 'shortDate' }}</span>
+                  </div>
+                  <p class="text-xs text-indigo-500 dark:text-indigo-400 mb-1 flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                    {{ concernedLabel(c) }}
+                  </p>
+                  <div class="flex items-center gap-1">
+                    @if (c.lastMessage.senderPatientId === patient?.patientId) {
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-indigo-500 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                      </svg>
                     }
-                  </ul>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 truncate" [ngClass]="{'font-bold text-slate-800 dark:text-slate-200': c.unreadCount > 0}">
+                      @if (c.lastMessage.attachments && c.lastMessage.attachments.length > 0) {
+                        <span class="inline-flex items-center gap-1">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                          </svg>
+                          Pièce jointe
+                        </span>
+                      } @else {
+                        {{ c.lastMessage.content }}
+                      }
+                    </p>
+                  </div>
+                </div>
+              </button>
+            }
+          </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <section class="flex-1 flex flex-col bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] bg-slate-50 dark:bg-slate-950/90 h-full overflow-hidden relative">
+          @if (!activeConversation) {
+            <div class="flex-1 flex flex-col items-center justify-center text-center p-8 bg-slate-100/50 dark:bg-slate-900/50 backdrop-blur-sm">
+              <div class="w-32 h-32 mb-6 rounded-full bg-slate-200/50 dark:bg-slate-800/50 flex items-center justify-center text-slate-400 dark:text-slate-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+              </div>
+              <h2 class="text-2xl font-bold text-slate-700 dark:text-slate-300 mb-2">Vos messages</h2>
+              <p class="text-slate-500 max-w-md">Sélectionnez une discussion dans le panneau latéral pour continuer ou démarrez une nouvelle conversation.</p>
+              <button (click)="openCompose()" class="mt-6 px-6 py-2.5 rounded-full bg-white dark:bg-slate-800 border-2 border-indigo-500 text-indigo-600 dark:text-indigo-400 font-bold hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors">
+                Nouveau Message
+              </button>
+            </div>
+          } @else {
+            <!-- Chat Header -->
+            <div class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 p-4 flex items-center justify-between shrink-0 z-10 shadow-sm">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="font-bold text-slate-900 dark:text-white">{{ activeConversation.contactName }}</h3>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">Pour : {{ concernedLabel(activeConversation) }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Chat Messages (Scrollable) -->
+            <div class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4" #scrollMe>
+              @for (m of activeConversation.messages; track m.id) {
+                <!-- Outgoing Message (Patient) -->
+                @if (m.senderPatientId === patient?.patientId) {
+                  <div class="flex justify-end mb-4">
+                    <div class="flex flex-col items-end max-w-[85%] md:max-w-[70%]">
+                      <div class="bg-indigo-600 text-white p-3 sm:p-4 rounded-2xl rounded-tr-sm shadow-md">
+                        @if (m.attachments && m.attachments.length > 0) {
+                          <div class="grid gap-2 mb-2">
+                            @for (a of m.attachments; track a.id) {
+                              <div class="bg-indigo-700/50 p-2 rounded-xl flex items-center gap-3 w-64 hover:bg-indigo-800/50 transition-colors cursor-pointer" (click)="download(m, a.id, a.fileName)">
+                                <div class="w-10 h-10 bg-indigo-500 rounded-lg flex items-center justify-center shrink-0">
+                                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                  </svg>
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                  <p class="text-sm font-bold truncate">{{ a.fileName }}</p>
+                                  <p class="text-[10px] text-indigo-200 uppercase mt-0.5">Cliquez pour télécharger</p>
+                                </div>
+                              </div>
+                            }
+                          </div>
+                        }
+                        <p class="whitespace-pre-wrap text-sm leading-relaxed" [ngClass]="{'mt-2 pt-2 border-t border-indigo-500/50': m.attachments.length}">{{ m.content }}</p>
+                      </div>
+                      <div class="text-[11px] font-medium text-slate-500 mt-1 flex items-center gap-1">
+                        {{ m.sentAt | date: 'shortTime' }}
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" [ngClass]="m.read ? 'text-indigo-500' : 'text-slate-400'" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                } @else {
+                  <!-- Incoming Message (Doctor) -->
+                  <div class="flex justify-start mb-4">
+                    <div class="flex items-end gap-2 max-w-[85%] md:max-w-[70%]">
+                      <div class="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 font-bold text-xs shrink-0 mb-5 border border-white dark:border-slate-800 shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                      </div>
+                      <div class="flex flex-col items-start">
+                        <div class="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 p-3 sm:p-4 rounded-2xl rounded-tl-sm shadow-md border border-slate-100 dark:border-slate-700">
+                          @if (m.attachments && m.attachments.length > 0) {
+                            <div class="grid gap-2 mb-2">
+                              @for (a of m.attachments; track a.id) {
+                                <div class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-2 rounded-xl flex items-center gap-3 w-64 hover:border-indigo-300 transition-colors cursor-pointer" (click)="download(m, a.id, a.fileName)">
+                                  <div class="w-10 h-10 bg-slate-200 dark:bg-slate-800 rounded-lg flex items-center justify-center shrink-0">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                  </div>
+                                  <div class="min-w-0 flex-1">
+                                    <p class="text-sm font-bold truncate">{{ a.fileName }}</p>
+                                    <p class="text-[10px] text-slate-500 uppercase mt-0.5">Télécharger</p>
+                                  </div>
+                                </div>
+                              }
+                            </div>
+                          }
+                          <p class="whitespace-pre-wrap text-sm leading-relaxed" [ngClass]="{'mt-2 pt-2 border-t border-slate-200 dark:border-slate-700': m.attachments.length}">{{ m.content }}</p>
+                        </div>
+                        <div class="text-[11px] font-medium text-slate-500 mt-1 ml-1">
+                          {{ m.sentAt | date: 'shortTime' }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 }
+              }
+            </div>
+
+            <!-- Chat Input Area -->
+            <div class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 p-4 shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+              @if (sendError) {
+                <div class="mb-3 p-2 rounded-lg bg-rose-50 text-rose-700 text-xs border border-rose-200">
+                  {{ sendError }}
+                </div>
+              }
+
+              @if (chatLimitsCheck.blocked) {
+                <div class="mb-3 p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/20 text-amber-800 dark:text-amber-300 text-sm border border-amber-200 dark:border-amber-900/50 flex items-start gap-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  <span>{{ chatLimitsCheck.reason }}</span>
+                </div>
+              }
+              
+              <!-- File preview area -->
+              @if (selectedFile) {
+                <div class="mb-3 flex items-center gap-3 p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl border border-indigo-100 dark:border-indigo-800 w-max pr-4">
+                  <div class="w-10 h-10 bg-indigo-100 dark:bg-indigo-800 rounded flex items-center justify-center text-indigo-600 dark:text-indigo-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="text-sm font-bold text-slate-700 dark:text-slate-200">{{ selectedFile.name }}</p>
+                    <p class="text-xs text-slate-500">{{ (selectedFile.size / 1024 / 1024).toFixed(2) }} MB</p>
+                  </div>
+                  <button (click)="clearFile()" class="ml-4 p-1.5 rounded-full hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-500 transition-colors" title="Retirer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              }
+ 
+              <div class="flex items-end gap-2 max-w-5xl mx-auto">
+                <input type="file" #fileInput (change)="onFileSelected($event)" class="hidden" accept=".pdf,image/*,.doc,.docx" />
+                
+                <button 
+                  (click)="triggerFileInput()"
+                  [disabled]="chatLimitsCheck.blocked"
+                  class="p-3 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-full transition-colors shrink-0 mb-1 disabled:opacity-50 disabled:hover:bg-transparent"
+                  title="Joindre un document"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transform -rotate-45" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                  </svg>
+                </button>
+ 
+                <div class="flex-1 bg-slate-100 dark:bg-slate-800 rounded-3xl border border-transparent focus-within:border-indigo-400 focus-within:bg-white dark:focus-within:bg-slate-900 transition-all shadow-sm overflow-hidden flex items-center">
+                  <textarea
+                    rows="1"
+                    [disabled]="chatLimitsCheck.blocked"
+                    class="w-full bg-transparent border-none focus:ring-0 px-5 py-3.5 text-sm resize-none max-h-32 disabled:text-slate-400"
+                    style="min-height: 50px;"
+                    [(ngModel)]="replyText"
+                    [placeholder]="chatLimitsCheck.blocked ? 'Envoi de messages désactivé temporairement.' : 'Écrivez un message...'"
+                    (keydown.enter)="!$any($event).shiftKey && sendReply(); $event.preventDefault()"
+                  ></textarea>
+                </div>
+ 
+                <button
+                  class="w-12 h-12 flex items-center justify-center rounded-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-500/30 transition-transform hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 shrink-0 mb-0.5"
+                  [disabled]="sending || (!replyText.trim() && !selectedFile) || chatLimitsCheck.blocked"
+                  (click)="sendReply()"
+                  title="Envoyer"
+                >
+                  @if (sending) {
+                    <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  } @else {
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                    </svg>
+                  }
+                </button>
               </div>
             </div>
           }
-          </div>
+        </section>
+      </div>
+    } @else {
+      <!-- COMPOSE WIZARD VIEW -->
+      <div class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+        <div class="max-w-3xl mx-auto w-full">
+          <button (click)="cancelCompose()" class="mb-4 text-sm font-medium text-slate-500 hover:text-slate-800 dark:hover:text-slate-300 inline-flex items-center gap-1 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Retour aux messages
+          </button>
 
-          <div
-            class="shrink-0 mt-4 pt-4 border-t border-slate-200/80 dark:border-slate-600/60 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between bg-slate-50/80 dark:bg-slate-900/40 -mx-6 sm:-mx-8 px-6 sm:px-8 pb-1 rounded-b-2xl"
-          >
-            <button type="button" class="pm-btn-secondary w-full sm:w-auto" (click)="prevStep()" [disabled]="wizardStep === 1">
-              {{ prefs.translate('messaging.prev') }}
-            </button>
-            <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto sm:justify-end">
+          <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 md:p-8 border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-slate-100 dark:bg-slate-800">
+              <div class="h-full bg-indigo-500 transition-all duration-300" [style.width.%]="(wizardStep / 4) * 100"></div>
+            </div>
+
+            <div class="mb-8">
+              <h2 class="text-2xl font-extrabold text-slate-900 dark:text-white mb-2">{{ prefs.translate('messaging.compose') }}</h2>
+              <p class="text-slate-500 dark:text-slate-400">Étape {{ wizardStep }} sur 4</p>
+            </div>
+
+            @if (sendError) {
+              <div class="mb-6 p-4 rounded-2xl bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300 text-sm border border-rose-200 dark:border-rose-800">
+                <strong class="block mb-1">Erreur</strong>
+                {{ sendError }}
+              </div>
+            }
+
+            <!-- Step 1: Concern -->
+            @if (wizardStep === 1) {
+              <div class="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200">{{ prefs.translate('messaging.step1.title') }}</h3>
+                <div class="grid sm:grid-cols-2 gap-4">
+                  <button type="button" (click)="pickMe()" [ngClass]="{'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 ring-2 ring-indigo-500/20': concernTargetType === 'SELF'}" class="p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-indigo-300 transition-all text-start">
+                    <div class="flex items-center gap-3 mb-2">
+                      <div class="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                        </svg>
+                      </div>
+                      <span class="font-bold text-slate-900 dark:text-white">{{ prefs.translate('messaging.concerned.me') }}</span>
+                    </div>
+                    <p class="text-sm text-slate-500 line-clamp-1">{{ patient?.prenom }} {{ patient?.nom }}</p>
+                  </button>
+
+                  @for (pr of proches; track trackProche($index, pr)) {
+                    <button type="button" (click)="pickProche(pr)" [ngClass]="{'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 ring-2 ring-indigo-500/20': concernTargetType === 'PROCHE' && concernTargetId === pr.id}" class="p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-indigo-300 transition-all text-start">
+                      <div class="flex items-center gap-3 mb-2">
+                        <div class="w-10 h-10 rounded-full bg-teal-100 dark:bg-teal-900/50 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                          </svg>
+                        </div>
+                        <span class="font-bold text-slate-900 dark:text-white">Proche</span>
+                      </div>
+                      <p class="text-sm text-slate-500 line-clamp-1">{{ pr.prenom }} {{ pr.nom }}</p>
+                    </button>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Step 2: Doctor -->
+            @if (wizardStep === 2) {
+              <div class="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200">{{ prefs.translate('messaging.step2.title') }}</h3>
+                @if (consultablePractitioners.length === 0) {
+                  <div class="p-6 rounded-2xl bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-center">
+                    <p class="text-amber-800 dark:text-amber-200 text-sm font-medium">{{ prefs.translate('messaging.step2.noPractitioners') }}</p>
+                  </div>
+                } @else {
+                  <div class="grid sm:grid-cols-2 gap-4">
+                    @for (doc of consultablePractitioners; track doc.externalId) {
+                      <button type="button" (click)="pickPractitioner(doc.externalId)" [ngClass]="{'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 ring-2 ring-indigo-500/20': selectedPractitionerExternalId === doc.externalId}" class="p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-indigo-300 transition-all text-start">
+                        <span class="block font-bold text-slate-900 dark:text-white mb-1">{{ doc.name }}</span>
+                        <span class="block text-sm text-slate-500">{{ doc.specialty || 'Médecin' }}</span>
+                      </button>
+                    }
+                  </div>
+                }
+                
+                @if (selectedPractitionerExternalId && composeLimitsCheck.blocked) {
+                  <div class="p-4 mt-4 rounded-2xl bg-amber-50 dark:bg-amber-950/20 text-amber-800 dark:text-amber-300 text-sm border border-amber-200 dark:border-amber-900/50 flex items-start gap-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <span>{{ composeLimitsCheck.reason }}</span>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Step 3: Subject -->
+            @if (wizardStep === 3) {
+              <div class="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200">{{ prefs.translate('messaging.step3.title') }}</h3>
+                <div class="grid sm:grid-cols-2 gap-4">
+                  @for (s of subjectKeys; track s) {
+                    <button type="button" (click)="pickSubject(s)" [ngClass]="{'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/30 ring-2 ring-indigo-500/20': selectedSubject === s}" class="p-4 rounded-2xl border-2 border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-indigo-300 transition-all text-start font-bold text-slate-700 dark:text-slate-300">
+                      {{ subjectLabel(s) }}
+                    </button>
+                  }
+                </div>
+                @if (selectedSubject === 'AUTRE') {
+                  <div class="mt-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 animate-in fade-in duration-300">
+                    <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Précisez le sujet :</label>
+                    <input type="text" [(ngModel)]="customSubject" class="w-full rounded-xl border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-4 py-2.5 focus:border-indigo-500 focus:ring-indigo-500" placeholder="Ex: Question concernant l'ordonnance" />
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Step 4: Write & Attach -->
+            @if (wizardStep === 4) {
+              <div class="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200">{{ prefs.translate('messaging.step4.title') }}</h3>
+                
+                <div>
+                  <textarea [(ngModel)]="messageContent" rows="6" class="w-full rounded-2xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-5 py-4 focus:border-indigo-500 focus:ring-0 transition-colors resize-y shadow-inner" placeholder="Écrivez votre message ici..."></textarea>
+                </div>
+
+                <div class="bg-indigo-50/50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-800/50 rounded-2xl p-5">
+                  <div class="flex items-center justify-between mb-4">
+                    <div>
+                      <h4 class="font-bold text-indigo-900 dark:text-indigo-100 text-sm flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                        </svg>
+                        Pièces jointes
+                      </h4>
+                      <p class="text-xs text-indigo-700/70 dark:text-indigo-300/70 mt-0.5">Documents, résultats d'analyses ou photos</p>
+                    </div>
+                    <div>
+                      <input type="file" multiple class="hidden" id="file-upload" (change)="onComposeFiles($event)" />
+                      <label for="file-upload" class="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-700 text-indigo-600 dark:text-indigo-400 rounded-xl text-sm font-bold hover:bg-indigo-50 dark:hover:bg-indigo-900/50 transition-colors">
+                        Ajouter
+                      </label>
+                    </div>
+                  </div>
+
+                  @if (composeFiles.length > 0) {
+                    <ul class="space-y-2">
+                      @for (cf of composeFiles; track $index) {
+                        <li class="flex items-center justify-between bg-white dark:bg-slate-800 p-3 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700">
+                          <span class="text-sm font-medium text-slate-700 dark:text-slate-300 truncate pr-4">{{ cf.file.name }}</span>
+                          <button type="button" (click)="removeComposeFile($index)" class="text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 p-1.5 rounded-lg transition-colors shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          </button>
+                        </li>
+                      }
+                    </ul>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Navigation Buttons -->
+            <div class="mt-8 flex items-center gap-4 justify-between pt-6 border-t border-slate-100 dark:border-slate-800">
+              <button type="button" (click)="prevStep()" class="px-6 py-2.5 rounded-xl font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" [class.invisible]="wizardStep === 1">
+                Retour
+              </button>
+              
               @if (wizardStep < 4) {
-                <button
-                  type="button"
-                  class="pm-btn-primary w-full sm:min-w-[10rem]"
-                  (click)="nextStep()"
-                  [disabled]="!canAdvanceFromCurrentStep()"
-                  [attr.title]="!canAdvanceFromCurrentStep() ? prefs.translate('messaging.wizard.fillStep') : null"
-                >
-                  {{ prefs.translate('messaging.next') }}
+                <button type="button" (click)="nextStep()" [disabled]="!canAdvanceFromCurrentStep()" class="px-8 py-2.5 rounded-xl font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-md transition-all disabled:opacity-50 disabled:shadow-none flex items-center gap-2">
+                  Continuer
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                  </svg>
                 </button>
               } @else {
-                <button
-                  type="button"
-                  class="pm-btn-primary w-full sm:min-w-[10rem]"
-                  (click)="submit()"
-                  [disabled]="!canSubmit()"
-                  [attr.title]="!canSubmit() ? prefs.translate('messaging.wizard.fillStep') : null"
-                >
-                  {{ sending ? prefs.translate('messaging.sending') : prefs.translate('messaging.send') }}
+                <button type="button" (click)="submit()" [disabled]="!canSubmit()" class="px-8 py-2.5 rounded-xl font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-500/20 transition-all disabled:opacity-50 disabled:shadow-none flex items-center gap-2">
+                  @if (sending) {
+                    <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Envoi...
+                  } @else {
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                    </svg>
+                    Démarrer la discussion
+                  }
                 </button>
               }
             </div>
           </div>
-        </section>
-      }
+        </div>
+      </div>
     }
-  </main>
+  }
 </div>

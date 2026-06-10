@@ -91,6 +91,7 @@
         }
         <div class="pad-table-scroll">
           <table class="pad-table">
+            <caption class="sr-only">Liste des cabinets médicaux</caption>
             <thead>
               <tr>
                 <th>{{ prefs.translate('platformAdmin.col.name') }}</th>
@@ -137,6 +138,7 @@
                         <p class="pad-muted">{{ prefs.translate('platformAdmin.noStaff') }}</p>
                       } @else {
                         <table class="pad-table pad-table--inner">
+                          <caption class="sr-only">Membres du personnel pour le cabinet sélectionné</caption>
                           <thead>
                             <tr>
                               <th>{{ prefs.translate('platformAdmin.col.staffName') }}</th>
@@ -197,6 +199,7 @@
         } @else {
           <div class="pad-table-scroll">
             <table class="pad-table">
+              <caption class="sr-only">Liste des patients enregistrés</caption>
               <thead>
                 <tr>
                   <th>{{ prefs.translate('platformAdmin.col.staffName') }}</th>

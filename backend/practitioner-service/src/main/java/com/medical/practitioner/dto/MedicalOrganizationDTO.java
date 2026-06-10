@@ -1,7 +1,7 @@
 package com.medical.practitioner.dto;
 
 import com.medical.practitioner.entity.MedicalOrganization;
-
+import java.util.List;
 public class MedicalOrganizationDTO {
 
     private Long id;
@@ -14,6 +14,7 @@ public class MedicalOrganizationDTO {
     private String codePostal;
     private String pays;
     private boolean actif;
+    private List<CabinetHoraireDTO> horaires;
 
     public static MedicalOrganizationDTO fromEntity(MedicalOrganization m) {
         MedicalOrganizationDTO dto = new MedicalOrganizationDTO();
@@ -27,6 +28,11 @@ public class MedicalOrganizationDTO {
         dto.codePostal = m.getCodePostal();
         dto.pays = m.getPays();
         dto.actif = m.isActif();
+        if (m.getHoraires() != null) {
+            dto.horaires = m.getHoraires().stream()
+                .map(CabinetHoraireDTO::fromEntity)
+                .toList();
+        }
         return dto;
     }
 
@@ -59,4 +65,7 @@ public class MedicalOrganizationDTO {
 
     public boolean isActif() { return actif; }
     public void setActif(boolean actif) { this.actif = actif; }
+
+    public List<CabinetHoraireDTO> getHoraires() { return horaires; }
+    public void setHoraires(List<CabinetHoraireDTO> horaires) { this.horaires = horaires; }
 }

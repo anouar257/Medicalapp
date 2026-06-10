@@ -47,9 +47,8 @@ public class Proche {
 
     // ── Identité ─────────────────────────────────────────────────────────────
 
-    @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 10)
+    @Column(length = 10)
     private Civilite civilite;
 
     @NotNull
@@ -79,40 +78,33 @@ public class Proche {
     @Column(name = "date_naissance", nullable = false)
     private LocalDate dateNaissance;
 
-    @NotBlank
-    @Column(name = "pays_naissance", nullable = false, length = 100)
+    @Column(name = "pays_naissance", length = 100)
     private String paysNaissance;
 
-    @NotBlank
-    @Column(name = "ville_naissance", nullable = false, length = 100)
+    @Column(name = "ville_naissance", length = 100)
     private String villeNaissance;
 
     // ── Contacts ─────────────────────────────────────────────────────────────
 
-    @NotBlank
-    @Column(name = "telephone_mobile", nullable = false, length = 20)
+    @Column(name = "telephone_mobile", length = 20)
     private String telephoneMobile;
 
     @Column(name = "telephone_fixe", length = 20)
     private String telephoneFixe;
 
-    @NotBlank
     @Email
-    @Column(nullable = false, length = 255)
+    @Column(length = 255)
     private String email;
 
     // ── Adresse ──────────────────────────────────────────────────────────────
 
-    @NotBlank
-    @Column(nullable = false, length = 500)
+    @Column(length = 500)
     private String adresse;
 
-    @NotBlank
-    @Column(name = "code_postal", nullable = false, length = 10)
+    @Column(name = "code_postal", length = 10)
     private String codePostal;
 
-    @NotBlank
-    @Column(nullable = false, length = 100)
+    @Column(length = 100)
     private String ville;
 
     // ── Informations médicales / administratives ─────────────────────────────

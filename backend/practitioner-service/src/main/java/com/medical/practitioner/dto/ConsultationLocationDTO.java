@@ -6,6 +6,7 @@ import com.medical.practitioner.entity.HoraireOuverture;
 import com.medical.practitioner.entity.JourSemaine;
 import com.medical.practitioner.entity.ParkingType;
 
+import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,7 @@ public class ConsultationLocationDTO {
     private String pays;
     private String telephoneBureau;
     private String fax;
+    private BigDecimal consultationFee;
     private boolean ascenseur;
     private boolean entreeAccessible;
     private String etage;
@@ -35,26 +37,27 @@ public class ConsultationLocationDTO {
 
     public static ConsultationLocationDTO fromEntity(ConsultationLocation l) {
         ConsultationLocationDTO dto = new ConsultationLocationDTO();
-        dto.id = l.getId();
+        dto.setId(l.getId());
         if (l.getPractitioner() != null) {
-            dto.practitionerId = l.getPractitioner().getId();
+            dto.setPractitionerId(l.getPractitioner().getId());
         }
-        dto.nomEtablissement = l.getNomEtablissement();
-        dto.adresse = l.getAdresse();
-        dto.ville = l.getVille();
-        dto.codePostal = l.getCodePostal();
-        dto.pays = l.getPays();
-        dto.telephoneBureau = l.getTelephoneBureau();
-        dto.fax = l.getFax();
-        dto.ascenseur = l.isAscenseur();
-        dto.entreeAccessible = l.isEntreeAccessible();
-        dto.etage = l.getEtage();
-        dto.parking = l.getParking();
-        dto.contactUrgenceType = l.getContactUrgenceType();
-        dto.telephoneUrgence = l.getTelephoneUrgence();
-        dto.actif = l.isActif();
+        dto.setNomEtablissement(l.getNomEtablissement());
+        dto.setAdresse(l.getAdresse());
+        dto.setVille(l.getVille());
+        dto.setCodePostal(l.getCodePostal());
+        dto.setPays(l.getPays());
+        dto.setTelephoneBureau(l.getTelephoneBureau());
+        dto.setFax(l.getFax());
+        dto.setConsultationFee(l.getConsultationFee());
+        dto.setAscenseur(l.isAscenseur());
+        dto.setEntreeAccessible(l.isEntreeAccessible());
+        dto.setEtage(l.getEtage());
+        dto.setParking(l.getParking());
+        dto.setContactUrgenceType(l.getContactUrgenceType());
+        dto.setTelephoneUrgence(l.getTelephoneUrgence());
+        dto.setActif(l.isActif());
         if (l.getHoraires() != null) {
-            dto.horaires = l.getHoraires().stream().map(HoraireDTO::fromEntity).toList();
+            dto.setHoraires(l.getHoraires().stream().map(HoraireDTO::fromEntity).toList());
         }
         return dto;
     }
@@ -86,6 +89,9 @@ public class ConsultationLocationDTO {
     public String getFax() { return fax; }
     public void setFax(String fax) { this.fax = fax; }
 
+    public BigDecimal getConsultationFee() { return consultationFee; }
+    public void setConsultationFee(BigDecimal consultationFee) { this.consultationFee = consultationFee; }
+
     public boolean isAscenseur() { return ascenseur; }
     public void setAscenseur(boolean ascenseur) { this.ascenseur = ascenseur; }
 
@@ -111,20 +117,35 @@ public class ConsultationLocationDTO {
     public void setHoraires(List<HoraireDTO> horaires) { this.horaires = horaires; }
 
     public static class HoraireDTO {
-        public Long id;
-        public JourSemaine jour;
-        public LocalTime heureDebut;
-        public LocalTime heureFin;
-        public boolean continu;
+        private Long id;
+        private JourSemaine jour;
+        private LocalTime heureDebut;
+        private LocalTime heureFin;
+        private boolean continu;
 
         public static HoraireDTO fromEntity(HoraireOuverture h) {
             HoraireDTO dto = new HoraireDTO();
-            dto.id = h.getId();
-            dto.jour = h.getJour();
-            dto.heureDebut = h.getHeureDebut();
-            dto.heureFin = h.getHeureFin();
-            dto.continu = h.isContinu();
+            dto.setId(h.getId());
+            dto.setJour(h.getJour());
+            dto.setHeureDebut(h.getHeureDebut());
+            dto.setHeureFin(h.getHeureFin());
+            dto.setContinu(h.isContinu());
             return dto;
         }
+
+        public Long getId() { return id; }
+        public void setId(Long id) { this.id = id; }
+
+        public JourSemaine getJour() { return jour; }
+        public void setJour(JourSemaine jour) { this.jour = jour; }
+
+        public LocalTime getHeureDebut() { return heureDebut; }
+        public void setHeureDebut(LocalTime heureDebut) { this.heureDebut = heureDebut; }
+
+        public LocalTime getHeureFin() { return heureFin; }
+        public void setHeureFin(LocalTime heureFin) { this.heureFin = heureFin; }
+
+        public boolean isContinu() { return continu; }
+        public void setContinu(boolean continu) { this.continu = continu; }
     }
 }
