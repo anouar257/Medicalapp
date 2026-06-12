@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthProService } from '../../services/auth-pro.service';
 import { RegisterCabinetRequest } from '../../models/practitioner.model';
 import { AppNavbarComponent } from '../../shared/app-navbar.component';
+import { PreferencesService } from '../../services/preferences.service';
 
 /**
  * Inscription d'un cabinet (organisme médical).
@@ -13,6 +14,7 @@ import { AppNavbarComponent } from '../../shared/app-navbar.component';
  * <ul>
  *   <li>l'organisme médical (cabinet) ;</li>
  *   <li>le compte ADMIN racine du cabinet (le créateur).</li>
+ *   <li>ou l'assistant.</li>
  * </ul>
  * <p>Après inscription, l'utilisateur est redirigé vers la page de vérification OTP.
  */
@@ -41,7 +43,11 @@ export class RegisterCabinetComponent {
   errorMessage = '';
   successMessage = '';
 
-  constructor(private authPro: AuthProService, private router: Router) {}
+  constructor(
+    private authPro: AuthProService,
+    private router: Router,
+    public prefs: PreferencesService
+  ) {}
 
   goToStep2() {
     this.errorMessage = '';

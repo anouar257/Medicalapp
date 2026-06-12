@@ -1,6 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { AuthProService } from '../../services/auth-pro.service';
 import { ProUserRole } from '../../models/practitioner.model';
 import { PreferencesService } from '../../services/preferences.service';
@@ -26,7 +26,7 @@ interface NavItem {
 @Component({
   selector: 'app-cabinet-shell',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, AppPreferencesToolbarComponent],
+  imports: [CommonModule, RouterOutlet, AppPreferencesToolbarComponent],
   templateUrl: './cabinet-shell.component.html',
   styleUrls: ['./cabinet-shell.component.scss'],
 })

@@ -6,16 +6,19 @@
 
       <main>
         <!-- 2. Hero Section : Le Moteur de Recherche -->
-        <section class="relative pt-24 pb-32 flex flex-col items-center justify-center text-center px-4 overflow-visible">
+        <section class="relative min-h-[calc(100vh-60px)] py-16 flex flex-col items-center justify-center text-center px-4 overflow-visible bg-slate-50/10 dark:bg-slate-950/10">
           
-          <!-- Background decoration -->
-          <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-[400px] bg-blue-400/20 dark:bg-blue-600/10 blur-[100px] rounded-full pointer-events-none"></div>
+          <!-- Background Image with Overlay -->
+          <div class="absolute inset-0 z-0 bg-cover bg-top bg-no-repeat opacity-95 dark:opacity-80 pointer-events-none transition-opacity duration-300" style="background-image: url('/assets/images/img3.png');"></div>
+          
+          <!-- Gradient overlay for text contrast and blending -->
+          <div class="absolute inset-0 z-0 bg-gradient-to-b from-slate-50/10 via-slate-50/30 to-slate-50 dark:from-slate-950/10 dark:via-slate-950/30 dark:to-slate-950 pointer-events-none"></div>
 
           <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight fade-in relative z-10">
             {{ translate('Trouvez votre médecin') }} <br class="hidden sm:block" />
             <span class="text-blue-600 dark:text-blue-400">{{ translate('Prenez rendez-vous en ligne.') }}</span>
           </h1>
-          <p class="mt-6 text-lg text-slate-600 dark:text-slate-400 fade-in max-w-2xl">
+          <p class="mt-6 text-lg text-slate-600 dark:text-slate-400 fade-in max-w-2xl relative z-10">
             {{ translate('Simple, rapide et sécurisé. Votre santé à portée de clic.') }}
           </p>
 
@@ -337,7 +340,10 @@
 
         <!-- 4. Section Conversion Praticien (B2B) -->
         <section class="py-20 relative overflow-hidden bg-slate-900">
-          <div class="absolute inset-0 opacity-20">
+          <!-- Background Image -->
+          <div class="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-45 mix-blend-overlay pointer-events-none" style="background-image: url('/assets/images/img4.png');"></div>
+
+          <div class="absolute inset-0 opacity-20 z-0">
             <div class="absolute top-0 right-0 w-96 h-96 bg-blue-500 blur-[120px] rounded-full"></div>
             <div class="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500 blur-[120px] rounded-full"></div>
           </div>
@@ -369,28 +375,46 @@
 
         <!-- 4. Section "Comment ça marche ?" -->
         <section class="py-24 bg-slate-50 dark:bg-slate-950">
-          <div class="max-w-7xl mx-auto px-4 text-center">
-            <h2 class="text-3xl font-bold mb-16">{{ translate('Comment utiliser MedConnect ?') }}</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="max-w-7xl mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-16 text-center">{{ translate('Comment utiliser MedConnect ?') }}</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+              <!-- Left Column: Image with glow effect -->
+              <div class="lg:col-span-6 relative group">
+                <div class="absolute inset-0 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-[2.5rem] blur-2xl opacity-20 group-hover:opacity-30 transition duration-700"></div>
+                <div class="relative overflow-hidden rounded-[2rem] border border-slate-200/80 dark:border-slate-800 shadow-2xl">
+                  <img src="/assets/images/img1.png" alt="Comment utiliser MedConnect" class="w-full h-auto object-cover transform group-hover:scale-102 transition duration-700" />
+                </div>
+              </div>
               
-              <div class="p-8 rounded-3xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md transition">
-                <div class="w-16 h-16 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mx-auto text-2xl mb-6">🔍</div>
-                <h3 class="font-bold text-lg mb-3">{{ translate('1. Recherchez') }}</h3>
-                <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{{ translate('Trouvez un praticien par nom ou spécialité près de chez vous en quelques clics.') }}</p>
-              </div>
+              <!-- Right Column: Stacked steps -->
+              <div class="lg:col-span-6 space-y-6">
+                
+                <div class="flex gap-6 p-6 rounded-3xl bg-white dark:bg-slate-900 shadow-sm border border-slate-100 dark:border-slate-800/80 hover:shadow-md transition">
+                  <div class="w-14 h-14 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center text-2xl shrink-0">🔍</div>
+                  <div>
+                    <h3 class="font-bold text-lg mb-2">{{ translate('1. Recherchez') }}</h3>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{{ translate('Trouvez un praticien par nom ou spécialité près de chez vous en quelques clics.') }}</p>
+                  </div>
+                </div>
 
-              <div class="p-8 rounded-3xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md transition">
-                <div class="w-16 h-16 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mx-auto text-2xl mb-6">📅</div>
-                <h3 class="font-bold text-lg mb-3">{{ translate('2. Choisissez') }}</h3>
-                <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{{ translate('Consultez les disponibilités en temps réel et choisissez le créneau qui vous convient.') }}</p>
-              </div>
+                <div class="flex gap-6 p-6 rounded-3xl bg-white dark:bg-slate-900 shadow-sm border border-slate-100 dark:border-slate-800/80 hover:shadow-md transition">
+                  <div class="w-14 h-14 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center text-2xl shrink-0">📅</div>
+                  <div>
+                    <h3 class="font-bold text-lg mb-2">{{ translate('2. Choisissez') }}</h3>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{{ translate('Consultez les disponibilités en temps réel et choisissez le créneau qui vous convient.') }}</p>
+                  </div>
+                </div>
 
-              <div class="p-8 rounded-3xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md transition">
-                <div class="w-16 h-16 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mx-auto text-2xl mb-6">✅</div>
-                <h3 class="font-bold text-lg mb-3">{{ translate('3. Réservez') }}</h3>
-                <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{{ translate('Confirmez votre RDV en toute sécurité et recevez vos rappels automatiques.') }}</p>
-              </div>
+                <div class="flex gap-6 p-6 rounded-3xl bg-white dark:bg-slate-900 shadow-sm border border-slate-100 dark:border-slate-800/80 hover:shadow-md transition">
+                  <div class="w-14 h-14 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center text-2xl shrink-0">✅</div>
+                  <div>
+                    <h3 class="font-bold text-lg mb-2">{{ translate('3. Réservez') }}</h3>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{{ translate('Confirmez votre RDV en toute sécurité et recevez vos rappels automatiques.') }}</p>
+                  </div>
+                </div>
 
+              </div>
             </div>
           </div>
         </section>

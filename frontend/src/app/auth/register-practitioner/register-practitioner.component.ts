@@ -11,6 +11,7 @@ import {
   Titre,
 } from '../../models/practitioner.model';
 import { AppNavbarComponent } from '../../shared/app-navbar.component';
+import { PreferencesService } from '../../services/preferences.service';
 
 /**
  * Inscription self-service d'un praticien (ou remplaçant).
@@ -69,6 +70,7 @@ export class RegisterPractitionerComponent implements OnInit {
     private authPro: AuthProService,
     private practitionerService: PractitionerService,
     private router: Router,
+    public prefs: PreferencesService
   ) {}
 
   ngOnInit() {
