@@ -1,0 +1,45 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        # Route for Messaging Service
+        - id: messaging_route
+          uri: lb://MESSAGING-SERVICE
+          predicates:
+            - Path=/messaging-api/**
+          filters:
+            - StripPrefix=1
+
+        # Route for Payment Service
+        - id: payment_route
+          uri: lb://PAYMENT-SERVICE
+          predicates:
+            - Path=/api/payments/**
+
+        # Route for Patient Service
+        - id: patient_route
+          uri: lb://PATIENT-SERVICE
+          predicates:
+            - Path=/api/auth/**, /api/auth, /api/patients/**, /api/patients, /api/proches/**, /api/proches
+
+        # Route for Practitioner Service
+        - id: practitioner_route
+          uri: lb://PRACTITIONER-SERVICE
+          predicates:
+            - Path=/api/pro/**, /api/pro
+
+        # Route for Agenda Service (Generic catch-all /api/**)
+        - id: agenda_route
+          uri: lb://AGENDA-SERVICE
+          predicates:
+            - Path=/api/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/

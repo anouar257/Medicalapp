@@ -23,5 +23,7 @@
     <module>practitioner-service</module>
     <module>messaging-service</module>
     <module>payment-service</module>
+    <module>eureka-server</module>
+    <module>api-gateway</module>
   </modules>
 </project>

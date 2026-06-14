@@ -2,6 +2,8 @@ server:
   port: ${SERVER_PORT:8081}
 
 spring:
+  application:
+    name: agenda-service
   servlet:
     multipart:
       max-file-size: 4MB
@@ -11,6 +13,12 @@ spring:
     username: postgres
     password: odoo
     driver-class-name: org.postgresql.Driver
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
+
   jpa:
     hibernate:
       ddl-auto: update

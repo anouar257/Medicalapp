@@ -33,8 +33,10 @@ services:
       - PRACTITIONER_BASE_URL=http://practitioner-service:8083
       - JWT_SECRET=${JWT_SECRET:-changeme-patient-jwt-secret-256bit-min}
       - JWT_PRO_SECRET=${JWT_PRO_SECRET:-changeme-pro-jwt-secret-256bit-min}
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
     depends_on:
       - postgres-db
+      - eureka-server
     volumes:
       - agenda_doctor_photos:/root/.agenda/doctor-photos
     networks:
@@ -55,8 +57,10 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=odoo
       - JWT_SECRET=${JWT_SECRET:-changeme-patient-jwt-secret-256bit-min}
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
     depends_on:
       - postgres-db
+      - eureka-server
     networks:
       - mediconnect-network
     restart: always
@@ -77,8 +81,10 @@ services:
       - PATIENT_BASE_URL=http://patient-service:8082
       - AGENDA_BASE_URL=http://agenda-service:8081
       - JWT_PRO_SECRET=${JWT_PRO_SECRET:-changeme-pro-jwt-secret-256bit-min}
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
     depends_on:
       - postgres-db
+      - eureka-server
     volumes:
       - practitioner_photos:/root/.practitioner/photos
     networks:
@@ -103,8 +109,10 @@ services:
       - PRACTITIONER_BASE_URL=http://practitioner-service:8083
       - JWT_SECRET=${JWT_SECRET:-changeme-patient-jwt-secret-256bit-min}
       - JWT_PRO_SECRET=${JWT_PRO_SECRET:-changeme-pro-jwt-secret-256bit-min}
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
     depends_on:
       - postgres-db
+      - eureka-server
     networks:
       - mediconnect-network
     restart: always
@@ -124,8 +132,39 @@ services:
       - SPRING_DATASOURCE_PASSWORD=odoo
       - AGENDA_BASE_URL=http://agenda-service:8081
       - JWT_PRO_SECRET=${JWT_PRO_SECRET:-changeme-pro-jwt-secret-256bit-min}
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
     depends_on:
       - postgres-db
+      - eureka-server
+    networks:
+      - mediconnect-network
+    restart: always
+
+  # Eureka Discovery Server
+  eureka-server:
+    build:
+      context: ./backend/eureka-server
+      dockerfile: Dockerfile
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    networks:
+      - mediconnect-network
+    restart: always
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./backend/api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    expose:
+      - "8090"
+    environment:
+      - SERVER_PORT=8090
+      - EUREKA_SERVER_URL=http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
     networks:
       - mediconnect-network
     restart: always
@@ -139,11 +178,7 @@ services:
     ports:
       - "4200:80" # Mappe le port 4200 de l'hôte vers le port 80 de Nginx
     depends_on:
-      - agenda-service
-      - patient-service
-      - practitioner-service
-      - messaging-service
-      - payment-service
+      - api-gateway
     networks:
       - mediconnect-network
     restart: always
