@@ -155,7 +155,7 @@
 
               <!-- List of Acts -->
               <div style="margin-bottom: 2rem; overflow-x: auto;">
-                <table class="acts-table" style="width: 100%; border-collapse: collapse; min-width: 600px;">
+                <table [attr.aria-label]="prefs.translate('PRACTITIONER.ACTS.TITLE')" class="acts-table" style="width: 100%; border-collapse: collapse; min-width: 600px;">
                   <thead>
                     <tr style="border-bottom: 2px solid var(--border); text-align: left;">
                       <th style="padding: 12px 16px; font-weight: 600; color: var(--text-secondary);">{{ prefs.translate('PRACTITIONER.ACTS.NAME') }}</th>

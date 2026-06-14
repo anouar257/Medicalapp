@@ -173,7 +173,7 @@ public class AppointmentTypeService {
 
     List<AppointmentType> dynamicTypes =
         repository.findBySourcePractitionerIdOrderByDisplayOrderAscIdAsc(sourcePractitionerId).stream()
-            .filter((type) -> type.getSourceActId() != null)
+            .filter(type -> type.getSourceActId() != null)
             .toList();
     if (dynamicTypes.isEmpty()) {
       return;
@@ -211,7 +211,7 @@ public class AppointmentTypeService {
 
     List<AppointmentType> dynamicTypes =
         repository.findBySourcePractitionerIdOrderByDisplayOrderAscIdAsc(sourcePractitionerId).stream()
-            .filter((type) -> type.getSourceActId() != null)
+            .filter(type -> type.getSourceActId() != null)
             .toList();
     if (dynamicTypes.isEmpty()) {
       return;
@@ -265,7 +265,7 @@ public class AppointmentTypeService {
     List<AppointmentType> durationMatches =
         dynamicTypes.stream()
             .filter(
-                (type) ->
+                type ->
                     type.getDefaultDurationMinutes() != null
                         && appointment.getDurationMinutes() != null
                         && type.getDefaultDurationMinutes().intValue()
@@ -380,10 +380,10 @@ public class AppointmentTypeService {
             || description.contains("prevu au cabinet")
             || description.contains("prevu en clinique");
 
-    final boolean expectedRemote = cabinetAppointment ? false : remoteAppointment;
+    final boolean expectedRemote = !cabinetAppointment && remoteAppointment;
 
     return durationMatches.stream()
-        .filter((type) -> isRemoteType(type) == expectedRemote)
+        .filter(type -> isRemoteType(type) == expectedRemote)
         .toList();
   }
 
