@@ -10,11 +10,6 @@ spring:
     password: odoo
     driver-class-name: org.postgresql.Driver
 
-eureka:
-  client:
-    service-url:
-      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
-
   jpa:
     hibernate:
       ddl-auto: update
@@ -79,3 +74,8 @@ agenda:
 practitioner:
   photos:
     directory: ${PRACTITIONER_PHOTOS_DIR:${user.home}/.practitioner/photos}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
