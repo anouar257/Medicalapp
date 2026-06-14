@@ -4,7 +4,7 @@ Mediconnect est une solution complète de gestion de cabinet médical et de pris
 
 ## 🛠️ Stack Technique
 
-- **Backend :** Java 21, Spring Boot 3.4.2, Spring Security (JWT), Hibernate/JPA, OpenFeign.
+- **Backend :** Java 21, Spring Boot 3.4.2, Spring Cloud (Eureka Discovery Server, Cloud Gateway), Spring Security (JWT), Hibernate/JPA, OpenFeign.
 - **Frontend :** Angular 18+, Tailwind CSS, RxJS, Signals (State Management).
 - **Base de données :** PostgreSQL.
 - **Gestion des fichiers :** Stockage local persistant pour les documents et photos médicales.
@@ -38,15 +38,25 @@ Le projet utilise **4 bases de données distinctes** pour garantir l'isolation d
 
 ### 1. Démarrage du Backend (Ordre recommandé)
 
-Chaque service peut être lancé dans son dossier respectif dans `backend/` :
+Pour démarrer en local sans Docker, commencez par lancer le serveur Eureka, puis la Gateway, puis les microservices :
 
 ```bash
-# Pour chaque dossier (agenda-service, patient-service, practitioner-service, messaging-service, payment-service) :
-mvn clean install
+# Lancer le serveur d'enregistrement (Eureka Server)
+cd backend/eureka-server
+mvn spring-boot:run
+
+# Lancer la Gateway (API Gateway)
+cd backend/api-gateway
+mvn spring-boot:run
+
+# Lancer les autres microservices (agenda-service, patient-service, practitioner-service, messaging-service, payment-service) :
+cd backend/<service-folder>
 mvn spring-boot:run
 ```
 
 **Services et Ports :**
+- `eureka-server` : **8761** (Serveur de découverte / Annuaire des services)
+- `api-gateway` : **8090** (Passerelle API / Routage)
 - `agenda-service` : **8081** (Cœur du système)
 - `patient-service` : **8082** (Gestion des patients & comptes)
 - `practitioner-service` : **8083** (Profils praticiens & authentification pro)
@@ -60,10 +70,11 @@ cd frontend
 npm install
 ng serve
 ```
-L'application sera accessible sur `http://localhost:4200`.
+L'application sera accessible sur `http://localhost:4200` et passera par l'API Gateway sur le port `8090` pour joindre les microservices.
 
 ## ✨ Fonctionnalités Clés
 
+- **Architecture Microservices :** Découverte dynamique des services via Eureka Server et routage via API Gateway.
 - **Agenda Dynamique :** Gestion des rendez-vous en temps réel avec indicateurs visuels.
 - **Messagerie Sécurisée :** Échange de documents et messages avec résolution automatique des noms via communication inter-services.
 - **Multi-Rôles :** Espaces dédiés pour les Praticiens, les Assistants et les Patients.
@@ -74,7 +85,7 @@ L'application sera accessible sur `http://localhost:4200`.
 
 Le projet contient une configuration complète pour déployer l'ensemble des services via **Docker Compose**.
 
-Pour tout lancer (bases de données, backend, frontend via Nginx) :
+Pour tout lancer (bases de données, Eureka, Gateway, microservices backend, frontend via Nginx) :
 
 ```bash
 docker-compose up --build -d
