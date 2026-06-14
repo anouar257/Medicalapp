@@ -1,6 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { Injectable, inject, signal } from '@angular/core';
-import { APP_DICTIONARY } from '../i18n/app-dictionary';
+import { TranslateService } from '@ngx-translate/core';
 
 export type ZoomLevel = 'faible' | 'moyen' | 'fort';
 export type AppLanguage = 'fr' | 'en' | 'ar';
@@ -8,11 +8,13 @@ export type AppLanguage = 'fr' | 'en' | 'ar';
 @Injectable({ providedIn: 'root' })
 export class PreferencesService {
   private readonly doc = inject(DOCUMENT);
+  private readonly translateService = inject(TranslateService);
 
   readonly zoomLevel = signal<ZoomLevel>('moyen');
   readonly language = signal<AppLanguage>('fr');
 
   constructor() {
+    this.translateService.setFallbackLang('fr');
     this.loadPreferences();
     this.applyZoom();
     this.applyLanguage();
@@ -30,10 +32,9 @@ export class PreferencesService {
     this.applyLanguage();
   }
 
-  /** Traduction globale (voir `i18n/app-dictionary.ts`). */
+  /** Traduction globale via ngx-translate. */
   translate(key: string): string {
-    const lang = this.language();
-    return APP_DICTIONARY[key]?.[lang] ?? key;
+    return this.translateService.instant(key);
   }
 
   private loadPreferences() {
@@ -65,8 +66,14 @@ export class PreferencesService {
   }
 
   private applyLanguage() {
+    const lang = this.language();
+    this.translateService.use(lang);
+    
     const html = this.doc.documentElement;
-    html.lang = this.language();
-    html.dir = this.language() === 'ar' ? 'rtl' : 'ltr';
+    html.lang = lang;
+    
+    const dir = lang === 'ar' ? 'rtl' : 'ltr';
+    this.doc.dir = dir;
+    html.dir = dir;
   }
 }

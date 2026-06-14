@@ -74,7 +74,7 @@ export class PatientDashboardComponent implements OnInit {
       },
       error: (e) => {
         this.appointmentsLoading = false;
-        this.appointmentsError = e?.error?.error || this.prefs.translate('Impossible de charger vos rendez-vous.');
+        this.appointmentsError = e?.error?.error || this.prefs.translate('PATIENT.DASHBOARD.LOAD_ERROR');
       },
     });
   }
@@ -188,10 +188,10 @@ export class PatientDashboardComponent implements OnInit {
   }
 
   statusLabel(status: AppointmentStatus | undefined): string {
-    if (status === 'CONFIRMED') return this.prefs.translate('Confirmé');
-    if (status === 'PENDING') return this.prefs.translate('En attente');
-    if (status === 'CANCELLED') return this.prefs.translate('Annulé');
-    return this.prefs.translate('Statut');
+    if (status === 'CONFIRMED') return this.prefs.translate('PATIENT.DASHBOARD.STATUS_CONFIRMED');
+    if (status === 'PENDING') return this.prefs.translate('PATIENT.DASHBOARD.PENDING');
+    if (status === 'CANCELLED') return this.prefs.translate('PATIENT.DASHBOARD.STATUS_CANCELLED');
+    return this.prefs.translate('PATIENT.DASHBOARD.STATUS');
   }
 
   statusBadgeClasses(status: AppointmentStatus | undefined): string {
@@ -239,13 +239,13 @@ export class PatientDashboardComponent implements OnInit {
     this.agendaService.createDoctorReview(body).subscribe({
       next: () => {
         this.reviewSubmitting = false;
-        this.reviewSuccess = this.prefs.translate('Avis enregistré avec succès.');
+        this.reviewSuccess = this.prefs.translate('PATIENT.DASHBOARD.REVIEW_SUCCESS');
         this.closeReview();
         setTimeout(() => (this.reviewSuccess = ''), 3000);
       },
       error: (e) => {
         this.reviewSubmitting = false;
-        this.reviewError = e?.error?.error || this.prefs.translate('Impossible d’enregistrer l’avis.');
+        this.reviewError = e?.error?.error || this.prefs.translate('PATIENT.DASHBOARD.REVIEW_ERROR');
       },
     });
   }

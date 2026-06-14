@@ -2,7 +2,9 @@ package com.medical.practitioner.controller;
 
 import com.medical.practitioner.dto.PractitionerProfileDTO;
 import com.medical.practitioner.entity.ProUser;
+import com.medical.practitioner.entity.ProUserRole;
 import com.medical.practitioner.entity.VerificationStatus;
+import com.medical.practitioner.repository.PractitionerProfileRepository;
 import com.medical.practitioner.security.AccessPolicies;
 import com.medical.practitioner.service.PractitionerService;
 import org.springframework.http.HttpStatus;
@@ -27,9 +29,13 @@ public class PractitionerController {
     private static final String KEY_EXISTS = "exists";
 
     private final PractitionerService practitionerService;
+    private final PractitionerProfileRepository practitionerProfileRepository;
 
-    public PractitionerController(PractitionerService practitionerService) {
+    public PractitionerController(
+            PractitionerService practitionerService,
+            PractitionerProfileRepository practitionerProfileRepository) {
         this.practitionerService = practitionerService;
+        this.practitionerProfileRepository = practitionerProfileRepository;
     }
 
     /** Profil du praticien connecté (token JWT requis). */
@@ -55,7 +61,11 @@ public class PractitionerController {
 
 
     @PutMapping("/{id}")
-    public PractitionerProfileDTO update(@PathVariable Long id, @RequestBody PractitionerProfileDTO body) {
+    public PractitionerProfileDTO update(
+            @AuthenticationPrincipal ProUser user,
+            @PathVariable Long id,
+            @RequestBody PractitionerProfileDTO body) {
+        AccessPolicies.requireOwnerOrCabinetMember(user, id, practitionerProfileRepository);
         return practitionerService.update(id, body);
     }
 
@@ -65,9 +75,22 @@ public class PractitionerController {
      */
     @PutMapping("/{id}/verifications/{type}")
     public ResponseEntity<PractitionerProfileDTO> updateVerification(
+            @AuthenticationPrincipal ProUser user,
             @PathVariable Long id,
             @PathVariable String type,
             @RequestBody Map<String, String> body) {
+        if (AccessPolicies.isPlatformAdmin(user)) {
+            // Admin can set any status
+        } else {
+            if (user == null || user.getRole() == ProUserRole.ASSISTANT) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accès refusé");
+            }
+            AccessPolicies.requireOwnerOrCabinetMember(user, id, practitionerProfileRepository);
+            String statusStr = body.get("status");
+            if (statusStr != null && !"EN_ATTENTE".equals(statusStr)) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Seul l'administrateur peut valider ou rejeter un profil");
+            }
+        }
         VerificationStatus status = VerificationStatus.valueOf(body.getOrDefault("status", "EN_ATTENTE"));
         String docUrl = body.get("docUrl");
         return ResponseEntity.ok(practitionerService.setVerification(id, type, status, docUrl));

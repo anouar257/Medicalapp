@@ -7,6 +7,7 @@ import { take } from 'rxjs';
 import { catchError, distinctUntilChanged, map, switchMap } from 'rxjs/operators';
 import { PractitionerService } from '../../services/practitioner.service';
 import { AuthProService } from '../../services/auth-pro.service';
+import { PreferencesService } from '../../services/preferences.service';
 import {
   ConsultationLocationDTO,
   HoraireDTO,
@@ -30,6 +31,7 @@ const JOURS: JourSemaine[] = ['LUNDI', 'MARDI', 'MERCREDI', 'JEUDI', 'VENDREDI',
   styleUrls: ['./consultation-locations.component.scss'],
 })
 export class ConsultationLocationsComponent {
+  readonly prefs = inject(PreferencesService);
   practitionerId: number | null = null;
   locations: ConsultationLocationDTO[] = [];
   editing: ConsultationLocationDTO | null = null;
@@ -63,7 +65,7 @@ export class ConsultationLocationsComponent {
       .subscribe((id) => {
         this.practitionerId = id;
         if (id == null) {
-          this.errorMessage = 'Impossible de charger votre profil praticien.';
+          this.errorMessage = this.prefs.translate('PRACTITIONER.LOCATIONS.ERROR_PROFILE_MISSING');
           this.locations = [];
           return;
         }
@@ -79,7 +81,7 @@ export class ConsultationLocationsComponent {
       .pipe(take(1))
       .subscribe({
         next: (l) => (this.locations = l),
-        error: (e) => (this.errorMessage = e.error?.error || 'Erreur de chargement'),
+        error: (e) => (this.errorMessage = e.error?.error || this.prefs.translate('PRACTITIONER.LOCATIONS.ERROR_LOADING')),
       });
   }
 
@@ -152,7 +154,7 @@ export class ConsultationLocationsComponent {
     if (!this.editing || !this.practitionerId) return;
     this.editingError = '';
     if (!this.editing.nomEtablissement?.trim() || !this.editing.adresse?.trim()) {
-      this.editingError = "Le nom de l'établissement et l'adresse sont obligatoires";
+      this.editingError = this.prefs.translate('PRACTITIONER.LOCATIONS.REQUIRED_FIELDS');
       return;
     }
     this.saving = true;
@@ -163,55 +165,55 @@ export class ConsultationLocationsComponent {
       next: () => {
         this.saving = false;
         this.editing = null;
-        this.successMessage = 'Lieu enregistré';
+        this.successMessage = this.prefs.translate('PRACTITIONER.LOCATIONS.SUCCESS_SAVED');
         this.refresh();
         setTimeout(() => (this.successMessage = ''), 3000);
       },
       error: (e) => {
         this.saving = false;
-        this.editingError = e.error?.error || "Erreur d'enregistrement";
+        this.editingError = e.error?.error || this.prefs.translate('PRACTITIONER.LOCATIONS.ERROR_SAVE');
       },
     });
   }
 
   remove(loc: ConsultationLocationDTO) {
     if (!loc.id) return;
-    if (!confirm(`Supprimer le lieu « ${loc.nomEtablissement} » ?`)) return;
+    if (!confirm(this.prefs.translate('PRACTITIONER.LOCATIONS.DELETE_CONFIRM').replace('{name}', loc.nomEtablissement))) return;
     this.practitionerService.deleteLocation(loc.id).subscribe({
       next: () => {
-        this.successMessage = 'Lieu supprimé';
+        this.successMessage = this.prefs.translate('PRACTITIONER.LOCATIONS.SUCCESS_DELETED');
         this.refresh();
         setTimeout(() => (this.successMessage = ''), 3000);
       },
-      error: (e) => (this.errorMessage = e.error?.error || 'Erreur de suppression'),
+      error: (e) => (this.errorMessage = e.error?.error || this.prefs.translate('PRACTITIONER.LOCATIONS.ERROR_DELETE')),
     });
   }
 
   jourLabel(j: JourSemaine | string): string {
-    return j.charAt(0) + j.slice(1).toLowerCase();
+    return this.prefs.translate(`COMMON.DAYS.${j}`);
   }
 
   parkingLabel(p: string): string {
     switch (p) {
       case 'GRATUIT':
-        return 'Parking gratuit';
+        return this.prefs.translate('PRACTITIONER.LOCATIONS.PARKING_FREE');
       case 'PAYANT':
-        return 'Parking payant';
+        return this.prefs.translate('PRACTITIONER.LOCATIONS.PARKING_PAID');
       default:
-        return 'Aucun parking';
+        return this.prefs.translate('PRACTITIONER.LOCATIONS.NO_PARKING');
     }
   }
 
   urgenceLabel(u: string): string {
     switch (u) {
       case 'SECRETARIAT':
-        return 'Secrétariat';
+        return this.prefs.translate('PRACTITIONER.LOCATIONS.SECRETARIAT');
       case 'SOS_MEDECINS':
-        return 'SOS Médecins';
+        return this.prefs.translate('PRACTITIONER.LOCATIONS.SOS_MEDECINS');
       case 'NUMERO_PERSONNEL':
-        return 'Numéro personnel';
+        return this.prefs.translate('PRACTITIONER.LOCATIONS.PERSONAL_NUMBER');
       case 'NUMERO_DIRECT':
-        return 'Numéro direct';
+        return this.prefs.translate('PRACTITIONER.LOCATIONS.DIRECT_NUMBER');
       default:
         return u;
     }

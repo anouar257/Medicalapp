@@ -64,7 +64,7 @@ export class CabinetMessagesComponent {
           return this.messaging.getPractitionerMessages(profileId).pipe(
             catchError(() => {
               this.loading = false;
-              this.error = this.prefs.translate('common.serviceUnavailable');
+              this.error = this.prefs.translate('COMMON.SERVICE_UNAVAILABLE');
               return of<MessageResponseDto[]>([]);
             }),
           );
@@ -134,7 +134,7 @@ export class CabinetMessagesComponent {
   private extractContactName(m: MessageResponseDto): string {
     if (m.senderPatientId != null && m.senderName) return m.senderName;
     if (m.receiverPatientId != null && m.receiverName) return m.receiverName;
-    return `${this.prefs.translate('Patient')} #${m.senderPatientId ?? m.receiverPatientId}`;
+    return `${this.prefs.translate('COMMON.PATIENT')} #${m.senderPatientId ?? m.receiverPatientId}`;
   }
 
   selectConversation(c: ChatConversation): void {
@@ -254,7 +254,7 @@ export class CabinetMessagesComponent {
         },
         error: (e) => {
           this.sending = false;
-          this.sendError = formatHttpError(e, this.prefs.translate('common.serviceUnavailable'));
+          this.sendError = formatHttpError(e, this.prefs.translate('COMMON.SERVICE_UNAVAILABLE'));
         },
       });
   }

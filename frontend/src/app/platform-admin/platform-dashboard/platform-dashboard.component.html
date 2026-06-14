@@ -3,17 +3,17 @@
 
   <header class="pad-header">
     <div class="pad-header__titles">
-      <p class="pad-badge">{{ prefs.translate('platformAdmin.badge') }}</p>
-      <h1>{{ prefs.translate('platformAdmin.title') }}</h1>
-      <p class="pad-sub">{{ prefs.translate('platformAdmin.subtitle') }}</p>
+      <p class="pad-badge">{{ prefs.translate('ADMIN.BADGE') }}</p>
+      <h1>{{ prefs.translate('ADMIN.TITLE') }}</h1>
+      <p class="pad-sub">{{ prefs.translate('ADMIN.SUBTITLE') }}</p>
     </div>
     <button type="button" class="pad-btn pad-btn--ghost" (click)="logout()">
-      {{ prefs.translate('platformAdmin.logout') }}
+      {{ prefs.translate('ADMIN.LOGOUT') }}
     </button>
   </header>
 
   @if (loading) {
-    <p class="pad-muted pad-skeleton-hint">{{ prefs.translate('common.loadingData') }}</p>
+    <p class="pad-muted pad-skeleton-hint">{{ prefs.translate('COMMON.LOADING_DATA') }}</p>
     <section class="pad-kpis" aria-hidden="true">
       @for (s of [1, 2, 3]; track s) {
         <article class="pad-kpi pad-kpi--skeleton">
@@ -37,31 +37,31 @@
   } @else {
     @if (loadError) {
       <p class="pad-alert">{{ loadError }}</p>
-      <button type="button" class="pad-btn" (click)="reload()">{{ prefs.translate('platformAdmin.retry') }}</button>
+      <button type="button" class="pad-btn" (click)="reload()">{{ prefs.translate('ADMIN.RETRY') }}</button>
     }
 
     <section class="pad-kpis" aria-label="KPI">
       <article class="pad-kpi">
-        <span class="pad-kpi__label">{{ prefs.translate('platformAdmin.kpi.cabinets') }}</span>
+        <span class="pad-kpi__label">{{ prefs.translate('ADMIN.DASHBOARD.KPI.CABINETS') }}</span>
         <strong class="pad-kpi__value">{{ stats?.totalActiveCabinets ?? '—' }}</strong>
       </article>
       <article class="pad-kpi">
-        <span class="pad-kpi__label">{{ prefs.translate('platformAdmin.kpi.doctors') }}</span>
+        <span class="pad-kpi__label">{{ prefs.translate('ADMIN.DASHBOARD.KPI.DOCTORS') }}</span>
         <strong class="pad-kpi__value">{{ stats?.totalSyncedDoctorsInAgenda ?? '—' }}</strong>
       </article>
       <article class="pad-kpi">
-        <span class="pad-kpi__label">{{ prefs.translate('platformAdmin.kpi.patients') }}</span>
+        <span class="pad-kpi__label">{{ prefs.translate('ADMIN.DASHBOARD.KPI.PATIENTS') }}</span>
         <strong class="pad-kpi__value">{{ stats?.totalPatients ?? '—' }}</strong>
       </article>
     </section>
 
     @if (stats) {
       <p class="pad-footnote">
-        {{ prefs.translate('platformAdmin.appointmentsNote') }}:
+        {{ prefs.translate('ADMIN.DASHBOARD.APPOINTMENTS_NOTE') }}:
         <strong>{{ stats.totalAppointments }}</strong>
       </p>
     } @else if (!loadError) {
-      <p class="pad-muted">{{ prefs.translate('platformAdmin.statsPartial') }}</p>
+      <p class="pad-muted">{{ prefs.translate('ADMIN.DASHBOARD.STATS_PARTIAL') }}</p>
     }
 
     <nav class="pad-tabs" aria-label="Sections administration">
@@ -71,7 +71,7 @@
         [class.pad-tab--active]="activeTab === 'cabinets'"
         (click)="activeTab = 'cabinets'"
       >
-        {{ prefs.translate('platformAdmin.tab.cabinets') }}
+        {{ prefs.translate('ADMIN.DASHBOARD.TAB_CABINETS') }}
       </button>
       <button
         type="button"
@@ -79,13 +79,13 @@
         [class.pad-tab--active]="activeTab === 'patients'"
         (click)="activeTab = 'patients'"
       >
-        {{ prefs.translate('platformAdmin.tab.patients') }}
+        {{ prefs.translate('ADMIN.DASHBOARD.TAB_PATIENTS') }}
       </button>
     </nav>
 
     @if (activeTab === 'cabinets') {
       <section class="pad-table-wrap" aria-labelledby="pad-cabinets-heading">
-        <h2 id="pad-cabinets-heading">{{ prefs.translate('platformAdmin.cabinetsTable') }}</h2>
+        <h2 id="pad-cabinets-heading">{{ prefs.translate('ADMIN.DASHBOARD.CABINETS_TABLE') }}</h2>
         @if (staffError) {
           <p class="pad-alert">{{ staffError }}</p>
         }
@@ -94,33 +94,33 @@
             <caption class="sr-only">Liste des cabinets médicaux</caption>
             <thead>
               <tr>
-                <th>{{ prefs.translate('platformAdmin.col.name') }}</th>
-                <th>{{ prefs.translate('platformAdmin.col.city') }}</th>
-                <th>{{ prefs.translate('Statut') }}</th>
-                <th>{{ prefs.translate('Actions') }}</th>
+                <th>{{ prefs.translate('ADMIN.COLUMNS.NAME') }}</th>
+                <th>{{ prefs.translate('ADMIN.COLUMNS.CITY') }}</th>
+                <th>{{ prefs.translate('COMMON.STATUS') }}</th>
+                <th>{{ prefs.translate('COMMON.ACTIONS') }}</th>
               </tr>
             </thead>
             <tbody>
               @for (c of cabinets; track c.id) {
                 <tr>
                   <td>{{ c.nom }}</td>
-                  <td>{{ c.ville || prefs.translate('common.emDash') }}</td>
+                  <td>{{ c.ville || prefs.translate('COMMON.EM_DASH') }}</td>
                   <td>
                     @if (c.actif) {
-                      <span class="pad-pill pad-pill--ok">{{ prefs.translate('platformAdmin.active') }}</span>
+                      <span class="pad-pill pad-pill--ok">{{ prefs.translate('ADMIN.ACTIVE') }}</span>
                     } @else {
-                      <span class="pad-pill">{{ prefs.translate('platformAdmin.inactive') }}</span>
+                      <span class="pad-pill">{{ prefs.translate('ADMIN.INACTIVE') }}</span>
                     }
                   </td>
                   <td class="pad-actions-cell">
                     <button type="button" class="pad-btn pad-btn--small pad-btn--ghost" (click)="openCabinetEdit(c)">
-                      {{ prefs.translate('platformAdmin.modify') }}
+                      {{ prefs.translate('ADMIN.MODIFY') }}
                     </button>
                     <button type="button" class="pad-btn pad-btn--small" (click)="toggleStaff(c.id)">
                       {{
                         isStaffExpanded(c.id)
-                          ? prefs.translate('platformAdmin.hideStaff')
-                          : prefs.translate('platformAdmin.showStaff')
+                          ? prefs.translate('ADMIN.HIDE_STAFF')
+                          : prefs.translate('ADMIN.SHOW_STAFF')
                       }}
                     </button>
                   </td>
@@ -135,17 +135,17 @@
                           <span class="pad-skeleton-line pad-skeleton-line--wide"></span>
                         </div>
                       } @else if (staffFor(c.id).length === 0) {
-                        <p class="pad-muted">{{ prefs.translate('platformAdmin.noStaff') }}</p>
+                        <p class="pad-muted">{{ prefs.translate('ADMIN.NO_STAFF') }}</p>
                       } @else {
                         <table class="pad-table pad-table--inner">
                           <caption class="sr-only">Membres du personnel pour le cabinet sélectionné</caption>
                           <thead>
                             <tr>
-                              <th>{{ prefs.translate('platformAdmin.col.staffName') }}</th>
-                              <th>{{ prefs.translate('Email') }}</th>
-                              <th>{{ prefs.translate('platformAdmin.col.role') }}</th>
-                              <th>{{ prefs.translate('Statut') }}</th>
-                              <th>{{ prefs.translate('Actions') }}</th>
+                              <th>{{ prefs.translate('ADMIN.COLUMNS.STAFF_NAME') }}</th>
+                              <th>{{ prefs.translate('COMMON.EMAIL') }}</th>
+                              <th>{{ prefs.translate('ADMIN.COLUMNS.ROLE') }}</th>
+                              <th>{{ prefs.translate('COMMON.STATUS') }}</th>
+                              <th>{{ prefs.translate('COMMON.ACTIONS') }}</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -156,9 +156,9 @@
                                 <td>{{ u.role }}</td>
                                 <td>
                                   @if (u.actif) {
-                                    <span class="pad-pill pad-pill--ok">{{ prefs.translate('common.active') }}</span>
+                                    <span class="pad-pill pad-pill--ok">{{ prefs.translate('COMMON.ACTIVE') }}</span>
                                   } @else {
-                                    <span class="pad-pill">{{ prefs.translate('common.inactive') }}</span>
+                                    <span class="pad-pill">{{ prefs.translate('COMMON.INACTIVE') }}</span>
                                   }
                                 </td>
                                 <td>
@@ -169,7 +169,7 @@
                                     (click)="toggleUserStatus(u)"
                                   >
                                     {{
-                                      u.actif ? prefs.translate('common.block') : prefs.translate('common.activate')
+                                      u.actif ? prefs.translate('COMMON.BLOCK') : prefs.translate('COMMON.ACTIVATE')
                                     }}
                                   </button>
                                 </td>
@@ -186,27 +186,27 @@
           </table>
         </div>
         @if (cabinets.length === 0 && !loadError) {
-          <p class="pad-muted">{{ prefs.translate('platformAdmin.noCabinets') }}</p>
+          <p class="pad-muted">{{ prefs.translate('ADMIN.NO_CABINETS') }}</p>
         }
       </section>
     }
 
     @if (activeTab === 'patients') {
       <section class="pad-table-wrap" aria-labelledby="pad-patients-heading">
-        <h2 id="pad-patients-heading">{{ prefs.translate('platformAdmin.patientsTable') }}</h2>
+        <h2 id="pad-patients-heading">{{ prefs.translate('ADMIN.DASHBOARD.PATIENTS_TABLE') }}</h2>
         @if (patientsLoading) {
-          <p class="pad-muted">{{ prefs.translate('common.loadingData') }}</p>
+          <p class="pad-muted">{{ prefs.translate('COMMON.LOADING_DATA') }}</p>
         } @else {
           <div class="pad-table-scroll">
             <table class="pad-table">
               <caption class="sr-only">Liste des patients enregistrés</caption>
               <thead>
                 <tr>
-                  <th>{{ prefs.translate('platformAdmin.col.staffName') }}</th>
-                  <th>{{ prefs.translate('Email') }}</th>
-                  <th>{{ prefs.translate('Mobile') }}</th>
-                  <th>{{ prefs.translate('Statut') }}</th>
-                  <th>{{ prefs.translate('Actions') }}</th>
+                  <th>{{ prefs.translate('ADMIN.COLUMNS.STAFF_NAME') }}</th>
+                  <th>{{ prefs.translate('COMMON.EMAIL') }}</th>
+                  <th>{{ prefs.translate('COMMON.MOBILE') }}</th>
+                  <th>{{ prefs.translate('COMMON.STATUS') }}</th>
+                  <th>{{ prefs.translate('COMMON.ACTIONS') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -217,9 +217,9 @@
                     <td>{{ p.telephone }}</td>
                     <td>
                       @if (p.actif) {
-                        <span class="pad-pill pad-pill--ok">{{ prefs.translate('common.active') }}</span>
+                        <span class="pad-pill pad-pill--ok">{{ prefs.translate('COMMON.ACTIVE') }}</span>
                       } @else {
-                        <span class="pad-pill">{{ prefs.translate('common.inactive') }}</span>
+                        <span class="pad-pill">{{ prefs.translate('COMMON.INACTIVE') }}</span>
                       }
                     </td>
                     <td>
@@ -229,7 +229,7 @@
                         [class.pad-btn--danger]="p.actif"
                         (click)="togglePatientStatus(p)"
                       >
-                        {{ p.actif ? prefs.translate('common.block') : prefs.translate('common.activate') }}
+                        {{ p.actif ? prefs.translate('COMMON.BLOCK') : prefs.translate('COMMON.ACTIVATE') }}
                       </button>
                     </td>
                   </tr>
@@ -238,7 +238,7 @@
             </table>
           </div>
           @if (patients.length === 0 && !patientsLoading) {
-            <p class="pad-muted">{{ prefs.translate('platformAdmin.noPatients') }}</p>
+            <p class="pad-muted">{{ prefs.translate('ADMIN.NO_PATIENTS') }}</p>
           }
         }
       </section>
@@ -248,13 +248,13 @@
   @if (cabinetModalOpen && cabinetEditTarget) {
     <div class="pad-modal-backdrop" role="presentation" (click)="closeCabinetModal()"></div>
     <div class="pad-modal" role="dialog" aria-modal="true" [attr.aria-labelledby]="'pad-cabinet-edit-title'">
-      <h3 id="pad-cabinet-edit-title" class="pad-modal__title">{{ prefs.translate('platformAdmin.editCabinetTitle') }}</h3>
+      <h3 id="pad-cabinet-edit-title" class="pad-modal__title">{{ prefs.translate('ADMIN.EDIT_CABINET_TITLE') }}</h3>
       @if (cabinetEditError) {
         <p class="pad-alert">{{ cabinetEditError }}</p>
       }
-      <label class="pad-modal__label">{{ prefs.translate('platformAdmin.col.name') }}</label>
+      <label class="pad-modal__label">{{ prefs.translate('ADMIN.COLUMNS.NAME') }}</label>
       <input class="pad-modal__input" type="text" [(ngModel)]="cabinetEditNom" name="cabinetNom" autocomplete="organization" />
-      <label class="pad-modal__label">{{ prefs.translate('platformAdmin.col.address') }}</label>
+      <label class="pad-modal__label">{{ prefs.translate('ADMIN.COLUMNS.ADDRESS') }}</label>
       <input
         class="pad-modal__input"
         type="text"
@@ -264,10 +264,10 @@
       />
       <div class="pad-modal__actions">
         <button type="button" class="pad-btn pad-btn--ghost" (click)="closeCabinetModal()" [disabled]="cabinetEditSaving">
-          {{ prefs.translate('platformAdmin.cancel') }}
+          {{ prefs.translate('ADMIN.CANCEL') }}
         </button>
         <button type="button" class="pad-btn" (click)="saveCabinetEdit()" [disabled]="cabinetEditSaving">
-          {{ prefs.translate('platformAdmin.save') }}
+          {{ prefs.translate('ADMIN.SAVE') }}
         </button>
       </div>
     </div>

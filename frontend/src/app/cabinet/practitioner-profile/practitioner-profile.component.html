@@ -3,12 +3,12 @@
       <div class="page">
         <header class="page-header" [class.flex-row-reverse]="prefs.language() === 'ar'">
           <div [class.text-end]="prefs.language() === 'ar'">
-            <h1>{{ prefs.translate('profile.title') }}</h1>
-            <p class="subtitle">{{ prefs.translate('profile.subtitle') }}</p>
+            <h1>{{ prefs.translate('PRACTITIONER.PROFILE.TITLE') }}</h1>
+            <p class="subtitle">{{ prefs.translate('PRACTITIONER.PROFILE.SUBTITLE') }}</p>
           </div>
           <button type="button" class="btn-primary shrink-0 transition duration-300 hover:scale-[1.02]" (click)="save()" [disabled]="saving">
             @if (saving) { <span class="spinner"></span> }
-            @else { {{ prefs.translate('profile.save') }} }
+            @else { {{ prefs.translate('COMMON.SAVE') }} }
           </button>
         </header>
 
@@ -19,66 +19,66 @@
           <div class="grid">
 
             <section class="card">
-              <h2>{{ prefs.translate('profile.section.identity') }}</h2>
+              <h2>{{ prefs.translate('PRACTITIONER.PROFILE.SECTION_IDENTITY') }}</h2>
               <div class="row">
                 <div class="form-group">
-                  <label>{{ prefs.translate('profile.label.civilite') }}</label>
+                  <label>{{ prefs.translate('PRACTITIONER.PROFILE.CIVILITY') }}</label>
                   <select [(ngModel)]="profile.civilite">
-                    <option value="">—</option>
-                    <option value="MME">{{ prefs.translate('profile.option.mme') }}</option>
-                    <option value="M">{{ prefs.translate('profile.option.m') }}</option>
+                    <option value="">{{ prefs.translate('COMMON.EM_DASH') }}</option>
+                    <option value="MME">{{ prefs.translate('PRACTITIONER.PROFILE.OPTION_MME') }}</option>
+                    <option value="M">{{ prefs.translate('PRACTITIONER.PROFILE.OPTION_M') }}</option>
                   </select>
                 </div>
                 <div class="form-group">
-                  <label>{{ prefs.translate('profile.label.titre') }}</label>
+                  <label>{{ prefs.translate('PRACTITIONER.PROFILE.TITLE_LABEL') }}</label>
                   <select [(ngModel)]="profile.titre">
-                    <option value="AUCUN">{{ prefs.translate('profile.option.aucun') }}</option>
-                    <option value="DR">{{ prefs.translate('profile.option.dr') }}</option>
-                    <option value="PR">{{ prefs.translate('profile.option.pr') }}</option>
+                    <option value="AUCUN">{{ prefs.translate('PRACTITIONER.PROFILE.OPTION_NONE') }}</option>
+                    <option value="DR">{{ prefs.translate('PRACTITIONER.PROFILE.OPTION_DR') }}</option>
+                    <option value="PR">{{ prefs.translate('PRACTITIONER.PROFILE.OPTION_PR') }}</option>
                   </select>
                 </div>
               </div>
               <div class="row">
                 <div class="form-group">
-                  <label>{{ prefs.translate('profile.label.prenom') }}</label>
+                  <label>{{ prefs.translate('PRACTITIONER.PROFILE.FIRST_NAME') }}</label>
                   <input type="text" [(ngModel)]="profile.prenom"/>
                 </div>
                 <div class="form-group">
-                  <label>{{ prefs.translate('profile.label.nom') }}</label>
+                  <label>{{ prefs.translate('PRACTITIONER.PROFILE.LAST_NAME') }}</label>
                   <input type="text" [(ngModel)]="profile.nom"/>
                 </div>
               </div>
               <div class="row">
                 <div class="form-group">
-                  <label>{{ prefs.translate('profile.label.sexe') }}</label>
+                  <label>{{ prefs.translate('PRACTITIONER.PROFILE.GENDER') }}</label>
                   <select [(ngModel)]="profile.sexe">
-                    <option value="HOMME">{{ prefs.translate('auth.register.homme') }}</option>
-                    <option value="FEMME">{{ prefs.translate('auth.register.femme') }}</option>
+                    <option value="HOMME">{{ prefs.translate('PRACTITIONER.PROFILE.OPTION_MALE') }}</option>
+                    <option value="FEMME">{{ prefs.translate('PRACTITIONER.PROFILE.OPTION_FEMALE') }}</option>
                   </select>
                 </div>
                 <div class="form-group">
-                  <label>{{ prefs.translate('profile.label.dob') }}</label>
+                  <label>{{ prefs.translate('PRACTITIONER.PROFILE.DOB') }}</label>
                   <input type="date" [(ngModel)]="profile.dateNaissance"/>
                 </div>
               </div>
               <div class="form-group">
-                <label>{{ prefs.translate('profile.label.statut') }}</label>
+                <label>{{ prefs.translate('PRACTITIONER.PROFILE.STATUS') }}</label>
                 <select [(ngModel)]="profile.statut">
-                  <option value="TITULAIRE">{{ prefs.translate('profile.option.titulaire') }}</option>
-                  <option value="REMPLACANT">{{ prefs.translate('profile.option.remplacant') }}</option>
-                  <option value="COLLABORATEUR">{{ prefs.translate('profile.option.collaborateur') }}</option>
-                  <option value="ASSISTANT">{{ prefs.translate('profile.option.assistant') }}</option>
-                  <option value="INTERNE">{{ prefs.translate('profile.option.interne') }}</option>
-                  <option value="ASSOCIE">{{ prefs.translate('profile.option.associe') }}</option>
-                  <option value="INDISPONIBLE">{{ prefs.translate('profile.option.indisponible') }}</option>
+                  <option value="TITULAIRE">{{ prefs.translate('PRACTITIONER.PROFILE.OPTION_TITULAIRE') }}</option>
+                  <option value="REMPLACANT">{{ prefs.translate('PRACTITIONER.PROFILE.OPTION_REMPLACANT') }}</option>
+                  <option value="COLLABORATEUR">{{ prefs.translate('PRACTITIONER.PROFILE.OPTION_COLLABORATEUR') }}</option>
+                  <option value="ASSISTANT">{{ prefs.translate('PRACTITIONER.PROFILE.OPTION_ASSISTANT') }}</option>
+                  <option value="INTERNE">{{ prefs.translate('PRACTITIONER.PROFILE.OPTION_INTERNE') }}</option>
+                  <option value="ASSOCIE">{{ prefs.translate('PRACTITIONER.PROFILE.OPTION_ASSOCIE') }}</option>
+                  <option value="INDISPONIBLE">{{ prefs.translate('PRACTITIONER.PROFILE.OPTION_INDISPONIBLE') }}</option>
                 </select>
               </div>
             </section>
 
             <section class="card">
-              <h2>{{ prefs.translate('profile.section.specialties') }}</h2>
-              <p class="muted">{{ prefs.translate('profile.specialtiesHint') }}</p>
-              @if (specialties.length === 0) { <p class="muted">{{ prefs.translate('Chargement') }}</p> }
+              <h2>{{ prefs.translate('PRACTITIONER.PROFILE.SECTION_SPECIALTIES') }}</h2>
+              <p class="muted">{{ prefs.translate('PRACTITIONER.PROFILE.SPECIALTIES_HINT') }}</p>
+              @if (specialties.length === 0) { <p class="muted">{{ prefs.translate('COMMON.LOADING') }}</p> }
               <div class="checkbox-grid">
                 @for (s of specialties; track s.id) {
                   <label class="check-card" [class.selected]="hasSpecialty(s.id)">
@@ -91,49 +91,49 @@
             </section>
 
             <section class="card wide">
-              <h2>{{ prefs.translate('profile.section.bio') }}</h2>
+              <h2>{{ prefs.translate('PRACTITIONER.PROFILE.SECTION_BIO') }}</h2>
               <div class="form-group">
-                <label>{{ prefs.translate('profile.label.biographie') }}</label>
-                <textarea rows="4" [(ngModel)]="profile.biographie" [placeholder]="prefs.translate('profile.bioPlaceholder')"></textarea>
+                <label>{{ prefs.translate('PRACTITIONER.PROFILE.BIOGRAPHY') }}</label>
+                <textarea rows="4" [(ngModel)]="profile.biographie" [placeholder]="prefs.translate('PRACTITIONER.PROFILE.BIO_PLACEHOLDER')"></textarea>
               </div>
               <div class="row">
                 <div class="form-group">
-                  <label>{{ prefs.translate('profile.label.siteWeb') }}</label>
-                  <input type="url" [(ngModel)]="profile.siteWeb" placeholder="https://"/>
+                  <label>{{ prefs.translate('PRACTITIONER.PROFILE.WEBSITE') }}</label>
+                  <input type="url" [(ngModel)]="profile.siteWeb" [attr.placeholder]="prefs.translate('PRACTITIONER.PROFILE.WEBSITE_PLACEHOLDER')"/>
                 </div>
                 <div class="form-group">
-                  <label>{{ prefs.translate('profile.label.youtube') }}</label>
-                  <input type="url" [(ngModel)]="profile.lienYoutube" placeholder="https://youtube.com/@..."/>
+                  <label>{{ prefs.translate('PRACTITIONER.PROFILE.YOUTUBE') }}</label>
+                  <input type="url" [(ngModel)]="profile.lienYoutube" [attr.placeholder]="prefs.translate('PRACTITIONER.PROFILE.YOUTUBE_PLACEHOLDER')"/>
                 </div>
               </div>
               <div class="row">
                 <div class="photo-section">
                   <div class="photo-preview-container">
-                    <img [src]="getPhotoUrl(profile.photoUrl)" alt="Profile Photo" class="photo-preview-image"/>
+                    <img [src]="getPhotoUrl(profile.photoUrl)" [attr.alt]="prefs.translate('PRACTITIONER.PROFILE.PHOTO_ALT')" class="photo-preview-image"/>
                   </div>
                   <div class="photo-controls">
-                    <label>{{ prefs.translate('profile.label.photoUrl') }}</label>
+                    <label>{{ prefs.translate('PRACTITIONER.PROFILE.PHOTO_URL') }}</label>
                     <div style="display: flex; align-items: center; gap: 0.75rem;">
                       <button type="button" class="btn-secondary" (click)="fileInput.click()">
-                        Choisir une photo
+                        {{ prefs.translate('PRACTITIONER.PROFILE.CHOOSE_PHOTO') }}
                       </button>
                       <input type="file" (change)="onPhotoSelected($event)" accept="image/*" #fileInput hidden/>
                     </div>
-                    <span class="muted" style="margin: 0; font-size: 0.75rem;">Formats acceptés : JPEG, PNG, WebP, GIF (max. 4MB)</span>
+                    <span class="muted" style="margin: 0; font-size: 0.75rem;">{{ prefs.translate('PRACTITIONER.PROFILE.PHOTO_FORMATS') }}</span>
                   </div>
                 </div>
                 <div class="form-group">
-                  <label>{{ prefs.translate('profile.label.color') }}</label>
+                  <label>{{ prefs.translate('PRACTITIONER.PROFILE.COLOR') }}</label>
                   <input type="color" [(ngModel)]="profile.colorCode" style="padding: 0; height: 46px; width: 80px; cursor: pointer;"/>
                 </div>
               </div>
               <div class="row">
                 <div class="form-group">
-                  <label>{{ prefs.translate('profile.label.consultationFee') }}</label>
-                  <input type="number" min="0" step="1" [(ngModel)]="profile.consultationFee" placeholder="400"/>
+                  <label>{{ prefs.translate('PRACTITIONER.PROFILE.CONSULTATION_FEE') }}</label>
+                  <input type="number" min="0" step="1" [(ngModel)]="profile.consultationFee" [attr.placeholder]="prefs.translate('PRACTITIONER.PROFILE.CONSULTATION_FEE_HINT')"/>
                 </div>
                 <div class="form-group">
-                  <label>{{ prefs.translate('profile.label.rating') }}</label>
+                  <label>{{ prefs.translate('PRACTITIONER.PROFILE.RATING') }}</label>
                   <div class="rating-summary">
                     <div class="rating-stars">
                       @for (star of ratingStars; track star) {
@@ -142,7 +142,7 @@
                     </div>
                     <div class="rating-meta">
                       <strong>{{ (profile.globalRating ?? 0).toFixed(1) }}</strong>
-                      <span>({{ profile.reviewCount ?? 0 }} avis)</span>
+                      <span>({{ profile.reviewCount ?? 0 }} {{ prefs.translate('PRACTITIONER.PROFILE.REVIEWS_LABEL') }})</span>
                     </div>
                   </div>
                 </div>
@@ -150,18 +150,18 @@
             </section>
 
             <section class="card wide">
-              <h2>Actes médicaux et Tarification</h2>
-              <p class="muted">Gérez les actes médicaux que vous proposez ainsi que leurs tarifs et durées associés.</p>
+              <h2>{{ prefs.translate('PRACTITIONER.ACTS.TITLE') }}</h2>
+              <p class="muted">{{ prefs.translate('PRACTITIONER.ACTS.SUBTITLE') }}</p>
 
               <!-- List of Acts -->
               <div style="margin-bottom: 2rem; overflow-x: auto;">
                 <table class="acts-table" style="width: 100%; border-collapse: collapse; min-width: 600px;">
                   <thead>
                     <tr style="border-bottom: 2px solid var(--border); text-align: left;">
-                      <th style="padding: 12px 16px; font-weight: 600; color: var(--text-secondary);">Nom de l'acte</th>
-                      <th style="padding: 12px 16px; font-weight: 600; color: var(--text-secondary);">Durée</th>
-                      <th style="padding: 12px 16px; font-weight: 600; color: var(--text-secondary);">Tarif</th>
-                      <th style="padding: 12px 16px; font-weight: 600; color: var(--text-secondary); text-align: right;">Actions</th>
+                      <th style="padding: 12px 16px; font-weight: 600; color: var(--text-secondary);">{{ prefs.translate('PRACTITIONER.ACTS.NAME') }}</th>
+                      <th style="padding: 12px 16px; font-weight: 600; color: var(--text-secondary);">{{ prefs.translate('PRACTITIONER.ACTS.DURATION') }}</th>
+                      <th style="padding: 12px 16px; font-weight: 600; color: var(--text-secondary);">{{ prefs.translate('PRACTITIONER.ACTS.FEE') }}</th>
+                      <th style="padding: 12px 16px; font-weight: 600; color: var(--text-secondary); text-align: right;">{{ prefs.translate('PRACTITIONER.ACTS.ACTIONS') }}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -170,14 +170,14 @@
                         <td style="padding: 16px; font-weight: 500;">{{ act.name }}</td>
                         <td style="padding: 16px;">{{ act.durationMinutes }} min</td>
                         <td style="padding: 16px; font-weight: 600; color: var(--primary);">
-                          {{ act.isPriceVariable ? 'À discuter' : (act.price != null ? (act.price | number:'1.0-0') + ' DH' : 'À discuter') }}
+                          {{ act.isPriceVariable ? prefs.translate('PRACTITIONER.ACTS.TO_DISCUSS') : (act.price != null ? (act.price | number:'1.0-0') + ' DH' : prefs.translate('PRACTITIONER.ACTS.TO_DISCUSS')) }}
                         </td>
                         <td style="padding: 16px; text-align: right; display: flex; gap: 0.5rem; justify-content: flex-end;">
                           <button type="button" class="btn-secondary" (click)="editAct(act)">
-                            Modifier
+                            {{ prefs.translate('COMMON.EDIT') }}
                           </button>
                           <button type="button" class="btn-secondary" style="color: var(--error); border-color: var(--error);" (click)="deleteAct(act.id)">
-                            Supprimer
+                            {{ prefs.translate('COMMON.DELETE') }}
                           </button>
                         </td>
                       </tr>
@@ -185,7 +185,7 @@
                     @if (acts.length === 0) {
                       <tr>
                         <td colspan="4" style="padding: 24px; text-align: center; color: var(--text-muted);">
-                          Aucun acte configuré. Cliquez sur le bouton ci-dessous pour ajouter votre premier acte médical.
+                          {{ prefs.translate('PRACTITIONER.ACTS.EMPTY_DESC') }}
                         </td>
                       </tr>
                     }
@@ -196,7 +196,7 @@
               <!-- Add Act Button -->
               @if (!showActForm) {
                 <button type="button" class="btn-primary" (click)="addNewAct()">
-                  + Ajouter un acte médical
+                  + {{ prefs.translate('PRACTITIONER.ACTS.ADD') }}
                 </button>
               }
 
@@ -204,16 +204,16 @@
               @if (showActForm && editingAct) {
                 <div style="background: var(--bg-dark); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-top: 1rem;">
                   <h3 style="font-size: 1rem; font-weight: bold; margin-bottom: 1rem;">
-                    {{ editingAct.id ? 'Modifier l\'acte médical' : 'Ajouter un nouvel acte médical' }}
+                    {{ editingAct.id ? prefs.translate('PRACTITIONER.ACTS.EDIT_TITLE') : prefs.translate('PRACTITIONER.ACTS.NEW_TITLE') }}
                   </h3>
                   
                   <div class="row">
                     <div class="form-group">
-                      <label>Nom de l'acte</label>
-                      <input type="text" [(ngModel)]="editingAct.name" placeholder="ex: Consultation de pédiatrie, Chirurgie mineure..."/>
+                      <label>{{ prefs.translate('PRACTITIONER.ACTS.NAME') }}</label>
+                      <input type="text" [(ngModel)]="editingAct.name" [attr.placeholder]="prefs.translate('PRACTITIONER.ACTS.NAME_PLACEHOLDER')"/>
                     </div>
                     <div class="form-group">
-                      <label>Durée par défaut</label>
+                      <label>{{ prefs.translate('PRACTITIONER.ACTS.DEFAULT_DURATION') }}</label>
                       <select [(ngModel)]="editingAct.durationMinutes">
                         <option [ngValue]="15">15 min</option>
                         <option [ngValue]="30">30 min</option>
@@ -226,21 +226,21 @@
 
                   <div class="row" style="align-items: center;">
                     <div class="form-group">
-                      <label>Tarif (DH)</label>
-                      <input type="number" min="0" step="10" [(ngModel)]="editingAct.price" [disabled]="editingAct.isPriceVariable" placeholder="ex: 400"/>
+                      <label>{{ prefs.translate('PRACTITIONER.ACTS.FEE') }}</label>
+                      <input type="number" min="0" step="10" [(ngModel)]="editingAct.price" [disabled]="editingAct.isPriceVariable" [attr.placeholder]="prefs.translate('PRACTITIONER.ACTS.FEE_HINT')"/>
                     </div>
                     <div class="form-group" style="flex-direction: row; align-items: center; gap: 0.5rem; margin-top: 1.25rem;">
                       <input type="checkbox" id="priceVariableCheckbox" [(ngModel)]="editingAct.isPriceVariable" style="width: auto; cursor: pointer;"/>
-                      <label for="priceVariableCheckbox" style="cursor: pointer; font-weight: 500;">Prix variable / À discuter</label>
+                      <label for="priceVariableCheckbox" style="cursor: pointer; font-weight: 500;">{{ prefs.translate('PRACTITIONER.ACTS.VARIABLE_PRICE') }} / {{ prefs.translate('PRACTITIONER.ACTS.TO_DISCUSS') }}</label>
                     </div>
                   </div>
 
                   <div style="display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1rem;">
                     <button type="button" class="btn-secondary" (click)="cancelActEdit()">
-                      Annuler
+                      {{ prefs.translate('COMMON.CANCEL') }}
                     </button>
                     <button type="button" class="btn-primary" (click)="saveAct()">
-                      Enregistrer
+                      {{ prefs.translate('COMMON.SAVE') }}
                     </button>
                   </div>
                 </div>
@@ -248,8 +248,8 @@
             </section>
 
             <section class="card">
-              <h2>{{ prefs.translate('profile.section.empreinte') }}</h2>
-              <p class="muted">{{ prefs.translate('profile.empreinteHint') }}</p>
+              <h2>{{ prefs.translate('PRACTITIONER.PROFILE.SECTION_EMPREINTE') }}</h2>
+              <p class="muted">{{ prefs.translate('PRACTITIONER.PROFILE.EMPREINTE_HINT') }}</p>
               <input type="text" [value]="profile.empreinte || ''" disabled class="empreinte-input"/>
             </section>
 

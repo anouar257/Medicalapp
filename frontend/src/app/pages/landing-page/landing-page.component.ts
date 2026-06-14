@@ -17,7 +17,6 @@ import { ThemeService } from '../../services/theme.service';
 import { PractitionerService } from '../../services/practitioner.service';
 import { AgendaService } from '../../services/agenda.service';
 import { PreferencesService, AppLanguage, ZoomLevel } from '../../services/preferences.service';
-import { APP_DICTIONARY } from '../../i18n/app-dictionary';
 import { AppNavbarComponent } from '../../shared/app-navbar.component';
 import type { SpecialtyDTO } from '../../models/practitioner.model';
 import {
@@ -82,98 +81,9 @@ export class LandingPageComponent implements OnInit, OnDestroy {
     return [1, 2, 3, 4, 5];
   }
 
-  /** Textes propres à la page d’accueil ; fusion avec le dictionnaire global dans translate(). */
-  private readonly dictionary: Record<string, Record<AppLanguage, string>> = {
-    'Espace Patient': { fr: 'Espace Patient', en: 'Patient Portal', ar: 'بوابة المريض' },
-    'Espace Pro': { fr: 'Espace Pro', en: 'Pro Portal', ar: 'بوابة الطبيب' },
-    'Trouvez votre médecin': { fr: 'Trouvez votre médecin', en: 'Find your doctor', ar: 'ابحث عن طبيبك' },
-    'Prenez rendez-vous en ligne.': { fr: 'et prenez rendez-vous en ligne.', en: 'and book appointments online.', ar: 'واحجز موعدك عبر الإنترنت.' },
-    'Simple, rapide et sécurisé. Votre santé à portée de clic.': {
-      fr: 'Simple, rapide et sécurisé. Votre santé à portée de clic.',
-      en: 'Simple, fast, and secure. Your health just a click away.',
-      ar: 'بسيط وسريع وآمن. صحتك sur la pointe des doigts.',
-    },
-    'Nom du praticien...': { fr: 'Nom du praticien...', en: 'Doctor name...', ar: 'اسم الطبيب...' },
-    'Spécialité': { fr: 'Spécialité', en: 'Specialty', ar: 'التخصص' },
-    'Où ? (Ville)': { fr: 'Où ? (Ville, Code postal)', en: 'Where? (City, Zip)', ar: 'أين؟ (المدينة، الرمز البريدي)' },
-    Rechercher: { fr: 'Rechercher', en: 'Search', ar: 'بحث' },
-    'Actualités & Prévention': { fr: 'Actualités & Prévention', en: 'News & Prevention', ar: 'أخبار ووقاية' },
-    PRÉVENTION: { fr: 'PRÉVENTION', en: 'PREVENTION', ar: 'وقاية' },
-    'Campagne de vaccination': { fr: 'Campagne de vaccination grippe', en: 'Flu Vaccination Campaign', ar: 'حملة التطعion ضد الإنفلونزا' },
-    'Prenez rendez-vous facilement près de chez vous pour vous protéger.': {
-      fr: 'Prenez rendez-vous facilement près de chez vous pour vous protéger.',
-      en: 'Easily book an appointment near you to protect yourself.',
-      ar: 'احجز موعدًا بسهولة بالقرب منك لحماية نفسك.',
-    },
-    NOUVEAU: { fr: 'NOUVEAU', en: 'NEW', ar: 'جديد' },
-    'Centre Médical Lumière': { fr: 'Centre Médical Lumière', en: 'Lumiere Medical Center', ar: 'مركز النور الطبي' },
-    "Ouverture d'un nouveau centre de radiologie. Prenez RDV en ligne.": {
-      fr: "Ouverture d'un nouveau centre de radiologie. Prenez RDV en ligne.",
-      en: 'Opening of a new radiology center. Book online.',
-      ar: 'افتتاح مركز أشعة جديد. احجز موعدك عبر الإنترنت.',
-    },
-    INFO: { fr: 'INFO', en: 'INFO', ar: 'معلومة' },
-    "Mise à jour de l'application": { fr: "Mise à jour de l'application", en: 'Application Update', ar: 'تحديث التطبيق' },
-    'Découvrez les nouvelles fonctionnalités de votre espace patient.': {
-      fr: 'Découvrez les nouvelles fonctionnalités de votre espace patient.',
-      en: 'Discover new features in your patient portal.',
-      ar: 'اكتشف الميزات الجديدة في بوابة المريض الخاصة بك.',
-    },
-    'Comment utiliser MedConnect ?': { fr: 'Comment utiliser MedConnect ?', en: 'How to use MedConnect?', ar: 'كيف تستخدم MedConnect؟' },
-    '1. Recherchez': { fr: '1. Recherchez', en: '1. Search', ar: '1. ابحث' },
-    'Trouvez un praticien par nom ou spécialité près de chez vous en quelques clics.': {
-      fr: 'Trouvez un praticien par nom ou spécialité près de chez vous en quelques clics.',
-      en: 'Find a practitioner by name or specialty near you in a few clicks.',
-      ar: 'ابحث عن ممارس بالاسم أو التخصص بالقرب منك ببضع نقرات.',
-    },
-    '2. Choisissez': { fr: '2. Choisissez un créneau', en: '2. Choose a slot', ar: '2. اختر موعدًا' },
-    'Consultez les disponibilités en temps réel et choisissez le créneau qui vous convient.': {
-      fr: 'Consultez les disponibilités en temps réel et choisissez le créneau qui vous convient.',
-      en: 'View real-time availability and pick the slot that fits you.',
-      ar: 'تحقق من التوافر في الوقت الفعلي واختر الوقت الذي يناسبك.',
-    },
-    '3. Réservez': { fr: '3. Prenez rendez-vous', en: '3. Book Appointment', ar: '3. احجز موعدًا' },
-    'Confirmez votre RDV en toute sécurité et recevez vos rappels automatiques.': {
-      fr: 'Confirmez votre RDV en toute sécurité et recevez vos rappels automatiques.',
-      en: 'Confirm your appointment securely and get automatic reminders.',
-      ar: 'قم بتأكيد موعدك بأمان واحصل على تذكيرات تلقائية.',
-    },
-    'La plateforme de prise de rendez-vous médicaux de nouvelle génération.': {
-      fr: 'La plateforme de prise de rendez-vous médicaux de nouvelle génération.',
-      en: 'The next-generation medical appointment booking platform.',
-      ar: 'منصة حجز المواعيد الطبية من الجيل القادم.',
-    },
-    'À propos': { fr: 'À propos', en: 'About', ar: 'حول' },
-    'Qui sommes-nous ?': { fr: 'Qui sommes-nous ?', en: 'Who are we?', ar: 'من نحن؟' },
-    Recrutement: { fr: 'Recrutement', en: 'Careers', ar: 'توظيف' },
-    'On embauche': { fr: 'On embauche', en: 'Hiring', ar: 'نوظف' },
-    Presse: { fr: 'Presse', en: 'Press', ar: 'صحافة' },
-    'Légal & Aide': { fr: 'Légal & Aide', en: 'Legal & Help', ar: 'قانوني ومساعدة' },
-    'Aide et Contact': { fr: 'Aide et Contact', en: 'Help & Contact', ar: 'مساعدة واتصال' },
-    "Note d'engagement": { fr: "Note d'engagement", en: 'Commitment Note', ar: 'ملاحظة الالتزام' },
-    'Confidentialité & RGPD': { fr: 'Confidentialité & RGPD', en: 'Privacy & GDPR', ar: 'الخصوصية' },
-    'Conditions Générales (CGU)': { fr: 'Conditions Générales (CGU)', en: 'Terms of Service', ar: 'الشروط والأحكام' },
-    Praticiens: { fr: 'Praticiens', en: 'Practitioners', ar: 'الممارسون' },
-    'Vous êtes professionnel de santé ? Équipez votre cabinet avec notre solution.': {
-      fr: 'Vous êtes professionnel de santé ? Équipez votre cabinet avec notre solution.',
-      en: 'Are you a healthcare professional? Equip your practice with our solution.',
-      ar: 'هل أنت أخصائي رعاية صحية? جهز عيادتك بحلنا.',
-    },
-    'Inscrire mon cabinet': { fr: 'Inscrire mon cabinet', en: 'Register my practice', ar: 'تسجيل عiادتي' },
-    'Aucun praticien trouvé.': { fr: 'Aucun praticien trouvé.', en: 'No practitioners found.', ar: 'لم يتم العثور على أطباء.' },
-    'Prendre RDV': { fr: 'Prendre RDV', en: 'Book appointment', ar: 'حجز موعد' },
-    'Tous droits réservés.': { fr: 'Tous droits réservés.', en: 'All rights reserved.', ar: 'كل الحقوق محفوظة.' },
-    'Vous êtes professionnel ?': { fr: 'Vous êtes professionnel de santé ?', en: 'Are you a healthcare professional?', ar: 'هل أنت أخصائي رعاية صحية؟' },
-    'Réduisez vos appels': { 
-      fr: 'Réduisez vos appels de 30% grâce à notre agenda intelligent.', 
-      en: 'Reduce your calls by 30% with our smart agenda.', 
-      ar: 'قلل مكالماتك بنسبة 30% من خلال أجندتنا الذكية.' 
-    },
-    'Découvrir la solution': { fr: 'Découvrir la solution', en: 'Discover the solution', ar: 'اكتشف الحل' },
-    avis: { fr: 'avis', en: 'reviews', ar: 'تقييمات' },
-    Consultation: { fr: 'Consultation', en: 'Consultation', ar: 'استشارة' },
-    'Tarif à confirmer': { fr: 'Tarif à confirmer', en: 'Fee to be confirmed', ar: 'السعر سيتم تأكيده' },
-  };
+  translate(key: string): string {
+    return this.prefs.translate(key);
+  }
 
   ngOnInit(): void {
     this.practitionerService.listSpecialties().subscribe({
@@ -188,39 +98,39 @@ export class LandingPageComponent implements OnInit, OnDestroy {
           this.filteredCities = [...this.cities];
         }
       },
-      error: () => {}
+      error: () => {},
     });
 
-    this.searchSub = this.searchSubject.pipe(
-      debounceTime(300),
-      distinctUntilChanged(
-        (a, b) => a.name === b.name && a.city === b.city && a.specialty === b.specialty,
-      ),
-      switchMap((q) => {
-        this.isSearching = true;
-        return forkJoin({
-          pros: this.practitionerService
-            .searchPublic({ name: q.name, city: q.city, specialty: q.specialty })
-            .pipe(catchError(() => of([]))),
-          doctors: this.agendaService.listDoctors().pipe(catchError(() => of([]))),
-        }).pipe(
-          map(({ pros, doctors }) => {
-            const merged = mergePractitionerSearchResults(pros, doctors);
-            return filterCombinedOptions(merged, q.name, q.city, q.specialty);
-          }),
-          finalize(() => (this.isSearching = false)),
-        );
-      })
-    ).subscribe({
-      next: (res) => {
-        this.results = res;
-        this.isSearching = false;
-      },
-      error: () => {
-        this.results = [];
-        this.isSearching = false;
-      }
-    });
+    this.searchSub = this.searchSubject
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged((a, b) => a.name === b.name && a.city === b.city && a.specialty === b.specialty),
+        switchMap((q) => {
+          this.isSearching = true;
+          return forkJoin({
+            pros: this.practitionerService
+              .searchPublic({ name: q.name, city: q.city, specialty: q.specialty })
+              .pipe(catchError(() => of([]))),
+            doctors: this.agendaService.listDoctors().pipe(catchError(() => of([]))),
+          }).pipe(
+            map(({ pros, doctors }) => {
+              const merged = mergePractitionerSearchResults(pros, doctors);
+              return filterCombinedOptions(merged, q.name, q.city, q.specialty);
+            }),
+            finalize(() => (this.isSearching = false)),
+          );
+        }),
+      )
+      .subscribe({
+        next: (res) => {
+          this.results = res;
+          this.isSearching = false;
+        },
+        error: () => {
+          this.results = [];
+          this.isSearching = false;
+        },
+      });
 
     this.startCarouselAutoPlay();
   }
@@ -281,11 +191,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
   }
 
   triggerSearch(): void {
-    const q = {
-      name: this.practitionerName,
-      city: this.city,
-      specialty: this.specialtyFilterText,
-    };
+    const q = { name: this.practitionerName, city: this.city, specialty: this.specialtyFilterText };
     if (q.name.trim() || q.city.trim() || q.specialty.trim()) {
       this.showSearchResults = true;
     }
@@ -311,7 +217,7 @@ export class LandingPageComponent implements OnInit, OnDestroy {
       this.filteredCities = [...this.cities];
     } else {
       const q = this.cityFilterText.toLowerCase();
-      this.filteredCities = this.cities.filter(c => c.toLowerCase().includes(q));
+      this.filteredCities = this.cities.filter((c) => c.toLowerCase().includes(q));
     }
   }
 
@@ -330,12 +236,6 @@ export class LandingPageComponent implements OnInit, OnDestroy {
       this.isSpecialtyDropdownOpen = false;
       this.isCityDropdownOpen = false;
     }
-  }
-
-  translate(key: string): string {
-    const lang = this.prefs.language();
-    const row = APP_DICTIONARY[key] ?? this.dictionary[key];
-    return row?.[lang] ?? key;
   }
 
   // ── Helpers Carousel Stack ───────────────────────────────────────────

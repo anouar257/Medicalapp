@@ -1,0 +1,25 @@
+{
+  "MESSAGING": {
+    "CABINET": {
+      "PAGE_TITLE": "Boîte de réception",
+      "SUBTITLE": "Échangez avec vos patients depuis votre cabinet.",
+      "NO_PROFILE": "Aucun profil praticien trouvé",
+      "VERIFY_PROFILE": "Veuillez vérifier votre profil praticien.",
+      "DISCUSSIONS": "Discussions",
+      "NO_ACTIVE": "Aucune discussion active",
+      "MY_MESSAGES": "Vos messages",
+      "SELECT_THREAD": "Sélectionnez une discussion dans le panneau latéral ou démarrez une nouvelle conversation avec un patient.",
+      "ATTACHMENT": "Pièce jointe",
+      "CLICK_DOWNLOAD": "Cliquez pour télécharger",
+      "DOWNLOAD": "Télécharger",
+      "WRITE_MESSAGE": "Écrivez un message…",
+      "SEND": "Envoyer",
+      "ENTER_HINT": "Appuyez sur Entrée pour envoyer, Maj+Entrée pour un retour à la ligne.",
+      "RETRIEVE": "Retirer",
+      "ADD_FILE": "Joindre un document ou une photo",
+      "ERROR": "Erreur",
+      "LOADING": "Chargement…",
+      "CONCERNING": "Concernant"
+    }
+  }
+}

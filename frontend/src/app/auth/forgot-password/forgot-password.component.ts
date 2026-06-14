@@ -32,12 +32,12 @@ export class ForgotPasswordComponent {
         this.loading = false;
         this.success =
           this.channel === 'email'
-            ? this.prefs.translate('auth.forgot.successEmail')
-            : this.prefs.translate('auth.forgot.successSms');
+            ? this.prefs.translate('AUTH.FORGOT.SUCCESS_EMAIL')
+            : this.prefs.translate('AUTH.FORGOT.SUCCESS_SMS');
       },
       error: (e) => {
         this.loading = false;
-        this.err = e.error?.error || this.prefs.translate('auth.forgot.genericError');
+        this.err = e.error?.error || this.prefs.translate('AUTH.FORGOT.GENERIC_ERROR');
       },
     });
   }

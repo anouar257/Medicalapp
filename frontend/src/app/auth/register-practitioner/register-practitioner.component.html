@@ -3,24 +3,21 @@
 
   <div class="auth-container fade-in relative px-4 pb-16 pt-8">
     <div class="auth-split-wrapper mx-auto">
-      
-      <!-- Image Section (Left) -->
       <div class="auth-split-image" style="background-image: url('/assets/images/img6.png');">
         <div class="image-content-header">
-          <span class="logo-icon">🩺</span>
+          <span class="logo-icon">🏺</span>
           <span>MedConnect <span class="badge-pro">PRO</span></span>
         </div>
-        
+
         <div class="image-content-footer">
-          <h4>{{ prefs.translate('Rejoignez notre réseau de praticiens.') }}</h4>
-          <p>{{ prefs.translate('Créez votre profil professionnel en quelques minutes, configurez vos spécialités et commencez à recevoir vos premiers patients.') }}</p>
+          <h4>{{ prefs.translate('AUTH.PRO.PRACTITIONER_INTRO_TITLE') }}</h4>
+          <p>{{ prefs.translate('AUTH.PRO.PRACTITIONER_INTRO_DESC') }}</p>
         </div>
       </div>
 
-      <!-- Form Section (Right) -->
       <div class="auth-split-form">
         <div class="logo-container lg:hidden">
-          <span class="logo-icon">🩺</span>
+          <span class="logo-icon">🏺</span>
           <h2>MedConnect <span class="badge-pro">PRO</span></h2>
         </div>
 
@@ -28,7 +25,7 @@
           @for (s of stepsConfig; track s.num; let i = $index) {
             <div class="stepper-item" [class.active]="step >= s.num">
               <div class="step-circle">{{ step > s.num ? '✓' : s.num }}</div>
-              <span class="step-label">{{ s.label }}</span>
+              <span class="step-label">{{ prefs.translate(s.label) }}</span>
             </div>
             @if (i < stepsConfig.length - 1) {
               <div class="stepper-line" [class.active]="step > s.num"></div>
@@ -37,116 +34,112 @@
         </div>
 
         <div class="auth-card">
-
           @if (step === 1) {
             <div class="auth-header">
-              <h3>Vérification d'identité</h3>
-              <p>Email et téléphone professionnels</p>
+              <h3>{{ prefs.translate('AUTH.PRO.IDENTITY_TITLE') }}</h3>
+              <p>{{ prefs.translate('AUTH.PRO.IDENTITY_SUBTITLE') }}</p>
             </div>
             <form (ngSubmit)="checkExistence()" class="auth-form">
               <div class="form-group">
-                <label>Email professionnel</label>
-                <input class="custom-input" type="email" [(ngModel)]="data.email" name="email" required placeholder="dr.dupont@cabinet.fr"/>
+                <label>{{ prefs.translate('AUTH.PRO.EMAIL_PRO') }}</label>
+                <input class="custom-input" type="email" [(ngModel)]="data.email" name="email" required [placeholder]="prefs.translate('AUTH.PRO.EMAIL_PRO_PH')" />
               </div>
               <div class="form-group">
-                <label>Téléphone</label>
-                <input class="custom-input" type="tel" [(ngModel)]="data.telephone" name="telephone" required placeholder="+33612345678"/>
+                <label>{{ prefs.translate('AUTH.PRO.PHONE') }}</label>
+                <input class="custom-input" type="tel" [(ngModel)]="data.telephone" name="telephone" required [placeholder]="prefs.translate('AUTH.PRO.PHONE_PH')" />
               </div>
               @if (errorMessage) { <div class="text-error">{{ errorMessage }}</div> }
               <button type="submit" class="btn-submit" [disabled]="loading">
                 @if (loading) { <span class="spinner"></span> }
-                @else { Continuer <span class="arrow">→</span> }
+                @else { {{ prefs.translate('AUTH.PRO.CONTINUE') }} <span class="arrow">→</span> }
               </button>
             </form>
           }
 
           @if (step === 2) {
             <div class="auth-header">
-              <h3>Vos informations</h3>
-              <p>Civilité, titre, identité du praticien</p>
+              <h3>{{ prefs.translate('AUTH.PRO.ADMIN_TITLE') }}</h3>
+              <p>{{ prefs.translate('AUTH.PRO.TITLE_ROLE_HINT') }}</p>
             </div>
             <form (ngSubmit)="goToStep3()" class="auth-form">
               <div class="form-row">
                 <div class="form-group">
-                  <label>Civilité</label>
+                  <label>{{ prefs.translate('AUTH.PRO.CIVILITY') }}</label>
                   <select class="custom-input" [(ngModel)]="data.civilite" name="civilite">
-                    <option value="">Choisir</option>
-                    <option value="MME">Mme</option>
-                    <option value="M">M.</option>
+                    <option value="">{{ prefs.translate('AUTH.PRO.CHOOSE') }}</option>
+                    <option value="MME">{{ prefs.translate('AUTH.PRO.FEMALE') }}</option>
+                    <option value="M">{{ prefs.translate('AUTH.PRO.MALE') }}</option>
                   </select>
                 </div>
                 <div class="form-group">
-                  <label>Titre</label>
+                  <label>{{ prefs.translate('AUTH.PRO.TITLE_ROLE') }}</label>
                   <select class="custom-input" [(ngModel)]="data.titre" name="titre">
-                    <option value="AUCUN">Aucun</option>
-                    <option value="DR">Dr.</option>
-                    <option value="PR">Pr.</option>
+                    <option value="AUCUN">{{ prefs.translate('AUTH.PRO.NONE') }}</option>
+                    <option value="DR">{{ prefs.translate('AUTH.PRO.TITLE_DR') }}</option>
+                    <option value="PR">{{ prefs.translate('AUTH.PRO.TITLE_PR') }}</option>
                   </select>
                 </div>
               </div>
 
               <div class="form-row">
                 <div class="form-group">
-                  <label>Prénom</label>
-                  <input class="custom-input" [(ngModel)]="data.prenom" name="prenom" required/>
+                  <label>{{ prefs.translate('AUTH.PRO.FIRST_NAME') }}</label>
+                  <input class="custom-input" [(ngModel)]="data.prenom" name="prenom" required />
                 </div>
                 <div class="form-group">
-                  <label>Nom</label>
-                  <input class="custom-input" [(ngModel)]="data.nom" name="nom" required/>
+                  <label>{{ prefs.translate('AUTH.PRO.LAST_NAME') }}</label>
+                  <input class="custom-input" [(ngModel)]="data.nom" name="nom" required />
                 </div>
               </div>
 
               <div class="form-row">
                 <div class="form-group">
-                  <label>Sexe</label>
+                  <label>{{ prefs.translate('AUTH.PRO.GENDER') }}</label>
                   <select class="custom-input" [(ngModel)]="data.sexe" name="sexe" required>
-                    <option value="" disabled>Choisir</option>
-                    <option value="HOMME">Homme</option>
-                    <option value="FEMME">Femme</option>
+                    <option value="" disabled>{{ prefs.translate('AUTH.PRO.CHOOSE') }}</option>
+                    <option value="HOMME">{{ prefs.translate('AUTH.PRO.MALE') }}</option>
+                    <option value="FEMME">{{ prefs.translate('AUTH.PRO.FEMALE') }}</option>
                   </select>
                 </div>
                 <div class="form-group">
-                  <label>Date de naissance</label>
-                  <input class="custom-input" type="date" [(ngModel)]="data.dateNaissance" name="dateNaissance" required/>
+                  <label>{{ prefs.translate('AUTH.PRO.BIRTH_DATE') }}</label>
+                  <input class="custom-input" type="date" [(ngModel)]="data.dateNaissance" name="dateNaissance" required />
                 </div>
               </div>
 
               <div class="form-group">
-                <label>Statut</label>
+                <label>{{ prefs.translate('AUTH.PRO.STATUS') }}</label>
                 <select class="custom-input" [(ngModel)]="data.statut" name="statut">
-                  <option value="TITULAIRE">Titulaire</option>
-                  <option value="REMPLACANT">Remplaçant</option>
-                  <option value="COLLABORATEUR">Collaborateur</option>
-                  <option value="ASSISTANT">Assistant</option>
-                  <option value="INTERNE">Interne</option>
-                  <option value="ASSOCIE">Associé</option>
+                  <option value="TITULAIRE">{{ prefs.translate('AUTH.PRO.STATUS_TITULAIRE') }}</option>
+                  <option value="REMPLACANT">{{ prefs.translate('AUTH.PRO.STATUS_REMPLACANT') }}</option>
+                  <option value="COLLABORATEUR">{{ prefs.translate('AUTH.PRO.STATUS_COLLABORATEUR') }}</option>
+                  <option value="ASSISTANT">{{ prefs.translate('AUTH.PRO.STATUS_ASSISTANT') }}</option>
+                  <option value="INTERNE">{{ prefs.translate('AUTH.PRO.STATUS_INTERNE') }}</option>
+                  <option value="ASSOCIE">{{ prefs.translate('AUTH.PRO.STATUS_ASSOCIE') }}</option>
                 </select>
               </div>
 
               @if (errorMessage) { <div class="text-error">{{ errorMessage }}</div> }
               <div class="form-actions">
-                <button type="button" class="btn-outline" (click)="step = 1">Retour</button>
-                <button type="submit" class="btn-submit" style="margin-top:0">Continuer <span class="arrow">→</span></button>
+                <button type="button" class="btn-outline" (click)="step = 1">{{ prefs.translate('COMMON.BACK') }}</button>
+                <button type="submit" class="btn-submit" style="margin-top:0">{{ prefs.translate('AUTH.PRO.CONTINUE') }} <span class="arrow">→</span></button>
               </div>
             </form>
           }
 
           @if (step === 3) {
             <div class="auth-header">
-              <h3>Spécialités médicales</h3>
-              <p>Sélectionnez une ou plusieurs spécialités</p>
+              <h3>{{ prefs.translate('AUTH.PRO.SPECIALTIES_TITLE') }}</h3>
+              <p>{{ prefs.translate('AUTH.PRO.SPECIALTIES_HINT') }}</p>
             </div>
             <div class="auth-form">
               @if (loadingSpecialties) {
-                <p class="text-muted">Chargement…</p>
+                <p class="text-muted">{{ prefs.translate('AUTH.PRO.LOADING') }}</p>
               }
               <div class="specialties-grid">
                 @for (spec of specialties; track spec.id) {
                   <label class="specialty-card" [class.selected]="isSelected(spec.id)">
-                    <input type="checkbox"
-                           [checked]="isSelected(spec.id)"
-                           (change)="toggleSpecialty(spec.id)"
-                           hidden/>
+                    <input type="checkbox" [checked]="isSelected(spec.id)" (change)="toggleSpecialty(spec.id)" hidden />
                     <span class="specialty-libelle">{{ spec.libelle }}</span>
                     @if (isSelected(spec.id)) { <span class="check">✓</span> }
                   </label>
@@ -155,9 +148,9 @@
 
               @if (errorMessage) { <div class="text-error">{{ errorMessage }}</div> }
               <div class="form-actions">
-                <button type="button" class="btn-outline" (click)="step = 2">Retour</button>
+                <button type="button" class="btn-outline" (click)="step = 2">{{ prefs.translate('COMMON.BACK') }}</button>
                 <button type="button" class="btn-submit" style="margin-top:0" (click)="goToStep4()">
-                  Continuer <span class="arrow">→</span>
+                  {{ prefs.translate('AUTH.PRO.CONTINUE') }} <span class="arrow">→</span>
                 </button>
               </div>
             </div>
@@ -165,20 +158,20 @@
 
           @if (step === 4) {
             <div class="auth-header">
-              <h3>Mot de passe & validation</h3>
-              <p>Dernière étape</p>
+              <h3>{{ prefs.translate('AUTH.PRO.PASSWORD_VALIDATION_TITLE') }}</h3>
+              <p>{{ prefs.translate('AUTH.PRO.LAST_STEP') }}</p>
             </div>
             <form (ngSubmit)="onSubmit()" class="auth-form">
               <div class="form-group">
-                <label>Mot de passe</label>
+                <label>{{ prefs.translate('AUTH.PRO.PASSWORD_LABEL') }}</label>
                 <div class="input-with-icon">
                   <span class="icon">🔒</span>
-                  <input class="custom-input pl-icon pr-10" [type]="showPassword ? 'text' : 'password'" [(ngModel)]="data.motDePasse" name="motDePasse" required placeholder="Min. 8 caractères"/>
+                  <input class="custom-input pl-icon pr-10" [type]="showPassword ? 'text' : 'password'" [(ngModel)]="data.motDePasse" name="motDePasse" required [placeholder]="prefs.translate('AUTH.PRO.PASSWORD_HINT')" />
                   <button
                     type="button"
                     class="toggle-password-btn"
                     (click)="showPassword = !showPassword"
-                    [attr.aria-label]="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+                    [attr.aria-label]="showPassword ? prefs.translate('AUTH.PRO.PASSWORD_TOGGLE_HIDE') : prefs.translate('AUTH.PRO.PASSWORD_TOGGLE_SHOW')"
                   >
                     @if (showPassword) {
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
@@ -194,15 +187,15 @@
                 </div>
               </div>
               <div class="form-group">
-                <label>Confirmer</label>
+                <label>{{ prefs.translate('AUTH.PRO.CONFIRM') }}</label>
                 <div class="input-with-icon">
                   <span class="icon">🔒</span>
-                  <input class="custom-input pl-icon pr-10" [type]="showConfirmPassword ? 'text' : 'password'" [(ngModel)]="confirmPassword" name="confirm" required/>
+                  <input class="custom-input pl-icon pr-10" [type]="showConfirmPassword ? 'text' : 'password'" [(ngModel)]="confirmPassword" name="confirm" required [placeholder]="prefs.translate('AUTH.PRO.CONFIRM_HINT')" />
                   <button
                     type="button"
                     class="toggle-password-btn"
                     (click)="showConfirmPassword = !showConfirmPassword"
-                    [attr.aria-label]="showConfirmPassword ? 'Masquer la confirmation' : 'Afficher la confirmation'"
+                    [attr.aria-label]="showConfirmPassword ? prefs.translate('AUTH.PRO.CONFIRM_TOGGLE_HIDE') : prefs.translate('AUTH.PRO.CONFIRM_TOGGLE_SHOW')"
                   >
                     @if (showConfirmPassword) {
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
@@ -219,13 +212,17 @@
               </div>
 
               <div class="cgu-box">
-                <p>En créant votre compte, vous acceptez nos <a href="#">Conditions Générales</a>
-                et notre <a href="#">Politique de Confidentialité</a>.</p>
+                <p>
+                  {{ prefs.translate('AUTH.PRO.TERMS_LEAD') }}
+                  <a href="#">{{ prefs.translate('AUTH.PRO.TERMS') }}</a>
+                  {{ prefs.translate('AUTH.PRO.PRIVACY_LEAD') }}
+                  <a href="#">{{ prefs.translate('AUTH.PRO.PRIVACY') }}</a>.
+                </p>
               </div>
               <div class="form-group checkbox-group">
                 <label class="checkbox-label">
                   <input type="checkbox" [(ngModel)]="data.cguAcceptees" name="cgu"/>
-                  <span>J'accepte les conditions générales d'utilisation</span>
+                  <span>{{ prefs.translate('AUTH.PRO.ACCEPT_TERMS') }}</span>
                 </label>
               </div>
 
@@ -233,22 +230,20 @@
               @if (successMessage) { <div class="text-success">{{ successMessage }}</div> }
 
               <div class="form-actions">
-                <button type="button" class="btn-outline" (click)="step = 3">Retour</button>
+                <button type="button" class="btn-outline" (click)="step = 3">{{ prefs.translate('COMMON.BACK') }}</button>
                 <button type="submit" class="btn-submit" style="margin-top:0" [disabled]="loading || !data.cguAcceptees">
                   @if (loading) { <span class="spinner"></span> }
-                  @else { Créer mon compte <span class="arrow">→</span> }
+                  @else { {{ prefs.translate('AUTH.PRO.CREATE_ACCOUNT') }} <span class="arrow">→</span> }
                 </button>
               </div>
             </form>
           }
 
           <div class="auth-links mt-2">
-            <p>Déjà un compte ? <a routerLink="/auth/login-pro">Se connecter</a></p>
+            <p>{{ prefs.translate('AUTH.PRO.ALREADY_ACCOUNT') }} <a routerLink="/auth/login-pro">{{ prefs.translate('AUTH.PRO.SIGN_IN') }}</a></p>
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </div>
-  

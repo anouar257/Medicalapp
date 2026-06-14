@@ -1,0 +1,33 @@
+{
+  "MESSAGING": {
+    "CABINET": {
+      "PAGE_TITLE": "Inbox",
+      "SUBTITLE": "Messages from patients.",
+      "NO_PROFILE": "Practitioner profile unavailable for messaging.",
+      "VERIFY_PROFILE": "Please verify your practitioner profile.",
+      "DISCUSSIONS": "Discussions",
+      "NO_ACTIVE_DISCUSSION": "No active discussion",
+      "YOUR_MESSAGES": "Your messages",
+      "SELECT_CONVERSATION_HINT": "Select a conversation in the side panel or start a new conversation with a patient.",
+      "ATTACHMENT": "Attachment",
+      "CLICK_TO_DOWNLOAD": "Click to download",
+      "DOWNLOAD": "Download",
+      "REMOVE": "Remove",
+      "ATTACH_DOCUMENT": "Attach a document or photo",
+      "WRITE_MESSAGE_PLACEHOLDER": "Write a message...",
+      "SEND": "Send",
+      "ENTER_TO_SEND_HINT": "Press Enter to send, Shift+Enter for a new line.",
+      "CONCERNED_PERSON": "Concerned person",
+      "ADD_FILE": "Attach a document or photo",
+      "CLICK_DOWNLOAD": "Click to download",
+      "CONCERNING": "Concerned person",
+      "ENTER_HINT": "Press Enter to send, Shift+Enter for a new line.",
+      "MY_MESSAGES": "Your messages",
+      "NO_ACTIVE": "No active discussion",
+      "RETRIEVE": "Remove",
+      "SELECT_THREAD": "Select a conversation in the side panel or start a new conversation with a patient.",
+      "WRITE_MESSAGE": "Write a message...",
+      "ERROR": "Error"
+    }
+  }
+}

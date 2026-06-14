@@ -4,7 +4,7 @@
   }
 
   @if (loading) {
-    <p class="cd-loading">{{ prefs.translate('cabinet.management.dashboardLoading') }}</p>
+    <p class="cd-loading">{{ prefs.translate('PRACTITIONER.DASHBOARD.LOADING_CABINET') }}</p>
     <div class="cd-skel-header">
       <span class="cd-skel-line cd-skel-line--h1"></span>
       <span class="cd-skel-line cd-skel-line--sub"></span>
@@ -31,25 +31,25 @@
   } @else {
     <header class="dashboard-header">
       <div class="header-main">
-        <h1>{{ prefs.translate('cabinet.dashboard.h1') }} — {{ cabinet?.nom || prefs.translate('cabinet.defaultOrg') }}</h1>
-        <p class="subtitle">{{ prefs.translate('cabinet.dashboard.subtitle') }}</p>
+        <h1>{{ prefs.translate('PRACTITIONER.DASHBOARD.PAGE_TITLE') }} — {{ cabinet?.nom || prefs.translate('PRACTITIONER.SHELL.DEFAULT_ORG') }}</h1>
+        <p class="subtitle">{{ prefs.translate('PRACTITIONER.DASHBOARD.PAGE_SUBTITLE') }}</p>
       </div>
     </header>
 
     <div class="dashboard-layout">
-      <!-- Left Column: Rendez-vous du jour -->
+      <!-- Left Column: {{ prefs.translate('PRACTITIONER.DASHBOARD.TITLE') }} -->
       <section class="card appointments-card">
         <header class="card-header flex-header">
           <div class="header-titles">
-            <h2>Rendez-vous du jour</h2>
-            <p class="card-subtitle">Gérez la présence de vos patients en un clic</p>
+            <h2>{{ prefs.translate('PRACTITIONER.DASHBOARD.TITLE') }}</h2>
+            <p class="card-subtitle">{{ prefs.translate('PRACTITIONER.DASHBOARD.SUBTITLE') }}</p>
           </div>
           <button
             type="button"
             class="btn-refresh"
             (click)="loadTodayAppointments()"
             [class.spinning]="appointmentsLoading"
-            title="Actualiser les rendez-vous"
+            title="{{ prefs.translate('PRACTITIONER.DASHBOARD.REFRESH') }}"
           >
             <svg class="size-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path
@@ -69,7 +69,7 @@
             [class.active]="activeFilter === 'TO_TREAT'"
             (click)="activeFilter = 'TO_TREAT'"
           >
-            <span>À traiter</span>
+            <span>{{ prefs.translate('PRACTITIONER.DASHBOARD.TO_TREAT') }}</span>
             @if (countToTreat > 0) {
               <span class="count-badge bg-primary-badge">{{ countToTreat }}</span>
             }
@@ -80,7 +80,7 @@
             [class.active]="activeFilter === 'ALL'"
             (click)="activeFilter = 'ALL'"
           >
-            <span>Tous</span>
+            <span>{{ prefs.translate('PRACTITIONER.DASHBOARD.ALL') }}</span>
             @if (todayAppointments.length > 0) {
               <span class="count-badge">{{ todayAppointments.length }}</span>
             }
@@ -90,20 +90,20 @@
         @if (appointmentsLoading && todayAppointments.length === 0) {
           <div class="appointments-loading-state">
             <div class="spinner"></div>
-            <p>Chargement des rendez-vous d'aujourd'hui...</p>
+            <p>{{ prefs.translate('PRACTITIONER.DASHBOARD.LOADING_TODAY') }}</p>
           </div>
         } @else {
           @if (todayAppointments.length === 0) {
             <div class="empty-appointments-state">
               <span class="empty-icon">📅</span>
-              <p class="empty-title">Aucun rendez-vous aujourd'hui</p>
-              <p class="empty-desc">Vous n'avez aucun rendez-vous planifié pour aujourd'hui dans votre agenda.</p>
+              <p class="empty-title">{{ prefs.translate('PRACTITIONER.DASHBOARD.NO_TODAY') }}</p>
+              <p class="empty-desc">{{ prefs.translate('PRACTITIONER.DASHBOARD.NO_TODAY_DESC') }}</p>
             </div>
           } @else if (filteredAppointments.length === 0 && activeFilter === 'TO_TREAT') {
             <div class="empty-appointments-state success-state">
               <span class="empty-icon">🎉</span>
-              <p class="empty-title">Tout est traité !</p>
-              <p class="empty-desc">Félicitations, tous les rendez-vous d'aujourd'hui ont été honorés ou traités.</p>
+              <p class="empty-title">{{ prefs.translate('PRACTITIONER.DASHBOARD.ALL_DONE') }}</p>
+              <p class="empty-desc">{{ prefs.translate('PRACTITIONER.DASHBOARD.ALL_DONE_DESC') }}</p>
             </div>
           } @else {
             <div class="appointments-list scrollbar-cabinet">
@@ -126,7 +126,7 @@
                         {{ apt.typeLabel }}
                       </span>
                       @if (apt.locationMode === 'REMOTE') {
-                        <span class="text-lg ml-2" title="Téléconsultation">🎥</span>
+                        <span class="text-lg ml-2" [attr.title]="prefs.translate('PRACTITIONER.DASHBOARD.TELECONSULTATION')">🎥</span>
                       }
                     </div>
                     @if (apt.description) {
@@ -137,36 +137,36 @@
                   <div class="apt-actions">
                     @if (apt.status === 'COMPLETED') {
                       <span class="status-badge status-completed">
-                        <span class="badge-icon">✓</span> Honoré
+                        <span class="badge-icon">✓</span> {{ prefs.translate('PRACTITIONER.DASHBOARD.HONORED') }}
                       </span>
                     } @else if (apt.status === 'NO_SHOW') {
                       <span class="status-badge status-noshow">
-                        <span class="badge-icon">⚠️</span> Absent
+                        <span class="badge-icon">⚠️</span> {{ prefs.translate('PRACTITIONER.DASHBOARD.ABSENT') }}
                       </span>
                     } @else if (apt.status === 'CANCELLED') {
-                      <span class="status-badge status-cancelled">Annulé</span>
+                      <span class="status-badge status-cancelled">{{ prefs.translate('PRACTITIONER.DASHBOARD.CANCELLED') }}</span>
                     } @else {
                       <button
                         type="button"
                         class="btn-action btn-honored"
                         (click)="markAsCompleted(apt.id)"
-                        title="Marquer comme Honoré"
+                        [attr.title]="prefs.translate('PRACTITIONER.DASHBOARD.MARK_HONORED')"
                       >
                         <svg class="size-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                         </svg>
-                        <span>Honoré</span>
+                        <span>{{ prefs.translate('PRACTITIONER.DASHBOARD.HONORED') }}</span>
                       </button>
                       <button
                         type="button"
                         class="btn-action btn-absent"
                         (click)="markAsNoShow(apt.id)"
-                        title="Marquer comme Absent"
+                        [attr.title]="prefs.translate('PRACTITIONER.DASHBOARD.MARK_ABSENT')"
                       >
                         <svg class="size-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                         </svg>
-                        <span>Absent</span>
+                        <span>{{ prefs.translate('PRACTITIONER.DASHBOARD.ABSENT') }}</span>
                       </button>
                     }
                   </div>
@@ -182,15 +182,15 @@
         <div class="stats-mini-grid">
           <div class="stat-card">
             <span class="stat-value">{{ users.length }}</span>
-            <span class="stat-label">{{ prefs.translate('cabinet.management.stat.users') }}</span>
+            <span class="stat-label">{{ prefs.translate('PRACTITIONER.DASHBOARD.USERS') }}</span>
           </div>
           <div class="stat-card">
             <span class="stat-value">{{ countByRole('PRATICIEN') }}</span>
-            <span class="stat-label">{{ prefs.translate('cabinet.management.stat.practitioners') }}</span>
+            <span class="stat-label">{{ prefs.translate('PRACTITIONER.DASHBOARD.PRACTITIONERS') }}</span>
           </div>
           <div class="stat-card">
             <span class="stat-value">{{ countByRole('ASSISTANT') }}</span>
-            <span class="stat-label">{{ prefs.translate('cabinet.management.stat.assistants') }}</span>
+            <span class="stat-label">{{ prefs.translate('PRACTITIONER.DASHBOARD.ASSISTANTS') }}</span>
           </div>
         </div>
       </div>

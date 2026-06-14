@@ -1,0 +1,18 @@
+{
+  "ASSISTANT.DASHBOARD.TITLE": "Appointment requests",
+  "ASSISTANT.DASHBOARD.SUBTITLE": "Handle pending requests for your practice.",
+  "ASSISTANT.PENDING.SECTION": "Requests to process",
+  "ASSISTANT.PENDING.REFRESH": "Refresh",
+  "ASSISTANT.PENDING.PROCESSING": "Processing...",
+  "ASSISTANT.PENDING.LOAD_ERROR": "Unable to load pending requests.",
+  "ASSISTANT.PENDING.EMPTY": "No pending requests",
+  "ASSISTANT.PENDING.EMPTY_HINT": "New requests will appear here as soon as they are submitted.",
+  "ASSISTANT.PENDING.DATE": "Date",
+  "ASSISTANT.PENDING.REASON": "Reason",
+  "ASSISTANT.PENDING.DOCTOR": "Doctor",
+  "ASSISTANT.PENDING.UNKNOWN_PATIENT": "Unknown patient",
+  "ASSISTANT.PENDING.CONFIRM": "Confirm",
+  "ASSISTANT.PENDING.CANCEL_MOVE": "Cancel / move",
+  "ASSISTANT.PENDING.ERROR": "Unable to update the request.",
+  "ASSISTANT.PENDING.REMOTE": "Teleconsultation"
+}

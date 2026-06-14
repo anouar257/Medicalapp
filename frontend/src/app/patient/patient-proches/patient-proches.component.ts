@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { ProcheService } from '../../services/proche.service';
 import { AuthService } from '../../services/auth.service';
+import { PreferencesService } from '../../services/preferences.service';
 import { Proche } from '../../models/proche.model';
 import { formatHttpError } from '../../utils/http-error-message';
 
@@ -27,6 +28,7 @@ export class PatientProchesComponent implements OnInit {
   formData: Proche = this.emptyProche();
 
   private readonly destroyRef = inject(DestroyRef);
+  readonly prefs = inject(PreferencesService);
 
   constructor(
     private procheService: ProcheService,
@@ -56,8 +58,8 @@ export class PatientProchesComponent implements OnInit {
           this.loadingList = false;
           const fallback =
             e?.status === 404
-              ? 'Impossible de charger vos proches. Si vous avez vidé la base de données, déconnectez-vous et reconnectez-vous.'
-              : "Service indisponible. Vérifiez que le microservice patient-service est démarré.";
+              ? `${this.prefs.translate('PATIENT.RELATIVES.ERROR_LOAD')} ${this.prefs.translate('PATIENT.RELATIVES.SERVICE_HINT')}`
+              : this.prefs.translate('PATIENT.RELATIVES.SERVICE_HINT');
           this.errorMessage = formatHttpError(e, fallback);
         },
       });
@@ -99,13 +101,13 @@ export class PatientProchesComponent implements OnInit {
     action$.subscribe({
       next: () => {
         this.loading = false;
-        this.successMessage = this.editingId ? 'Proche modifié' : 'Proche ajouté';
+        this.successMessage = this.editingId ? this.prefs.translate('PATIENT.RELATIVES.SUCCESS_UPDATED') : this.prefs.translate('PATIENT.RELATIVES.SUCCESS_ADDED');
         this.loadProches();
         setTimeout(() => this.resetForm(), 1500);
       },
       error: (e) => {
         this.loading = false;
-        this.errorMessage = formatHttpError(e, 'Erreur');
+        this.errorMessage = formatHttpError(e, this.prefs.translate('COMMON.ERROR'));
       },
     });
   }
@@ -141,11 +143,11 @@ export class PatientProchesComponent implements OnInit {
   }
 
   deleteProche(id: number) {
-    if (!confirm('Supprimer ce proche ?')) return;
+    if (!confirm(this.prefs.translate('PATIENT.RELATIVES.DELETE_CONFIRM'))) return;
     this.procheService.deleteProche(id).subscribe({
       next: () => this.loadProches(),
       error: (e) => {
-        this.errorMessage = formatHttpError(e, 'Erreur');
+        this.errorMessage = formatHttpError(e, this.prefs.translate('COMMON.ERROR'));
       },
     });
   }

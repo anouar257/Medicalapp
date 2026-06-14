@@ -10,15 +10,15 @@
           <svg class="size-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
-          {{ prefs.translate('cabinet.doctors.backToCabinet') }}
+          {{ prefs.translate('PRACTITIONER.DOCTORS.BACK_TO_CABINET') }}
         </a>
 
         <div class="min-w-0 flex-1">
           <p class="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
-            {{ prefs.translate('cabinet.doctors.kicker') }}
+            {{ prefs.translate('PRACTITIONER.DOCTORS.KICKER') }}
           </p>
           <h1 class="truncate text-lg font-semibold tracking-tight text-slate-900 dark:text-slate-100 md:text-xl">
-            {{ prefs.translate('cabinet.doctors.title') }}
+            {{ prefs.translate('PRACTITIONER.DOCTORS.TITLE') }}
           </h1>
         </div>
 
@@ -26,7 +26,7 @@
           type="button"
           class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-700 transition hover:bg-slate-100 dark:border-slate-600 dark:bg-slate-800 dark:text-amber-300 dark:hover:bg-slate-700/80"
           [attr.aria-pressed]="theme.isDark()"
-          aria-label="Basculer mode clair ou sombre"
+          [attr.aria-label]="prefs.translate('COMMON.THEME')"
           (click)="theme.toggle()"
         >
           @if (theme.isDark()) {
@@ -47,38 +47,37 @@
           class="rounded-xl border border-slate-200/90 bg-white p-5 shadow-sm dark:border-slate-700/80 dark:bg-slate-900 sm:p-6"
         >
           <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100">
-            {{ editingId() ? 'Modifier le médecin' : 'Nouveau médecin' }}
+            {{ editingId() ? prefs.translate('PRACTITIONER.DOCTORS.EDIT_TITLE') : prefs.translate('PRACTITIONER.DOCTORS.NEW_TITLE') }}
           </h2>
           <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Nom obligatoire. Photo : <strong>upload</strong> (recommandé, stocké sur le serveur) ou URL manuelle. Couleur hex
-            (ex. <code class="text-slate-600 dark:text-slate-300">#3b82f6</code>) — vide = défaut serveur.
+            {{ prefs.translate('PRACTITIONER.DOCTORS.HELP_TEXT') }}
           </p>
 
           <div class="mt-4 grid gap-3 sm:grid-cols-2">
             <label class="flex flex-col gap-1 text-sm">
-              <span class="font-medium text-slate-700 dark:text-slate-300">Nom *</span>
+              <span class="font-medium text-slate-700 dark:text-slate-300">{{ prefs.translate('PRACTITIONER.DOCTORS.NAME') }} *</span>
               <input
                 type="text"
                 class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-slate-900 shadow-sm outline-none ring-sky-500/30 focus:ring-2 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
                 [value]="formName()"
                 (input)="formName.set($any($event.target).value)"
-                placeholder="Dr. …"
+                [attr.placeholder]="prefs.translate('PRACTITIONER.DOCTORS.NAME_PLACEHOLDER')"
                 autocomplete="off"
               />
             </label>
             <label class="flex flex-col gap-1 text-sm sm:col-span-2">
-              <span class="font-medium text-slate-700 dark:text-slate-300">Spécialité</span>
+              <span class="font-medium text-slate-700 dark:text-slate-300">{{ prefs.translate('PRACTITIONER.DOCTORS.SPECIALTY') }}</span>
               <input
                 type="text"
                 class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-slate-900 shadow-sm outline-none ring-sky-500/30 focus:ring-2 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
                 [value]="formSpecialty()"
                 (input)="formSpecialty.set($any($event.target).value)"
-                placeholder="Ex. Médecine générale, Cardiologie…"
+                [attr.placeholder]="prefs.translate('PRACTITIONER.DOCTORS.SPECIALTY_PLACEHOLDER')"
                 autocomplete="off"
               />
             </label>
             <div class="flex flex-col gap-2 text-sm">
-              <span class="font-medium text-slate-700 dark:text-slate-300">Couleur</span>
+              <span class="font-medium text-slate-700 dark:text-slate-300">{{ prefs.translate('PRACTITIONER.DOCTORS.COLOR') }}</span>
               <div class="flex flex-wrap items-center gap-2">
                 @for (c of predefinedColors; track c) {
                   <button
@@ -89,7 +88,7 @@
                     [class.scale-110]="formColor() === c"
                     [style.backgroundColor]="c"
                     (click)="formColor.set(c)"
-                    [attr.aria-label]="'Choisir la couleur ' + c"
+                    [attr.aria-label]="prefs.translate('PRACTITIONER.DOCTORS.PICK_ANOTHER_COLOR') + ' ' + c"
                   ></button>
                 }
                 <div class="relative flex size-8 cursor-pointer items-center justify-center rounded-full border border-slate-200 bg-white shadow-sm transition hover:scale-110 focus-within:ring-2 focus-within:ring-slate-400 focus-within:ring-offset-2 dark:border-slate-600 dark:bg-slate-800 dark:focus-within:ring-offset-slate-900">
@@ -98,7 +97,7 @@
                     class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                     [value]="formColor() || '#64748b'"
                     (input)="formColor.set($any($event.target).value)"
-                    title="Choisir une autre couleur"
+                    [attr.title]="prefs.translate('PRACTITIONER.DOCTORS.PICK_ANOTHER_COLOR')"
                   />
                   <svg class="size-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
@@ -107,7 +106,7 @@
               </div>
             </div>
             <div class="flex flex-col gap-2 text-sm sm:col-span-2">
-              <span class="font-medium text-slate-700 dark:text-slate-300">Photo du médecin</span>
+              <span class="font-medium text-slate-700 dark:text-slate-300">{{ prefs.translate('PRACTITIONER.DOCTORS.PHOTO') }}</span>
               <div class="flex flex-wrap items-center gap-3">
                 <input
                   #photoFile
@@ -118,26 +117,25 @@
                 />
                 @if (pendingFile()) {
                   <span class="text-xs font-medium text-emerald-600 dark:text-emerald-400">
-                    → {{ pendingFile()!.name }} (enregistrement au submit)
+                    → {{ pendingFile()!.name }} ({{ prefs.translate('PRACTITIONER.DOCTORS.PENDING_FILE_HINT') }})
                   </span>
                 }
               </div>
               <label class="flex flex-col gap-1">
                 <span class="text-xs font-medium text-slate-600 dark:text-slate-400"
-                  >Ou URL (optionnel — ex. <code class="rounded bg-slate-100 px-1 dark:bg-slate-800">/assets/doctors/nom.jpg</code>)</span
+                  >{{ prefs.translate('PRACTITIONER.DOCTORS.PHOTO_URL_HELP') }} <code class="rounded bg-slate-100 px-1 dark:bg-slate-800">/assets/doctors/nom.jpg</code></span
                 >
                 <input
                   type="text"
                   class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm outline-none ring-sky-500/30 focus:ring-2 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
                   [value]="formPhoto()"
                   (input)="formPhoto.set($any($event.target).value)"
-                  placeholder="Laisser vide si vous uploadez un fichier"
+                  [attr.placeholder]="prefs.translate('PRACTITIONER.DOCTORS.PHOTO_URL_HINT')"
                   autocomplete="off"
                 />
               </label>
               <p class="text-xs text-slate-500 dark:text-slate-400">
-                L’upload enregistre le fichier sur le serveur (répertoire configurable) et met l’URL en base — pas besoin de copier
-                manuellement dans <code class="rounded bg-slate-100 px-1 dark:bg-slate-800">public/</code>.
+                {{ prefs.translate('PRACTITIONER.DOCTORS.PHOTO_UPLOAD_NOTE') }}
               </p>
             </div>
           </div>
@@ -149,7 +147,7 @@
               [disabled]="saving() || !formName().trim()"
               (click)="submit()"
             >
-              {{ saving() ? 'Enregistrement…' : 'Enregistrer' }}
+              {{ saving() ? prefs.translate('COMMON.SAVING') : prefs.translate('PRACTITIONER.DOCTORS.SAVE') }}
             </button>
             @if (editingId()) {
               <button
@@ -158,7 +156,7 @@
                 [disabled]="saving()"
                 (click)="cancelEdit()"
               >
-                Annuler
+              {{ prefs.translate('PRACTITIONER.DOCTORS.CANCEL') }}
               </button>
             }
           </div>
@@ -171,9 +169,9 @@
           class="overflow-hidden rounded-xl border border-slate-200/90 bg-white shadow-sm dark:border-slate-700/80 dark:bg-slate-900"
         >
           <div class="border-b border-slate-100 px-5 py-4 dark:border-slate-700/80">
-            <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100">Liste des médecins</h2>
+            <h2 class="text-sm font-semibold text-slate-900 dark:text-slate-100">{{ prefs.translate('PRACTITIONER.DOCTORS.LIST_TITLE') }}</h2>
             <p class="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
-              Un médecin avec au moins un RDV ne peut pas être supprimé tant que ces RDV existent.
+              {{ prefs.translate('PRACTITIONER.DOCTORS.DELETE_GUARD') }}
             </p>
           </div>
 
@@ -189,22 +187,22 @@
           @if (doctors$ | async; as doctors) {
             @if (doctors.length === 0) {
               <p class="px-5 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
-                Aucun médecin — vérifiez que l’API tourne sur le port 8081.
+                {{ prefs.translate('PRACTITIONER.DOCTORS.EMPTY') }}
               </p>
             } @else {
               <div class="overflow-x-auto">
                 <table class="w-full min-w-[36rem] text-left text-sm">
-                  <caption class="sr-only">Liste des médecins du cabinet</caption>
+                  <caption class="sr-only">{{ prefs.translate('PRACTITIONER.DOCTORS.CAPTION') }}</caption>
                   <thead
                     class="border-b border-slate-100 bg-slate-50/80 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:border-slate-700/80 dark:bg-slate-800/50 dark:text-slate-400"
                   >
                     <tr>
-                      <th class="px-5 py-3">Photo</th>
-                      <th class="px-5 py-3">Couleur</th>
-                      <th class="px-5 py-3">Nom</th>
-                      <th class="px-5 py-3">Spécialité</th>
-                      <th class="px-5 py-3 text-right tabular-nums">RDV</th>
-                      <th class="px-5 py-3 text-right">Actions</th>
+                      <th class="px-5 py-3">{{ prefs.translate('PRACTITIONER.DOCTORS.PHOTO') }}</th>
+                      <th class="px-5 py-3">{{ prefs.translate('PRACTITIONER.DOCTORS.COLOR') }}</th>
+                      <th class="px-5 py-3">{{ prefs.translate('PRACTITIONER.DOCTORS.NAME_LABEL') }}</th>
+                      <th class="px-5 py-3">{{ prefs.translate('PRACTITIONER.DOCTORS.SPECIALTY') }}</th>
+                      <th class="px-5 py-3 text-right tabular-nums">{{ prefs.translate('PRACTITIONER.DOCTORS.APPOINTMENTS') }}</th>
+                      <th class="px-5 py-3 text-right">{{ prefs.translate('PRACTITIONER.DOCTORS.ACTIONS') }}</th>
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-slate-100 dark:divide-slate-700/60">
@@ -249,7 +247,7 @@
                               class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
                               (click)="startEdit(d)"
                             >
-                              Modifier
+                              {{ prefs.translate('PRACTITIONER.DOCTORS.MODIFY') }}
                             </button>
                             <button
                               type="button"
@@ -258,15 +256,13 @@
                               [attr.title]="
                                 (d.appointmentCount ?? 0) > 0
                                   ? (d.appointmentCount === 1
-                                      ? 'Supprimez ou déplacez d’abord le rendez-vous lié.'
-                                      : 'Supprimez ou déplacez d’abord les ' +
-                                        d.appointmentCount +
-                                        ' rendez-vous liés.')
+                                      ? prefs.translate('PRACTITIONER.DOCTORS.DOCTOR_RULE')
+                                      : prefs.translate('PRACTITIONER.DOCTORS.DOCTOR_RULE_PLURAL').replace('{count}', '' + d.appointmentCount))
                                   : null
                               "
                               (click)="remove(d)"
                             >
-                              {{ deletingId() === d.id ? '…' : 'Supprimer' }}
+                              {{ deletingId() === d.id ? '…' : prefs.translate('PRACTITIONER.DOCTORS.DELETE') }}
                             </button>
                           </div>
                         </td>

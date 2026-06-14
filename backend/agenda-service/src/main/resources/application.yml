@@ -23,8 +23,8 @@ spring:
 
 # JWT patient + pro (alignés sur patient-service / practitioner-service).
 jwt:
-  patient-secret: ${JWT_SECRET:MEDICAl-PATIENT-SERVICE-JWT-SECRET-KEY-256-BITS-CHANGE-IN-PROD-0123456789}
-  pro-secret: ${JWT_PRO_SECRET:MEDICAL-PRACTITIONER-SERVICE-JWT-SECRET-KEY-256-BITS-CHANGE-IN-PROD-9876543210}
+  patient-secret: ${JWT_SECRET}
+  pro-secret: ${JWT_PRO_SECRET}
 
 # Appels inter-services (agrégats administration plateforme, messaging).
 integration:

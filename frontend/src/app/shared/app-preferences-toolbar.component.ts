@@ -44,7 +44,7 @@ import type { AppLanguage, ZoomLevel } from '../services/preferences.service';
         type="button"
         (click)="theme.toggle()"
         class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/80 bg-white/80 text-slate-700 transition duration-300 hover:scale-105 dark:border-slate-700 dark:bg-slate-900/80 dark:text-amber-300"
-        [attr.aria-label]="prefs.translate('Thème')"
+        [attr.aria-label]="prefs.translate('COMMON.TOGGLE_THEME')"
       >
         @if (theme.isDark()) {
           <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

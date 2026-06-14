@@ -1,0 +1,18 @@
+{
+  "PRACTITIONER": {
+    "DASHBOARD": {
+      "PAGE_SUBTITLE": "Track practice activity and manage today's appointments."
+    },
+    "DIPLOMAS": {
+      "DELETE_CONFIRM": "Delete \"{title}\"?"
+    },
+    "DOCTORS": {
+      "DELETE_BLOCKED": "\"{name}\" still has {count} appointments in the database: delete or move those appointments from the schedule before deleting the doctor.",
+      "DELETE_CONFIRM": "Delete \"{name}\"?",
+      "NAME_PLACEHOLDER": "Dr.",
+      "PHOTO_UPLOAD_NOTE": "Uploading saves the file on the server (configurable directory) and stores the URL in the database; no need to copy it manually into public/.",
+      "PHOTO_URL_HELP": "Or URL (optional, e.g.",
+      "SPECIALTY_PLACEHOLDER": "e.g. General medicine, Cardiology"
+    }
+  }
+}

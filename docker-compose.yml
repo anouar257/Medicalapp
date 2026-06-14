@@ -31,6 +31,8 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=odoo
       - PRACTITIONER_BASE_URL=http://practitioner-service:8083
+      - JWT_SECRET=${JWT_SECRET:-changeme-patient-jwt-secret-256bit-min}
+      - JWT_PRO_SECRET=${JWT_PRO_SECRET:-changeme-pro-jwt-secret-256bit-min}
     depends_on:
       - postgres-db
     volumes:
@@ -52,6 +54,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/patient_medical
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=odoo
+      - JWT_SECRET=${JWT_SECRET:-changeme-patient-jwt-secret-256bit-min}
     depends_on:
       - postgres-db
     networks:
@@ -73,6 +76,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=odoo
       - PATIENT_BASE_URL=http://patient-service:8082
       - AGENDA_BASE_URL=http://agenda-service:8081
+      - JWT_PRO_SECRET=${JWT_PRO_SECRET:-changeme-pro-jwt-secret-256bit-min}
     depends_on:
       - postgres-db
     volumes:
@@ -97,6 +101,8 @@ services:
       - AGENDA_BASE_URL=http://agenda-service:8081
       - PATIENT_BASE_URL=http://patient-service:8082
       - PRACTITIONER_BASE_URL=http://practitioner-service:8083
+      - JWT_SECRET=${JWT_SECRET:-changeme-patient-jwt-secret-256bit-min}
+      - JWT_PRO_SECRET=${JWT_PRO_SECRET:-changeme-pro-jwt-secret-256bit-min}
     depends_on:
       - postgres-db
     networks:
@@ -117,6 +123,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=odoo
       - AGENDA_BASE_URL=http://agenda-service:8081
+      - JWT_PRO_SECRET=${JWT_PRO_SECRET:-changeme-pro-jwt-secret-256bit-min}
     depends_on:
       - postgres-db
     networks:

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { PreferencesService } from '../../services/preferences.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AppNavbarComponent } from '../../shared/app-navbar.component';
 
@@ -14,6 +15,7 @@ import { AppNavbarComponent } from '../../shared/app-navbar.component';
   styleUrls: ['./reset-password.component.scss'],
 })
 export class ResetPasswordComponent implements OnInit {
+  readonly prefs = inject(PreferencesService);
   token = '';
   password = '';
   confirm = '';
@@ -33,16 +35,16 @@ export class ResetPasswordComponent implements OnInit {
 
   onSubmit() {
     this.err = '';
-    if (this.password !== this.confirm) { this.err = 'Les mots de passe ne correspondent pas'; return; }
-    if (this.password.length < 8) { this.err = 'Minimum 8 caractères'; return; }
+    if (this.password !== this.confirm) { this.err = this.prefs.translate('AUTH.RESET.PASSWORD_MISMATCH'); return; }
+    if (this.password.length < 8) { this.err = this.prefs.translate('AUTH.RESET.PASSWORD_MIN'); return; }
     this.loading = true;
     this.authService.resetPassword({ token: this.token, nouveauMotDePasse: this.password }).subscribe({
       next: () => {
         this.loading = false;
-        this.success = 'Mot de passe réinitialisé !';
+        this.success = this.prefs.translate('AUTH.RESET.SUCCESS');
         setTimeout(() => this.router.navigate(['/auth/login']), 2000);
       },
-      error: e => { this.loading = false; this.err = e.error?.error || 'Erreur'; }
+      error: e => { this.loading = false; this.err = e.error?.error || this.prefs.translate('AUTH.RESET.ERROR'); }
     });
   }
 }

@@ -89,14 +89,14 @@ export class CabinetDashboardComponent {
           this.cabinet = null;
           this.users = [];
           this.loading = false;
-          this.errorMessage = 'cabinet.management.noOrganization';
+          this.errorMessage = 'PRACTITIONER.DASHBOARD.NO_ORGANIZATION';
           return;
         }
         if (r.kind === 'error') {
           this.cabinet = null;
           this.users = [];
           this.loading = false;
-          this.errorMessage = 'cabinet.management.loadCabinetError';
+          this.errorMessage = 'PRACTITIONER.DASHBOARD.LOAD_ERROR';
           return;
         }
         this.cabinet = r.cabinet;

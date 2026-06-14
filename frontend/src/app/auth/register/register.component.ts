@@ -44,14 +44,14 @@ export class RegisterComponent {
       next: (res) => {
         this.loading = false;
         if (res.exists) {
-          this.errorMessage = this.prefs.translate('auth.register.errExists');
+          this.errorMessage = this.prefs.translate('AUTH.REGISTER.ERR_EXISTS');
         } else {
           this.step = 2;
         }
       },
       error: () => {
         this.loading = false;
-        this.errorMessage = this.prefs.translate('auth.register.errCheck');
+        this.errorMessage = this.prefs.translate('AUTH.REGISTER.ERR_CHECK');
       }
     });
   }
@@ -59,11 +59,11 @@ export class RegisterComponent {
   goToStep3(): void {
     this.errorMessage = '';
     if (this.registerData.motDePasse !== this.confirmPassword) {
-      this.errorMessage = this.prefs.translate('auth.register.errPasswordMatch');
+      this.errorMessage = this.prefs.translate('AUTH.REGISTER.ERR_PASSWORD_MATCH');
       return;
     }
     if (this.registerData.motDePasse.length < 8) {
-      this.errorMessage = this.prefs.translate('auth.register.errPasswordLength');
+      this.errorMessage = this.prefs.translate('AUTH.REGISTER.ERR_PASSWORD_LENGTH');
       return;
     }
     this.step = 3;
@@ -76,7 +76,7 @@ export class RegisterComponent {
     this.authService.register(this.registerData).subscribe({
       next: (res) => {
         this.loading = false;
-        this.successMessage = this.prefs.translate('auth.register.success');
+        this.successMessage = this.prefs.translate('AUTH.REGISTER.SUCCESS');
         setTimeout(() => {
           this.router.navigate(['/auth/verify-otp'], {
             queryParams: {
@@ -88,7 +88,7 @@ export class RegisterComponent {
       },
       error: (err) => {
         this.loading = false;
-        this.errorMessage = err.error?.error || this.prefs.translate('auth.register.errRegister');
+        this.errorMessage = err.error?.error || this.prefs.translate('AUTH.REGISTER.ERR_REGISTER');
       }
     });
   }

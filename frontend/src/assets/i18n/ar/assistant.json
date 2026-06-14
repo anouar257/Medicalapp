@@ -1,0 +1,18 @@
+{
+  "ASSISTANT.DASHBOARD.TITLE": "طلبات المواعيد",
+  "ASSISTANT.DASHBOARD.SUBTITLE": "تعامل مع الطلبات المعلقة الخاصة بعيادتك.",
+  "ASSISTANT.PENDING.SECTION": "الطلبات المطلوب معالجتها",
+  "ASSISTANT.PENDING.REFRESH": "تحديث",
+  "ASSISTANT.PENDING.PROCESSING": "جارٍ المعالجة...",
+  "ASSISTANT.PENDING.LOAD_ERROR": "تعذر تحميل الطلبات المعلقة.",
+  "ASSISTANT.PENDING.EMPTY": "لا توجد طلبات معلقة",
+  "ASSISTANT.PENDING.EMPTY_HINT": "ستظهر الطلبات الجديدة هنا فور إرسالها.",
+  "ASSISTANT.PENDING.DATE": "التاريخ",
+  "ASSISTANT.PENDING.REASON": "السبب",
+  "ASSISTANT.PENDING.DOCTOR": "الطبيب",
+  "ASSISTANT.PENDING.UNKNOWN_PATIENT": "مريض غير معروف",
+  "ASSISTANT.PENDING.CONFIRM": "تأكيد",
+  "ASSISTANT.PENDING.CANCEL_MOVE": "إلغاء / نقل",
+  "ASSISTANT.PENDING.ERROR": "تعذر تحديث الطلب.",
+  "ASSISTANT.PENDING.REMOTE": "استشارة عن بُعد"
+}

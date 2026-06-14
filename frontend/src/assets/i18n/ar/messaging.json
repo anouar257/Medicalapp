@@ -1,0 +1,33 @@
+{
+  "MESSAGING": {
+    "CABINET": {
+      "PAGE_TITLE": "صندوق الوارد",
+      "SUBTITLE": "رسائل المرضى.",
+      "NO_PROFILE": "ملف الطبيب غير متاح للرسائل.",
+      "VERIFY_PROFILE": "يرجى التحقق من ملف الطبيب.",
+      "DISCUSSIONS": "المحادثات",
+      "NO_ACTIVE_DISCUSSION": "لا توجد محادثة نشطة",
+      "YOUR_MESSAGES": "رسائلك",
+      "SELECT_CONVERSATION_HINT": "اختر محادثة من اللوحة الجانبية أو ابدأ محادثة جديدة مع مريض.",
+      "ATTACHMENT": "مرفق",
+      "CLICK_TO_DOWNLOAD": "انقر للتنزيل",
+      "DOWNLOAD": "تنزيل",
+      "REMOVE": "إزالة",
+      "ATTACH_DOCUMENT": "إرفاق مستند أو صورة",
+      "WRITE_MESSAGE_PLACEHOLDER": "اكتب رسالة...",
+      "SEND": "إرسال",
+      "ENTER_TO_SEND_HINT": "اضغط Enter للإرسال، وShift+Enter لسطر جديد.",
+      "CONCERNED_PERSON": "الشخص المعني",
+      "ADD_FILE": "إرفاق مستند أو صورة",
+      "CLICK_DOWNLOAD": "انقر للتنزيل",
+      "CONCERNING": "الشخص المعني",
+      "ENTER_HINT": "اضغط Enter للإرسال، وShift+Enter لسطر جديد.",
+      "MY_MESSAGES": "رسائلك",
+      "NO_ACTIVE": "لا توجد محادثة نشطة",
+      "RETRIEVE": "إزالة",
+      "SELECT_THREAD": "اختر محادثة من اللوحة الجانبية أو ابدأ محادثة جديدة مع مريض.",
+      "WRITE_MESSAGE": "اكتب رسالة...",
+      "ERROR": "حدث خطأ"
+    }
+  }
+}

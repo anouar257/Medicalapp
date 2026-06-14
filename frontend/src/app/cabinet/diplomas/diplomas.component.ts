@@ -6,6 +6,7 @@ import { of, take } from 'rxjs';
 import { catchError, distinctUntilChanged, map, switchMap } from 'rxjs/operators';
 import { PractitionerService } from '../../services/practitioner.service';
 import { AuthProService } from '../../services/auth-pro.service';
+import { PreferencesService } from '../../services/preferences.service';
 import { DiplomaDTO, DiplomaType, PractitionerProfileDTO } from '../../models/practitioner.model';
 
 /**
@@ -20,6 +21,7 @@ import { DiplomaDTO, DiplomaType, PractitionerProfileDTO } from '../../models/pr
   styleUrls: ['./diplomas.component.scss'],
 })
 export class DiplomasComponent {
+  readonly prefs = inject(PreferencesService);
   practitionerId: number | null = null;
   diplomas: DiplomaDTO[] = [];
   editing: DiplomaDTO | null = null;
@@ -51,7 +53,7 @@ export class DiplomasComponent {
       .subscribe((id) => {
         this.practitionerId = id;
         if (id == null) {
-          this.errorMessage = 'Profil praticien introuvable.';
+          this.errorMessage = this.prefs.translate('PRACTITIONER.DIPLOMAS.ERROR_PROFILE_MISSING');
           this.diplomas = [];
           return;
         }
@@ -67,7 +69,7 @@ export class DiplomasComponent {
       .pipe(take(1))
       .subscribe({
         next: (d) => (this.diplomas = d),
-        error: (e) => (this.errorMessage = e.error?.error || 'Erreur de chargement'),
+        error: (e) => (this.errorMessage = e.error?.error || this.prefs.translate('PRACTITIONER.DIPLOMAS.ERROR_LOADING')),
       });
   }
 
@@ -92,7 +94,7 @@ export class DiplomasComponent {
   save() {
     if (!this.editing || !this.practitionerId) return;
     if (!this.editing.intitule?.trim()) {
-      this.editingError = "L'intitulé est obligatoire";
+      this.editingError = this.prefs.translate('PRACTITIONER.DIPLOMAS.TITLE_REQUIRED');
       return;
     }
     this.saving = true;
@@ -103,40 +105,40 @@ export class DiplomasComponent {
       next: () => {
         this.saving = false;
         this.editing = null;
-        this.successMessage = 'Enregistré';
+        this.successMessage = this.prefs.translate('PRACTITIONER.DIPLOMAS.SUCCESS_SAVED');
         this.refresh();
         setTimeout(() => (this.successMessage = ''), 3000);
       },
       error: (e) => {
         this.saving = false;
-        this.editingError = e.error?.error || "Erreur d'enregistrement";
+        this.editingError = e.error?.error || this.prefs.translate('PRACTITIONER.DIPLOMAS.ERROR_SAVE');
       },
     });
   }
 
   remove(d: DiplomaDTO) {
     if (!d.id) return;
-    if (!confirm(`Supprimer « ${d.intitule} » ?`)) return;
+    if (!confirm(this.prefs.translate('PRACTITIONER.DIPLOMAS.DELETE_CONFIRM').replace('{title}', d.intitule))) return;
     this.practitionerService.deleteDiploma(d.id).subscribe({
       next: () => {
-        this.successMessage = 'Supprimé';
+        this.successMessage = this.prefs.translate('PRACTITIONER.DIPLOMAS.SUCCESS_DELETED');
         this.refresh();
         setTimeout(() => (this.successMessage = ''), 3000);
       },
-      error: (e) => (this.errorMessage = e.error?.error || 'Erreur'),
+      error: (e) => (this.errorMessage = e.error?.error || this.prefs.translate('PRACTITIONER.DIPLOMAS.ERROR_DELETE')),
     });
   }
 
   typeLabel(t: DiplomaType): string {
     switch (t) {
       case 'DIPLOME':
-        return 'Diplôme';
+        return this.prefs.translate('PRACTITIONER.DIPLOMAS.DIPLOMA');
       case 'CERTIFICATION':
-        return 'Certification';
+        return this.prefs.translate('PRACTITIONER.DIPLOMAS.CERTIFICATION');
       case 'CONFERENCE':
-        return 'Conférence';
+        return this.prefs.translate('PRACTITIONER.DIPLOMAS.CONFERENCE');
       case 'FORMATION':
-        return 'Formation';
+        return this.prefs.translate('PRACTITIONER.DIPLOMAS.TRAINING');
     }
   }
 }

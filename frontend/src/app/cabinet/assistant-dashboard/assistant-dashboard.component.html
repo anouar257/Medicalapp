@@ -5,10 +5,10 @@
     <div class="absolute inset-0 bg-gradient-to-br from-sky-500/10 via-transparent to-indigo-500/10 pointer-events-none"></div>
     <div class="relative z-10 space-y-2">
       <h1 class="text-3xl font-extrabold tracking-tight">
-        {{ prefs.translate('assistant.dashboard.title') }}
+        {{ prefs.translate('ASSISTANT.DASHBOARD.TITLE') }}
       </h1>
       <p class="text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
-        {{ prefs.translate('assistant.dashboard.subtitle') }}
+        {{ prefs.translate('ASSISTANT.DASHBOARD.SUBTITLE') }}
       </p>
     </div>
   </div>
@@ -34,7 +34,7 @@
     <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
       <div>
         <h2 class="text-xl font-bold text-slate-900 dark:text-white">
-          {{ prefs.translate('assistant.pending.section') }}
+          {{ prefs.translate('ASSISTANT.PENDING.SECTION') }}
         </h2>
       </div>
       <button
@@ -43,7 +43,7 @@
         [disabled]="loading"
         class="inline-flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-600 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition disabled:opacity-50"
       >
-        {{ loading ? prefs.translate('assistant.pending.processing') : '↻' }}
+        {{ loading ? prefs.translate('ASSISTANT.PENDING.PROCESSING') : '↻' }}
       </button>
     </div>
 
@@ -59,7 +59,7 @@
           </div>
         }
         <p class="text-center text-sm text-slate-500 dark:text-slate-400 pt-2">
-          {{ prefs.translate('common.loadingData') }}
+          {{ prefs.translate('COMMON.LOADING_DATA') }}
         </p>
       </div>
     } @else if (pending.length === 0) {
@@ -67,10 +67,10 @@
         class="text-center py-16 px-4 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/30"
       >
         <p class="text-lg font-semibold text-slate-800 dark:text-slate-100">
-          {{ prefs.translate('assistant.pending.empty') }}
+          {{ prefs.translate('ASSISTANT.PENDING.EMPTY') }}
         </p>
         <p class="mt-2 text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">
-          {{ prefs.translate('assistant.pending.emptyHint') }}
+          {{ prefs.translate('ASSISTANT.PENDING.EMPTY_HINT') }}
         </p>
       </div>
     } @else {
@@ -86,20 +86,20 @@
                 </span>
                 @if (row.locationMode === 'REMOTE') {
                   <span class="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-semibold text-emerald-700 bg-emerald-50 rounded-full dark:bg-emerald-500/10 dark:text-emerald-400">
-                    🎥 Téléconsultation
+                    🎥 {{ prefs.translate('ASSISTANT.PENDING.REMOTE') }}
                   </span>
                 }
               </div>
               <p class="text-sm text-slate-600 dark:text-slate-300">
-                <span class="font-semibold">{{ prefs.translate('assistant.pending.date') }}:</span>
+                <span class="font-semibold">{{ prefs.translate('ASSISTANT.PENDING.DATE') }}:</span>
                 {{ formatWhen(row.startTime) }}
               </p>
               <p class="text-sm text-slate-600 dark:text-slate-300">
-                <span class="font-semibold">{{ prefs.translate('assistant.pending.reason') }}:</span>
+                <span class="font-semibold">{{ prefs.translate('ASSISTANT.PENDING.REASON') }}:</span>
                 {{ reasonLabel(row) }}
               </p>
               <p class="text-xs text-slate-500 dark:text-slate-400">
-                {{ prefs.translate('assistant.pending.doctor') }}: {{ row.doctorName }} — {{ row.typeLabel }}
+                {{ prefs.translate('ASSISTANT.PENDING.DOCTOR') }}: {{ row.doctorName }} — {{ row.typeLabel }}
               </p>
             </div>
             <div class="flex flex-wrap gap-2 shrink-0">
@@ -109,7 +109,7 @@
                 [disabled]="busyId === row.id"
                 class="inline-flex items-center justify-center rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold px-4 py-2.5 shadow-lg shadow-emerald-600/20 transition disabled:opacity-60"
               >
-                {{ busyId === row.id ? prefs.translate('assistant.pending.processing') : prefs.translate('assistant.pending.confirm') }}
+                {{ busyId === row.id ? prefs.translate('ASSISTANT.PENDING.PROCESSING') : prefs.translate('ASSISTANT.PENDING.CONFIRM') }}
               </button>
               <button
                 type="button"
@@ -117,7 +117,7 @@
                 [disabled]="busyId === row.id"
                 class="inline-flex items-center justify-center rounded-xl border border-slate-300 dark:border-slate-600 bg-white/80 dark:bg-slate-900/60 text-slate-800 dark:text-slate-100 text-sm font-bold px-4 py-2.5 hover:bg-slate-100 dark:hover:bg-slate-800 transition disabled:opacity-60"
               >
-                {{ prefs.translate('assistant.pending.cancelMove') }}
+                {{ prefs.translate('ASSISTANT.PENDING.CANCEL_MOVE') }}
               </button>
             </div>
           </li>

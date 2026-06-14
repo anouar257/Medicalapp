@@ -36,10 +36,10 @@ export class RegisterPractitionerComponent implements OnInit {
   step = 1;
 
   stepsConfig: { num: number; label: string }[] = [
-    { num: 1, label: 'Email/Tél' },
-    { num: 2, label: 'Identité' },
-    { num: 3, label: 'Spécialités' },
-    { num: 4, label: 'Validation' },
+    { num: 1, label: 'AUTH.PRO.STEP_EMAIL' },
+    { num: 2, label: 'AUTH.PRO.STEP_IDENTITY' },
+    { num: 3, label: 'AUTH.PRO.STEP_SPECIALTIES' },
+    { num: 4, label: 'AUTH.PRO.STEP_VALIDATION' },
   ];
 
   data: RegisterPractitionerRequest = {
@@ -100,7 +100,7 @@ export class RegisterPractitionerComponent implements OnInit {
   checkExistence() {
     this.errorMessage = '';
     if (!this.data.email || !this.data.telephone) {
-      this.errorMessage = 'Email et téléphone obligatoires';
+      this.errorMessage = this.prefs.translate('AUTH.PRO.EMAIL_REQUIRED');
       return;
     }
     this.loading = true;
@@ -108,14 +108,14 @@ export class RegisterPractitionerComponent implements OnInit {
       next: (res) => {
         this.loading = false;
         if (res.exists) {
-          this.errorMessage = 'Un compte avec cet email ou ce téléphone existe déjà';
+          this.errorMessage = this.prefs.translate('AUTH.PRO.ACCOUNT_EXISTS');
         } else {
           this.step = 2;
         }
       },
       error: () => {
         this.loading = false;
-        this.errorMessage = 'Erreur de vérification';
+        this.errorMessage = this.prefs.translate('AUTH.PRO.CHECK_ERROR');
       },
     });
   }
@@ -123,7 +123,7 @@ export class RegisterPractitionerComponent implements OnInit {
   goToStep3() {
     this.errorMessage = '';
     if (!this.data.prenom || !this.data.nom || !this.data.sexe || !this.data.dateNaissance) {
-      this.errorMessage = 'Veuillez compléter tous les champs obligatoires';
+      this.errorMessage = this.prefs.translate('AUTH.PRO.COMPLETE_REQUIRED');
       return;
     }
     this.step = 3;
@@ -132,7 +132,7 @@ export class RegisterPractitionerComponent implements OnInit {
   goToStep4() {
     this.errorMessage = '';
     if (!this.data.specialiteIds || this.data.specialiteIds.length === 0) {
-      this.errorMessage = 'Veuillez sélectionner au moins une spécialité';
+      this.errorMessage = this.prefs.translate('AUTH.PRO.SELECT_SPECIALTY');
       return;
     }
     this.step = 4;
@@ -141,18 +141,18 @@ export class RegisterPractitionerComponent implements OnInit {
   onSubmit() {
     this.errorMessage = '';
     if (this.data.motDePasse !== this.confirmPassword) {
-      this.errorMessage = 'Les mots de passe ne correspondent pas';
+      this.errorMessage = this.prefs.translate('AUTH.PRO.PASSWORD_MISMATCH');
       return;
     }
     if (this.data.motDePasse.length < 8) {
-      this.errorMessage = 'Le mot de passe doit contenir au moins 8 caractères';
+      this.errorMessage = this.prefs.translate('AUTH.PRO.PASSWORD_MIN');
       return;
     }
     this.loading = true;
     this.authPro.registerPractitioner(this.data).subscribe({
       next: () => {
         this.loading = false;
-        this.successMessage = 'Compte praticien créé. Vérifiez votre email/SMS.';
+        this.successMessage = this.prefs.translate('AUTH.PRO.EMAIL_SMS_SUCCESS');
         setTimeout(() => {
           this.router.navigate(['/auth/verify-otp-pro'], {
             queryParams: { email: this.data.email, telephone: this.data.telephone },
@@ -161,7 +161,7 @@ export class RegisterPractitionerComponent implements OnInit {
       },
       error: (e) => {
         this.loading = false;
-        this.errorMessage = e.error?.error || "Erreur lors de l'inscription";
+        this.errorMessage = e.error?.error || this.prefs.translate('AUTH.PRO.REGISTER_ERROR');
       },
     });
   }

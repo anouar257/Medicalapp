@@ -18,7 +18,7 @@ spring:
 
 # JWT pro (aligné sur practitioner-service pour les accès professionnels).
 jwt:
-  pro-secret: ${JWT_PRO_SECRET:MEDICAL-PRACTITIONER-SERVICE-JWT-SECRET-KEY-256-BITS-CHANGE-IN-PROD-9876543210}
+  pro-secret: ${JWT_PRO_SECRET}
 
 # Appels inter-services si nécessaire
 integration:

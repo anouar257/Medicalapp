@@ -2,6 +2,7 @@ import { Component, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { Router, RouterOutlet, NavigationEnd } from '@angular/router';
 import { Title } from '@angular/platform-browser';
+import { TranslateService } from '@ngx-translate/core';
 import { filter, merge, of } from 'rxjs';
 import { PreferencesService } from './services/preferences.service';
 
@@ -15,6 +16,7 @@ export class AppComponent {
   private readonly router = inject(Router);
   private readonly title = inject(Title);
   private readonly prefs = inject(PreferencesService);
+  private readonly translate = inject(TranslateService);
   private readonly destroyRef = inject(DestroyRef);
 
   constructor() {
@@ -22,6 +24,7 @@ export class AppComponent {
       of(null),
       this.router.events.pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd)),
       toObservable(this.prefs.language),
+      this.translate.onLangChange,
     )
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.applyDocumentTitle());
@@ -33,10 +36,10 @@ export class AppComponent {
       route = route.firstChild;
     }
     const key = route.data['pageTitleKey'] as string | undefined;
-    if (key) {
-      this.title.setTitle(this.prefs.translate(key) + this.prefs.translate('docTitle.suffix'));
-    } else {
-      this.title.setTitle(this.prefs.translate('docTitle.default'));
-    }
+    const defaultTitle = this.prefs.translate('docTitle.default');
+    const suffix = this.prefs.translate('docTitle.suffix');
+    const pageTitle = key ? this.prefs.translate(key) : defaultTitle;
+    const resolvedTitle = !key || pageTitle === key ? defaultTitle : `${pageTitle}${suffix}`;
+    this.title.setTitle(resolvedTitle);
   }
 }

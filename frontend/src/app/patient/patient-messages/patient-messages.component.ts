@@ -86,19 +86,19 @@ export class PatientMessagesComponent implements OnInit {
     forkJoin({
       proches: this.procheService.getMyProches().pipe(
         catchError((err) => {
-          this.loadWarnings.push(formatHttpError(err, this.prefs.translate('messaging.loadWarningProches')));
+          this.loadWarnings.push(formatHttpError(err, this.prefs.translate('PATIENT.MESSAGES.LOAD_WARNING_PROCHES')));
           return of([] as Proche[]);
         }),
       ),
       appts: this.agenda.getAppointmentsForPatient(p.patientId).pipe(
         catchError((err) => {
-          this.loadWarnings.push(formatHttpError(err, this.prefs.translate('messaging.loadWarningAgenda')));
+          this.loadWarnings.push(formatHttpError(err, this.prefs.translate('PATIENT.MESSAGES.LOAD_WARNING_AGENDA')));
           return of([] as AppointmentPatientDTO[]);
         }),
       ),
       msgs: this.messaging.getPatientMessages(p.patientId).pipe(
         catchError((err) => {
-          this.loadWarnings.push(formatHttpError(err, this.prefs.translate('messaging.loadWarningMessaging')));
+          this.loadWarnings.push(formatHttpError(err, this.prefs.translate('PATIENT.MESSAGES.LOAD_WARNING_MESSAGING')));
           return of([] as MessageResponseDto[]);
         }),
       ),
@@ -114,7 +114,7 @@ export class PatientMessagesComponent implements OnInit {
         },
         error: () => {
           this.loading = false;
-          this.loadWarnings.push(this.prefs.translate('common.serviceUnavailable'));
+          this.loadWarnings.push(this.prefs.translate('COMMON.SERVICE_UNAVAILABLE'));
         },
       });
   }
@@ -168,7 +168,7 @@ export class PatientMessagesComponent implements OnInit {
   }
 
   private getPractitionerName(extId: number): string {
-    return this.practitionerLabelByExternalId.get(extId) || `${this.prefs.translate('messaging.unknownDoctor')} #${extId}`;
+    return this.practitionerLabelByExternalId.get(extId) || `${this.prefs.translate('PATIENT.MESSAGES.UNKNOWN_DOCTOR')} #${extId}`;
   }
 
   selectConversation(c: ChatConversation): void {
@@ -269,7 +269,7 @@ export class PatientMessagesComponent implements OnInit {
         },
         error: (e) => {
           this.sending = false;
-          this.sendError = formatHttpError(e, this.prefs.translate('common.serviceUnavailable'));
+          this.sendError = formatHttpError(e, this.prefs.translate('COMMON.SERVICE_UNAVAILABLE'));
         },
       });
   }
@@ -327,7 +327,7 @@ export class PatientMessagesComponent implements OnInit {
     if (!hasCompleted) {
       return { 
         blocked: true, 
-        reason: this.prefs.translate('messaging.limits.noCompletedAppointment')
+        reason: this.prefs.translate('PATIENT.MESSAGES.LIMITS.NO_COMPLETED_APPOINTMENT')
       };
     }
 
@@ -350,7 +350,7 @@ export class PatientMessagesComponent implements OnInit {
     if (consecutive >= 3) {
       return { 
         blocked: true, 
-        reason: this.prefs.translate('messaging.limits.consecutiveBlocked')
+        reason: this.prefs.translate('PATIENT.MESSAGES.LIMITS.CONSECUTIVE_BLOCKED')
       };
     }
 
@@ -362,7 +362,7 @@ export class PatientMessagesComponent implements OnInit {
     if (daily >= 10) {
       return { 
         blocked: true, 
-        reason: this.prefs.translate('messaging.limits.dailyLimitReached')
+        reason: this.prefs.translate('PATIENT.MESSAGES.LIMITS.DAILY_LIMIT_REACHED')
       };
     }
 
@@ -406,7 +406,7 @@ export class PatientMessagesComponent implements OnInit {
   }
 
   subjectLabel(s: MessagingSubject): string {
-    return this.prefs.translate(`messaging.subject.${s}`);
+    return this.prefs.translate(`PATIENT.MESSAGES.SUBJECT.${s}`);
   }
 
   canGoStep2(): boolean { return this.concernTargetId != null; }
@@ -432,6 +432,13 @@ export class PatientMessagesComponent implements OnInit {
 
   prevStep(): void {
     if (this.wizardStep > 1) this.wizardStep--;
+  }
+
+  stepCounterLabel(total = 4): string {
+    return this.prefs
+      .translate('PATIENT.MESSAGES.STEP_COUNTER')
+      .replace('{{current}}', String(this.wizardStep))
+      .replace('{{total}}', String(total));
   }
 
   onComposeFiles(ev: Event): void {
@@ -460,8 +467,8 @@ export class PatientMessagesComponent implements OnInit {
   filesCountLabel(): string {
     const n = this.composeFiles.length;
     if (n <= 0) return '';
-    if (n === 1) return this.prefs.translate('messaging.files.one');
-    return this.prefs.translate('messaging.files.many').replace('{{n}}', String(n));
+    if (n === 1) return this.prefs.translate('PATIENT.MESSAGES.FILES.ONE');
+    return this.prefs.translate('PATIENT.MESSAGES.FILES.MANY').replace('{{n}}', String(n));
   }
 
   canSubmit(): boolean {
@@ -516,7 +523,7 @@ export class PatientMessagesComponent implements OnInit {
         },
         error: (e) => {
           this.sending = false;
-          this.sendError = formatHttpError(e, this.prefs.translate('common.serviceUnavailable'));
+          this.sendError = formatHttpError(e, this.prefs.translate('COMMON.SERVICE_UNAVAILABLE'));
         },
       });
   }
@@ -554,10 +561,10 @@ export class PatientMessagesComponent implements OnInit {
 
   concernedLabel(m: ChatConversation): string {
     const me = this.patient?.patientId;
-    if (me != null && m.concernedPersonId === me) return this.prefs.translate('messaging.concerned.me');
+    if (me != null && m.concernedPersonId === me) return this.prefs.translate('PATIENT.MESSAGES.CONCERNED.ME');
     const pr = this.proches.find((x) => x.id === m.concernedPersonId);
     if (pr) return `${pr.prenom} ${pr.nom}`;
-    return this.prefs.translate('messaging.concerned.relative');
+    return this.prefs.translate('PATIENT.MESSAGES.CONCERNED.RELATIVE');
   }
 }
 

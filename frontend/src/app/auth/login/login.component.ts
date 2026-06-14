@@ -42,7 +42,7 @@ export class LoginComponent {
       },
       error: (err) => {
         this.loading = false;
-        this.errorMessage = err.error?.error || this.prefs.translate('Erreur de connexion');
+        this.errorMessage = err.error?.error || this.prefs.translate('AUTH.LOGIN.ERROR');
       }
     });
   }

@@ -60,7 +60,7 @@ export class CabinetStaffComponent {
           this.loading = false;
         },
         error: () => {
-          this.listError = this.prefs.translate('cabinet.users.loadError');
+          this.listError = this.prefs.translate('PRACTITIONER.STAFF.LOAD_ERROR');
           this.assistants = [];
           this.loading = false;
         },
@@ -79,7 +79,7 @@ export class CabinetStaffComponent {
 
   submitCreate(): void {
     if (this.form.motDePasse.length < 8) {
-      this.createError = this.prefs.translate('cabinet.users.passwordHint');
+      this.createError = this.prefs.translate('PRACTITIONER.STAFF.PASSWORD_TOO_SHORT');
       return;
     }
     this.creating = true;
@@ -87,7 +87,7 @@ export class CabinetStaffComponent {
     this.practitionerService.createAssistant({ ...this.form }).subscribe({
       next: () => {
         this.creating = false;
-        this.successMessage = this.prefs.translate('cabinet.users.success');
+        this.successMessage = this.prefs.translate('PRACTITIONER.STAFF.SUCCESS_CREATED');
         this.showCreate = false;
         this.refresh();
         setTimeout(() => (this.successMessage = ''), 5000);
@@ -98,22 +98,22 @@ export class CabinetStaffComponent {
         this.createError =
           typeof msg === 'string' && msg.length > 0
             ? msg
-            : this.prefs.translate('cabinet.staff.createFailedGeneric');
+            : this.prefs.translate('PRACTITIONER.STAFF.CREATE_FAILED_GENERIC');
       },
     });
   }
 
   deactivate(u: ProUserDTO): void {
     if (!this.canManageAssistants) return;
-    if (!confirm(this.prefs.translate('cabinet.users.deactivateConfirm'))) return;
+    if (!confirm(this.prefs.translate('PRACTITIONER.STAFF.DEACTIVATE_CONFIRM'))) return;
     this.practitionerService.desactiverUser(u.id).subscribe({
       next: () => {
-        this.successMessage = this.prefs.translate('cabinet.users.statusInactive');
+        this.successMessage = this.prefs.translate('PRACTITIONER.STAFF.STATUS_INACTIVE');
         this.refresh();
         setTimeout(() => (this.successMessage = ''), 4000);
       },
       error: () => {
-        this.listError = this.prefs.translate('cabinet.users.loadError');
+        this.listError = this.prefs.translate('PRACTITIONER.STAFF.LOAD_ERROR');
       },
     });
   }
@@ -122,12 +122,12 @@ export class CabinetStaffComponent {
     if (!this.canManageAssistants) return;
     this.practitionerService.reactiverUser(u.id).subscribe({
       next: () => {
-        this.successMessage = this.prefs.translate('cabinet.users.statusActive');
+        this.successMessage = this.prefs.translate('PRACTITIONER.STAFF.STATUS_ACTIVE');
         this.refresh();
         setTimeout(() => (this.successMessage = ''), 4000);
       },
       error: () => {
-        this.listError = this.prefs.translate('cabinet.users.loadError');
+        this.listError = this.prefs.translate('PRACTITIONER.STAFF.LOAD_ERROR');
       },
     });
   }

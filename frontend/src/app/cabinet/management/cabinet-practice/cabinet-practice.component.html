@@ -1,11 +1,11 @@
 <div class="page">
   <header class="page-header">
     <div>
-      <h1>{{ prefs.translate('cabinet.practice.h1') }}</h1>
-      <p class="subtitle">{{ prefs.translate('cabinet.practice.subtitle') }}</p>
+      <h1>{{ prefs.translate('PRACTITIONER.PRACTICE.TITLE') }}</h1>
+      <p class="subtitle">{{ prefs.translate('PRACTITIONER.PRACTICE.SUBTITLE') }}</p>
     </div>
     <button type="button" class="btn-primary" (click)="save()" [disabled]="saving || loading || !cabinet">
-      {{ saving ? prefs.translate('cabinet.practice.saving') : prefs.translate('cabinet.practice.save') }}
+      {{ saving ? prefs.translate('PRACTITIONER.PRACTICE.SAVING') : prefs.translate('PRACTITIONER.PRACTICE.SAVE') }}
     </button>
   </header>
 
@@ -17,7 +17,7 @@
   }
 
   @if (loading) {
-    <p class="cp-loading">{{ prefs.translate('cabinet.practice.loading') }}</p>
+    <p class="cp-loading">{{ prefs.translate('PRACTITIONER.PRACTICE.LOADING') }}</p>
     <div class="cp-skel-grid">
       @for (i of [1, 2]; track i) {
         <div class="card cp-skel-card">
@@ -31,23 +31,23 @@
   } @else if (cabinet) {
     <!-- Identity Section -->
     <section class="card">
-      <h2>{{ prefs.translate('cabinet.practice.sectionIdentity') }}</h2>
+      <h2>{{ prefs.translate('PRACTITIONER.PRACTICE.SECTION_IDENTITY') }}</h2>
       <div class="form-group">
-        <label>{{ prefs.translate('cabinet.practice.label.name') }}</label>
+        <label>{{ prefs.translate('PRACTITIONER.PRACTICE.NAME') }}</label>
         <input type="text" [(ngModel)]="cabinet.nom" name="nom" />
       </div>
       <div class="row">
         <div class="form-group">
-          <label>{{ prefs.translate('cabinet.practice.label.siret') }}</label>
+          <label>{{ prefs.translate('PRACTITIONER.PRACTICE.SIRET') }}</label>
           <input type="text" [(ngModel)]="cabinet.siret" name="siret" />
         </div>
         <div class="form-group">
-          <label>{{ prefs.translate('cabinet.practice.label.phone') }}</label>
+          <label>{{ prefs.translate('PRACTITIONER.PRACTICE.PHONE') }}</label>
           <input type="tel" [(ngModel)]="cabinet.telephone" name="tel" />
         </div>
       </div>
       <div class="form-group">
-        <label>{{ prefs.translate('cabinet.practice.label.email') }}</label>
+        <label>{{ prefs.translate('PRACTITIONER.PRACTICE.EMAIL') }}</label>
         <input type="email" [(ngModel)]="cabinet.email" name="email" />
       </div>
     </section>
@@ -55,14 +55,14 @@
     <!-- Addresses & Locations Section -->
     <section class="card">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.75rem;">
-        <h2 style="margin: 0;">Lieux de consultation (Cabinets, cliniques...)</h2>
+        <h2 style="margin: 0;">{{ prefs.translate('PRACTITIONER.PRACTICE.LOCATIONS_TITLE') }}</h2>
         <button
           type="button"
           class="btn-primary"
           style="padding: 0.5rem 1rem; font-size: 0.85rem;"
           (click)="newLocation()"
         >
-          + Ajouter une adresse
+          + {{ prefs.translate('PRACTITIONER.PRACTICE.ADD_ADDRESS') }}
         </button>
       </div>
 
@@ -74,9 +74,9 @@
           style="display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2px dashed var(--border); border-radius: 12px; padding: 1.5rem; text-align: center; cursor: pointer; transition: 0.2s;"
         >
           <span style="font-size: 2rem; color: var(--text-secondary); margin-bottom: 0.5rem;">+</span>
-          <h3 style="font-size: 0.95rem; font-weight: bold; margin: 0; color: var(--text-primary);">Ajouter une adresse</h3>
+          <h3 style="font-size: 0.95rem; font-weight: bold; margin: 0; color: var(--text-primary);">{{ prefs.translate('PRACTITIONER.PRACTICE.ADD_ADDRESS') }}</h3>
           <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">
-            Cabinet principal, secondaire ou clinique.
+            {{ prefs.translate('PRACTITIONER.PRACTICE.ADD_ADDRESS_DESC') }}
           </p>
         </div>
 
@@ -100,7 +100,7 @@
                     type="button"
                     class="btn-icon"
                     style="border: 1px solid var(--border); background: var(--bg-dark); border-radius: 6px; padding: 0.25rem 0.5rem; font-size: 0.8rem; cursor: pointer;"
-                    title="Modifier"
+                    title="{{ prefs.translate('COMMON.EDIT') }}"
                     (click)="edit(loc)"
                   >
                     ✏️
@@ -109,7 +109,7 @@
                     type="button"
                     class="btn-icon danger"
                     style="border: 1px solid var(--error); background: rgba(239, 68, 68, 0.05); border-radius: 6px; padding: 0.25rem 0.5rem; font-size: 0.8rem; cursor: pointer; color: var(--error);"
-                    title="Supprimer"
+                    title="{{ prefs.translate('COMMON.DELETE') }}"
                     (click)="removeLocation(loc)"
                   >
                     🗑️
@@ -126,12 +126,12 @@
               <div style="display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.75rem;">
                 @if (loc.ascenseur) {
                   <span style="font-size: 0.7rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 6px; padding: 0.15rem 0.4rem; color: var(--text-primary);">
-                    🛗 Ascenseur
+                    🛗 {{ prefs.translate('PRACTITIONER.PRACTICE.ASCENSEUR') }}
                   </span>
                 }
                 @if (loc.entreeAccessible) {
                   <span style="font-size: 0.7rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 6px; padding: 0.15rem 0.4rem; color: var(--text-primary);">
-                    ♿ PMR
+                    ♿ {{ prefs.translate('PRACTITIONER.PRACTICE.ACCESS_PMR') }}
                   </span>
                 }
                 <span style="font-size: 0.7rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 6px; padding: 0.15rem 0.4rem; color: var(--text-primary);">
@@ -139,7 +139,7 @@
                 </span>
                 @if (loc.etage) {
                   <span style="font-size: 0.7rem; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 6px; padding: 0.15rem 0.4rem; color: var(--text-primary);">
-                    🏢 Étage {{ loc.etage }}
+                    🏢 {{ prefs.translate('PRACTITIONER.PRACTICE.LEVEL') }} {{ loc.etage }}
                   </span>
                 }
               </div>
@@ -149,7 +149,7 @@
             @if (loc.horaires.length) {
               <div style="margin-top: 0.75rem; border-top: 1px solid var(--border); padding-top: 0.75rem;">
                 <strong style="font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 0.35rem;">
-                  Horaires d'ouverture
+                  {{ prefs.translate('PRACTITIONER.PRACTICE.OPENING_HOURS') }}
                 </strong>
                 <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.75rem; color: var(--text-secondary); display: flex; flex-direction: column; gap: 0.2rem;">
                   @for (h of loc.horaires; track h.id) {
@@ -157,7 +157,7 @@
                       <span style="font-weight: 600; color: var(--text-primary);">{{ jourLabel(h.jour) }}</span>
                       <span>
                         {{ h.heureDebut }} – {{ h.heureFin }}
-                        @if (h.continu) { <em style="font-size: 0.65rem; color: var(--text-muted); font-style: normal; margin-left: 0.25rem;">(continu)</em> }
+                        @if (h.continu) { <em style="font-size: 0.65rem; color: var(--text-muted); font-style: normal; margin-left: 0.25rem;">({{ prefs.translate('PRACTITIONER.PRACTICE.CONTINUOUS') }})</em> }
                       </span>
                     </li>
                   }
@@ -187,7 +187,7 @@
         <!-- Modal Header -->
         <header style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
           <h2 style="font-size: 1.15rem; font-weight: bold; margin: 0;">
-            {{ editing.id ? 'Modifier l\'adresse' : 'Nouvelle adresse de consultation' }}
+            {{ editing.id ? prefs.translate('PRACTITIONER.PRACTICE.EDIT_LOCATION') : prefs.translate('PRACTITIONER.PRACTICE.NEW_LOCATION') }}
           </h2>
           <button
             type="button"
@@ -204,74 +204,74 @@
           <div style="display: flex; flex-direction: column; gap: 1rem;">
             <div class="row">
               <div class="form-group">
-                <label>Nom de l'établissement *</label>
+                <label>{{ prefs.translate('PRACTITIONER.PRACTICE.ESTABLISHMENT') }}</label>
                 <input
                   type="text"
                   [(ngModel)]="editing.nomEtablissement"
-                  placeholder="Ex. Cabinet Principal, Clinique du Parc..."
+                  [attr.placeholder]="prefs.translate('PRACTITIONER.PRACTICE.ESTABLISHMENT_HINT')"
                 />
               </div>
               <div class="form-group">
-                <label>Téléphone du bureau</label>
+                <label>{{ prefs.translate('PRACTITIONER.PRACTICE.OFFICE_PHONE') }}</label>
                 <input
                   type="tel"
                   [(ngModel)]="editing.telephoneBureau"
-                  placeholder="Ex. 01 23 45 67 89"
+                  [attr.placeholder]="prefs.translate('PRACTITIONER.PRACTICE.OFFICE_PHONE_HINT')"
                 />
               </div>
             </div>
 
             <div class="form-group">
-              <label>Adresse complète *</label>
+              <label>{{ prefs.translate('PRACTITIONER.PRACTICE.ADDRESS') }}</label>
               <input
                 type="text"
                 [(ngModel)]="editing.adresse"
-                placeholder="Ex. 12 rue de la Paix"
+                [attr.placeholder]="prefs.translate('PRACTITIONER.PRACTICE.ADDRESS_HINT')"
               />
             </div>
 
             <div class="row">
               <div class="form-group">
-                <label>Ville</label>
+                <label>{{ prefs.translate('PRACTITIONER.PRACTICE.CITY') }}</label>
                 <input
                   type="text"
                   [(ngModel)]="editing.ville"
-                  placeholder="Ex. Paris"
+                  [attr.placeholder]="prefs.translate('PRACTITIONER.PRACTICE.CITY_HINT')"
                 />
               </div>
               <div class="form-group">
-                <label>Code postal</label>
+                <label>{{ prefs.translate('PRACTITIONER.PRACTICE.POSTAL_CODE') }}</label>
                 <input
                   type="text"
                   [(ngModel)]="editing.codePostal"
-                  placeholder="Ex. 75001"
+                  [attr.placeholder]="prefs.translate('PRACTITIONER.PRACTICE.POSTAL_CODE_HINT')"
                 />
               </div>
             </div>
 
             <div class="row">
               <div class="form-group">
-                <label>Étage</label>
+                <label>{{ prefs.translate('PRACTITIONER.PRACTICE.LEVEL') }}</label>
                 <input
                   type="text"
                   [(ngModel)]="editing.etage"
-                  placeholder="Ex. RDC, 3ème..."
+                  [attr.placeholder]="prefs.translate('PRACTITIONER.PRACTICE.LEVEL_HINT')"
                 />
               </div>
               <div class="form-group">
-                <label>Fax</label>
+                <label>{{ prefs.translate('PRACTITIONER.PRACTICE.FAX') }}</label>
                 <input
                   type="tel"
                   [(ngModel)]="editing.fax"
-                  placeholder="Ex. 01 23 45 67 80"
+                  [attr.placeholder]="prefs.translate('PRACTITIONER.PRACTICE.FAX_HINT')"
                 />
               </div>
               <div class="form-group">
-                <label>Tarif consultation (DH)</label>
+                <label>{{ prefs.translate('PRACTITIONER.PRACTICE.CONSULTATION_FEE') }}</label>
                 <input
                   type="number"
                   [(ngModel)]="editing.consultationFee"
-                  placeholder="Ex. 400"
+                  [attr.placeholder]="prefs.translate('PRACTITIONER.PRACTICE.CONSULTATION_FEE_HINT')"
                 />
               </div>
             </div>
@@ -279,7 +279,7 @@
 
           <!-- Accessibilité -->
           <div style="border-top: 1px solid var(--border); padding-top: 1rem;">
-            <h3 style="font-size: 0.9rem; font-weight: bold; margin-bottom: 0.75rem;">Accessibilité & Infrastructure</h3>
+            <h3 style="font-size: 0.9rem; font-weight: bold; margin-bottom: 0.75rem;">{{ prefs.translate('PRACTITIONER.PRACTICE.ACCESSIBILITY') }}</h3>
             <div style="display: flex; gap: 1.5rem; margin-bottom: 0.75rem;">
               <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; cursor: pointer;">
                 <input
@@ -287,7 +287,7 @@
                   [(ngModel)]="editing.ascenseur"
                   style="width: auto;"
                 />
-                Ascenseur disponible
+                {{ prefs.translate('PRACTITIONER.PRACTICE.ASCENSEUR_AVAILABLE') }}
               </label>
               <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; cursor: pointer;">
                 <input
@@ -295,39 +295,39 @@
                   [(ngModel)]="editing.entreeAccessible"
                   style="width: auto;"
                 />
-                Accès PMR
+                {{ prefs.translate('PRACTITIONER.PRACTICE.ACCESS_PMR_LABEL') }}
               </label>
             </div>
             <div class="form-group" style="max-width: 250px;">
-              <label>Stationnement / Parking</label>
+              <label>{{ prefs.translate('PRACTITIONER.PRACTICE.PARKING_SECTION') }}</label>
               <select [(ngModel)]="editing.parking">
-                <option value="AUCUN">Aucun parking</option>
-                <option value="GRATUIT">Parking gratuit</option>
-                <option value="PAYANT">Parking payant</option>
+                <option value="AUCUN">{{ prefs.translate('PRACTITIONER.PRACTICE.NO_PARKING') }}</option>
+                <option value="GRATUIT">{{ prefs.translate('PRACTITIONER.PRACTICE.PARKING_FREE') }}</option>
+                <option value="PAYANT">{{ prefs.translate('PRACTITIONER.PRACTICE.PARKING_PAID') }}</option>
               </select>
             </div>
           </div>
 
           <!-- Contact Urgence -->
           <div style="border-top: 1px solid var(--border); padding-top: 1rem;">
-            <h3 style="font-size: 0.9rem; font-weight: bold; margin-bottom: 0.75rem;">Contact en cas d'urgence</h3>
+            <h3 style="font-size: 0.9rem; font-weight: bold; margin-bottom: 0.75rem;">{{ prefs.translate('PRACTITIONER.PRACTICE.EMERGENCY_CONTACT') }}</h3>
             <div class="row">
               <div class="form-group">
-                <label>Type de contact</label>
+                <label>{{ prefs.translate('PRACTITIONER.PRACTICE.CONTACT_TYPE') }}</label>
                 <select [(ngModel)]="editing.contactUrgenceType">
-                  <option [ngValue]="null">— Aucun —</option>
-                  <option value="SECRETARIAT">Secrétariat</option>
-                  <option value="SOS_MEDECINS">SOS Médecins</option>
-                  <option value="NUMERO_PERSONNEL">Numéro personnel</option>
-                  <option value="NUMERO_DIRECT">Numéro direct</option>
+                  <option [ngValue]="null">{{ prefs.translate('COMMON.NONE') }}</option>
+                  <option value="SECRETARIAT">{{ prefs.translate('PRACTITIONER.PRACTICE.SECRETARIAT') }}</option>
+                  <option value="SOS_MEDECINS">{{ prefs.translate('PRACTITIONER.PRACTICE.SOS_MEDECINS') }}</option>
+                  <option value="NUMERO_PERSONNEL">{{ prefs.translate('PRACTITIONER.PRACTICE.PERSONAL_NUMBER') }}</option>
+                  <option value="NUMERO_DIRECT">{{ prefs.translate('PRACTITIONER.PRACTICE.DIRECT_NUMBER') }}</option>
                 </select>
               </div>
               <div class="form-group">
-                <label>Numéro d'urgence</label>
+                <label>{{ prefs.translate('PRACTITIONER.PRACTICE.EMERGENCY_NUMBER') }}</label>
                 <input
                   type="tel"
                   [(ngModel)]="editing.telephoneUrgence"
-                  placeholder="Ex. 06 12 34 56 78"
+                  [attr.placeholder]="prefs.translate('PRACTITIONER.PRACTICE.EMERGENCY_NUMBER_HINT')"
                 />
               </div>
             </div>
@@ -335,9 +335,9 @@
 
           <!-- Horaires -->
           <div style="border-top: 1px solid var(--border); padding-top: 1rem;">
-            <h3 style="font-size: 0.9rem; font-weight: bold; margin-bottom: 0.5rem;">Horaires d'ouverture</h3>
+            <h3 style="font-size: 0.9rem; font-weight: bold; margin-bottom: 0.5rem;">{{ prefs.translate('PRACTITIONER.PRACTICE.OPENING_HOURS') }}</h3>
             <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.75rem; line-height: 1.4;">
-              Configurez vos plages horaires. Le format 24h sera appliqué automatiquement par votre navigateur.
+              {{ prefs.translate('PRACTITIONER.PRACTICE.HOURS_HELP') }}
             </p>
 
             <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem;">
@@ -376,7 +376,7 @@
                       </select>
                     </div>
 
-                    <span style="color: var(--text-secondary); font-size: 0.85rem; margin: 0 0.25rem;">à</span>
+                    <span style="color: var(--text-secondary); font-size: 0.85rem; margin: 0 0.25rem;">{{ prefs.translate('COMMON.AT') }}</span>
 
                     <!-- Heure Fin -->
                     <div style="display: flex; align-items: center; gap: 0.15rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 0.25rem 0.4rem;">
@@ -411,13 +411,13 @@
                         [name]="'cnt'+i"
                         style="width: auto;"
                       />
-                      Continu
+                      {{ prefs.translate('PRACTITIONER.PRACTICE.CONTINUOUS') }}
                     </label>
                     <button
                       type="button"
                       style="border: none; background: none; color: var(--error); cursor: pointer; font-size: 1.1rem; padding: 0 0.25rem;"
                       (click)="removeHoraire(i)"
-                      title="Supprimer la plage"
+                      title="{{ prefs.translate('PRACTITIONER.PRACTICE.REMOVE_SLOT') }}"
                     >
                       ✕
                     </button>
@@ -432,7 +432,7 @@
               style="padding: 0.4rem 0.8rem; font-size: 0.8rem;"
               (click)="addHoraire()"
             >
-              + Ajouter une plage
+              + {{ prefs.translate('PRACTITIONER.PRACTICE.ADD_SLOT') }}
             </button>
           </div>
 
@@ -449,7 +449,7 @@
             style="background: transparent; border: 1px solid var(--border); color: var(--text-primary);"
             (click)="cancelEdit()"
           >
-            Annuler
+            {{ prefs.translate('COMMON.CANCEL') }}
           </button>
           <button
             type="button"
@@ -457,7 +457,7 @@
             (click)="saveLocation()"
             [disabled]="editingSaving"
           >
-            {{ editingSaving ? 'Enregistrement…' : 'Enregistrer' }}
+            {{ editingSaving ? prefs.translate('PRACTITIONER.PRACTICE.SAVING') : prefs.translate('COMMON.SAVE') }}
           </button>
         </footer>
       </div>

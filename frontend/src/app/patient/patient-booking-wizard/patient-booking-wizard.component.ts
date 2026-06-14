@@ -534,17 +534,17 @@ export class PatientBookingWizardComponent implements OnInit, OnDestroy {
           this.locations = data.locations ?? [];
           this.practitionerActs = data.acts ?? [];
           if (this.resolvedAgendaDoctorId == null) {
-            this.step3LoadError = this.prefs.translate('patient.booking.noAgendaDoctor');
+            this.step3LoadError = this.prefs.translate('PATIENT.BOOKING.NO_AGENDA_DOCTOR');
             return;
           }
           if (!this.practitionerActs.length) {
-            this.step3LoadError =
-              'Aucun acte medical n’est configure pour ce medecin. Ajoutez les actes depuis le profil du praticien.';
+            this.step3LoadError = this.prefs.translate('PATIENT.BOOKING.NO_CONFIGURED_ACT');
             this.typeCode = '';
             this.selectedDuration = 0;
             return;
           }
           this.generateAvailableDays();
+
           this.currentMonthDate = new Date();
           this.generateCalendarCells();
           this.applyDefaultPractitionerAct();
@@ -552,7 +552,7 @@ export class PatientBookingWizardComponent implements OnInit, OnDestroy {
           this.scheduleBookingMapInit();
         },
         error: () => {
-          this.step3LoadError = this.prefs.translate('patient.booking.step3LoadError');
+          this.step3LoadError = this.prefs.translate('PATIENT.BOOKING.STEP3_LOAD_ERROR');
         },
       });
   }
@@ -655,8 +655,8 @@ export class PatientBookingWizardComponent implements OnInit, OnDestroy {
       const val = `${y}-${m}-${dd}`;
       
       let label = '';
-      if (i === 0) label = this.prefs.translate('Aujourd\'hui');
-      else if (i === 1) label = this.prefs.translate('Demain');
+      if (i === 0) label = this.prefs.translate('PATIENT.BOOKING.TODAY');
+      else if (i === 1) label = this.prefs.translate('PATIENT.BOOKING.TOMORROW');
       else {
         label = d.toLocaleDateString(this.prefs.language() === 'fr' ? 'fr-FR' : 'en-US', {
           weekday: 'short',
@@ -686,7 +686,7 @@ export class PatientBookingWizardComponent implements OnInit, OnDestroy {
         year: 'numeric',
       });
       const formattedDate = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
-      return `${formattedDate} ${this.prefs.translate('à')} ${this.selectedHour || ''}`;
+      return `${formattedDate} ${this.prefs.translate('COMMON.AT')} ${this.selectedHour || ''}`;
     } catch {
       return `${this.selectedDay} à ${this.selectedHour}`;
     }
@@ -952,29 +952,29 @@ export class PatientBookingWizardComponent implements OnInit, OnDestroy {
     const patient = this.auth.getCurrentPatient();
     const docId = this.resolvedAgendaDoctorId;
     if (!patient?.patientId || docId == null) {
-      this.submitError = this.prefs.translate('patient.booking.missingPatientOrDoctor');
+      this.submitError = this.prefs.translate('PATIENT.BOOKING.MISSING_PATIENT_OR_DOCTOR');
       return;
     }
     
     if (!this.slotLocal?.trim()) {
-      this.submitError = this.prefs.translate('patient.booking.slotRequired');
+      this.submitError = this.prefs.translate('PATIENT.BOOKING.SLOT_REQUIRED');
       return;
     }
     const start = new Date(this.slotLocal);
     if (Number.isNaN(start.getTime())) {
-      this.submitError = this.prefs.translate('patient.booking.invalidSlot');
+      this.submitError = this.prefs.translate('PATIENT.BOOKING.INVALID_SLOT');
       return;
     }
 
     if (start < new Date()) {
-      this.submitError = this.prefs.translate('Impossible de choisir une date ou heure passée');
+      this.submitError = this.prefs.translate('PATIENT.BOOKING.PAST_DATE_ERROR');
       return;
     }
     if (!this.selectedAct || !this.typeCode.trim()) {
-      this.submitError =
-        'Aucun acte medical dynamique n’est selectionne. Verifiez le profil du medecin.';
+      this.submitError = this.prefs.translate('PATIENT.BOOKING.NO_DYNAMIC_ACT');
       return;
     }
+
 
     const body: PatientBookingRequestDTO = {
       doctorId: docId,
@@ -984,7 +984,7 @@ export class PatientBookingWizardComponent implements OnInit, OnDestroy {
       typeCode: this.typeCode,
       startTime: start.toISOString(),
       durationMinutes: this.selectedDuration,
-      title: `${this.prefs.translate('patient.booking.requestTitle')} — ${this.selected?.nom ?? ''}`,
+      title: `${this.prefs.translate('PATIENT.BOOKING.REQUEST_TITLE')} — ${this.selected?.nom ?? ''}`,
       color: '#0ea5e9',
       locationMode: this.locationMode,
       referredBy: this.referredBy.trim() || null,
@@ -1007,7 +1007,7 @@ export class PatientBookingWizardComponent implements OnInit, OnDestroy {
         this.submitError =
           typeof msg === 'string' && msg.length > 0
             ? msg
-            : this.prefs.translate('patient.booking.submitError');
+            : this.prefs.translate('PATIENT.BOOKING.SUBMIT_ERROR');
       },
     });
   }
@@ -1143,10 +1143,10 @@ export class PatientBookingWizardComponent implements OnInit, OnDestroy {
 
   get selectedProcheLabel(): string {
     if (this.selectedProcheId === null) {
-      return this.prefs.translate('auth.register.choose');
+      return this.prefs.translate('PATIENT.BOOKING.CHOOSE_RELATIVE');
     }
     const p = this.proches.find((x) => x.id === this.selectedProcheId);
-    return p ? `${p.prenom} ${p.nom}` : this.prefs.translate('auth.register.choose');
+    return p ? `${p.prenom} ${p.nom}` : this.prefs.translate('PATIENT.BOOKING.CHOOSE_RELATIVE');
   }
 
   selectProche(p: Proche | null): void {
@@ -1156,13 +1156,13 @@ export class PatientBookingWizardComponent implements OnInit, OnDestroy {
 
   get selectedLocationLabel(): string {
     if (this.selectedLocationId === null) {
-      return this.prefs.translate('auth.register.choose');
+      return this.prefs.translate('PATIENT.BOOKING.CHOOSE_LOCATION');
     }
     if (this.selectedLocationId === -1) {
-      return 'Téléconsultation (En ligne)';
+      return this.prefs.translate('PATIENT.BOOKING.TELECONSULTATION_ONLINE');
     }
     const loc = this.locations.find((l) => l.id === this.selectedLocationId);
-    return loc ? `${loc.nomEtablissement} — ${loc.ville}` : this.prefs.translate('auth.register.choose');
+    return loc ? `${loc.nomEtablissement} — ${loc.ville}` : this.prefs.translate('PATIENT.BOOKING.CHOOSE_LOCATION');
   }
 
   getSelectedLocation(): ConsultationLocationDTO | undefined {

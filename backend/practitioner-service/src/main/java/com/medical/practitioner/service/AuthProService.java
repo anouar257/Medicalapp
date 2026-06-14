@@ -396,14 +396,12 @@ public class AuthProService {
         }
         ProUser user = userOpt.orElseThrow(() ->
                 new IllegalArgumentException("Aucun compte trouvé avec cet identifiant"));
-
         if (CHANNEL_EMAIL.equalsIgnoreCase(req.getChannel())) {
             String token = UUID.randomUUID().toString();
             user.setResetToken(token);
             user.setResetTokenExpiry(Instant.now().plus(resetTokenExpirationMinutes, ChronoUnit.MINUTES));
             proUserRepository.save(user);
-            log.info("[PasswordReset] Token de réinitialisation généré pour {} : {}", user.getEmail(), token);
-            log.info("[PasswordReset] Lien de réinitialisation : {}?token={}", resetBaseUrl, token);
+            log.info("[PasswordReset] Token de réinitialisation généré pour {}", user.getEmail());
             sendResetEmail(user.getEmail(), token);
         } else {
             otpService.sendOtp(user.getTelephone(), "sms");

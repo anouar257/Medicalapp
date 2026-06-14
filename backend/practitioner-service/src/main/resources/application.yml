@@ -33,7 +33,7 @@ spring:
 
 # ── JWT (clé distincte du patient-service) ───────────────────────────────────
 jwt:
-  secret: ${JWT_PRO_SECRET:MEDICAL-PRACTITIONER-SERVICE-JWT-SECRET-KEY-256-BITS-CHANGE-IN-PROD-9876543210}
+  secret: ${JWT_PRO_SECRET}
   expiration-ms: ${JWT_EXPIRATION:86400000}   # 24 h
 
 # ── Twilio Verify API (OTP réel SMS + Email) ─────────────────────────────────

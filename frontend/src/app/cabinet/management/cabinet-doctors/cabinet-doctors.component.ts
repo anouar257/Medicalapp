@@ -132,7 +132,7 @@ export class CabinetDoctorsComponent {
           complete: () => doneSaving(),
           error: (err: unknown) => {
             doneSaving();
-            this.formError.set(extractHttpErrorDetail(err) ?? 'Échec du téléversement de la photo.');
+            this.formError.set(extractHttpErrorDetail(err) ?? this.prefs.translate('PRACTITIONER.DOCTORS.ERROR_UPLOAD'));
           },
         });
         return;
@@ -146,7 +146,7 @@ export class CabinetDoctorsComponent {
         next: () => afterDoctorSaved(id),
         error: (err: unknown) => {
           doneSaving();
-          this.formError.set(extractHttpErrorDetail(err) ?? 'Impossible d’enregistrer le médecin.');
+          this.formError.set(extractHttpErrorDetail(err) ?? this.prefs.translate('PRACTITIONER.DOCTORS.ERROR_UPDATE'));
         },
       });
       return;
@@ -155,7 +155,7 @@ export class CabinetDoctorsComponent {
       next: (doc) => afterDoctorSaved(doc.id),
       error: (err: unknown) => {
         doneSaving();
-        this.formError.set(extractHttpErrorDetail(err) ?? 'Impossible de créer le médecin.');
+        this.formError.set(extractHttpErrorDetail(err) ?? this.prefs.translate('PRACTITIONER.DOCTORS.ERROR_CREATE'));
       },
     });
   }
@@ -163,11 +163,13 @@ export class CabinetDoctorsComponent {
   remove(d: Doctor): void {
     if ((d.appointmentCount ?? 0) > 0) {
       this.deleteFeedback.set(
-        `« ${d.name} » a encore ${d.appointmentCount} rendez-vous en base : supprimez ou modifiez ces RDV depuis l’agenda avant de supprimer le médecin.`,
+        this.prefs.translate('PRACTITIONER.DOCTORS.DELETE_BLOCKED')
+          .replace('{name}', d.name)
+          .replace('{count}', '' + d.appointmentCount),
       );
       return;
     }
-    if (!window.confirm(`Supprimer « ${d.name} » ?`)) {
+    if (!window.confirm(this.prefs.translate('PRACTITIONER.DOCTORS.DELETE_CONFIRM').replace('{name}', d.name))) {
       return;
     }
     this.deleteFeedback.set(null);
@@ -177,9 +179,7 @@ export class CabinetDoctorsComponent {
       error: (err: unknown) => {
         this.deletingId.set(null);
         const msg = conflictMessage(err);
-        if (msg) {
-          this.deleteFeedback.set(msg);
-        }
+        this.deleteFeedback.set(msg || this.prefs.translate('PRACTITIONER.DOCTORS.DELETE_CONFLICT'));
       },
     });
   }
@@ -203,5 +203,5 @@ function conflictMessage(err: unknown): string | null {
       return m.trim();
     }
   }
-  return 'Impossible de supprimer : des rendez-vous sont encore associés à ce médecin.';
+  return null;
 }

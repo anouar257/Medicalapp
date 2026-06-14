@@ -9,44 +9,43 @@
       </div>
       <div class="auth-card">
         <div class="auth-header">
-          <h3>Vérification requise</h3>
-          <p>Saisissez les codes reçus par email et SMS</p>
+          <h3>{{ prefs.translate('AUTH.OTP.TITLE') }}</h3>
+          <p>{{ prefs.translate('AUTH.OTP.SUBTITLE') }}</p>
         </div>
         <div class="otp-section">
-          <h4>📧 Email @if (emailVerified) { <span class="badge-success">✓</span> }</h4>
+          <h4>{{ prefs.translate('AUTH.OTP.EMAIL_LABEL') }} @if (emailVerified) { <span class="badge-success">✓</span> }</h4>
           @if (!emailVerified) {
             <div class="otp-row">
-              <input type="text" [(ngModel)]="emailCode" placeholder="Code email" maxlength="6"/>
-              <button class="btn btn-primary" (click)="verifyEmail()" [disabled]="loadingEmail">Vérifier</button>
+              <input type="text" [(ngModel)]="emailCode" [placeholder]="prefs.translate('AUTH.OTP.EMAIL_PH')" maxlength="6"/>
+              <button class="btn btn-primary" (click)="verifyEmail()" [disabled]="loadingEmail">{{ prefs.translate('AUTH.OTP.VERIFY') }}</button>
             </div>
             <button class="btn-link" (click)="resendEmail()" [disabled]="emailCd>0">
-              {{ emailCd > 0 ? 'Renvoyer dans '+emailCd+'s' : 'Renvoyer' }}
+              {{ emailCd > 0 ? prefs.translate('AUTH.OTP.RESEND_IN') + ' ' + emailCd + 's' : prefs.translate('AUTH.OTP.RESEND') }}
             </button>
           }
         </div>
         <div class="otp-section">
-          <h4>📱 SMS @if (smsVerified) { <span class="badge-success">✓</span> }</h4>
+          <h4>{{ prefs.translate('AUTH.OTP.SMS_LABEL') }} @if (smsVerified) { <span class="badge-success">✓</span> }</h4>
           @if (!smsVerified) {
             <div class="otp-row">
-              <input type="text" [(ngModel)]="smsCode" placeholder="Code SMS" maxlength="6"/>
-              <button class="btn btn-primary" (click)="verifySms()" [disabled]="loadingSms">Vérifier</button>
+              <input type="text" [(ngModel)]="smsCode" [placeholder]="prefs.translate('AUTH.OTP.SMS_PH')" maxlength="6"/>
+              <button class="btn btn-primary" (click)="verifySms()" [disabled]="loadingSms">{{ prefs.translate('AUTH.OTP.VERIFY') }}</button>
             </div>
             <button class="btn-link" (click)="resendSms()" [disabled]="smsCd>0">
-              {{ smsCd > 0 ? 'Renvoyer dans '+smsCd+'s' : 'Renvoyer' }}
+              {{ smsCd > 0 ? prefs.translate('AUTH.OTP.RESEND_IN') + ' ' + smsCd + 's' : prefs.translate('AUTH.OTP.RESEND') }}
             </button>
           }
         </div>
         @if (err) { <div class="text-error" style="text-align: center; margin-top: 1rem;">{{ err }}</div> }
         @if (emailVerified && smsVerified) {
           <button class="btn-submit" (click)="router.navigate(['/auth/login'])">
-            Continuer vers la connexion <span class="arrow">→</span>
+            {{ prefs.translate('AUTH.OTP.CONTINUE_LOGIN') }} <span class="arrow">→</span>
           </button>
         }
         <div class="auth-links mt-2">
-          <a routerLink="/auth/login">Retour connexion</a>
+          <a routerLink="/auth/login">{{ prefs.translate('AUTH.OTP.BACK_LOGIN') }}</a>
         </div>
       </div>
     </div>
   </div>
 </div>
-  

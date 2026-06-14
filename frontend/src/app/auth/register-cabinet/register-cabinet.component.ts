@@ -52,7 +52,7 @@ export class RegisterCabinetComponent {
   goToStep2() {
     this.errorMessage = '';
     if (!this.data.nomCabinet?.trim()) {
-      this.errorMessage = 'Le nom du cabinet est obligatoire';
+      this.errorMessage = this.prefs.translate('AUTH.PRO.CABINET_NAME_REQUIRED');
       return;
     }
     this.step = 2;
@@ -61,11 +61,11 @@ export class RegisterCabinetComponent {
   goToStep3() {
     this.errorMessage = '';
     if (this.data.motDePasse !== this.confirmPassword) {
-      this.errorMessage = 'Les mots de passe ne correspondent pas';
+      this.errorMessage = this.prefs.translate('AUTH.REGISTER.ERR_PASSWORD_MATCH');
       return;
     }
     if (this.data.motDePasse.length < 8) {
-      this.errorMessage = 'Le mot de passe doit contenir au moins 8 caractères';
+      this.errorMessage = this.prefs.translate('AUTH.REGISTER.ERR_PASSWORD_LENGTH');
       return;
     }
     this.step = 3;
@@ -77,7 +77,7 @@ export class RegisterCabinetComponent {
     this.authPro.registerCabinet(this.data).subscribe({
       next: () => {
         this.loading = false;
-        this.successMessage = 'Cabinet créé. Vérifiez votre email/téléphone.';
+        this.successMessage = this.prefs.translate('AUTH.PRO.CABINET_CREATED');
         setTimeout(() => {
           this.router.navigate(['/auth/verify-otp-pro'], {
             queryParams: { email: this.data.email, telephone: this.data.telephone },
@@ -86,7 +86,7 @@ export class RegisterCabinetComponent {
       },
       error: (e) => {
         this.loading = false;
-        this.errorMessage = e.error?.error || "Erreur lors de l'inscription";
+        this.errorMessage = e.error?.error || this.prefs.translate('AUTH.REGISTER.ERR_REGISTER');
       },
     });
   }

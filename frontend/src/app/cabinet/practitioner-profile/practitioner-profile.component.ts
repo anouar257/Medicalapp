@@ -49,17 +49,17 @@ export class PractitionerProfileComponent {
         distinctUntilChanged(),
         switchMap(() =>
           forkJoin({
-            profile: this.practitionerService.me(),
+              profile: this.practitionerService.me(),
             specialties: this.practitionerService.listSpecialties(),
           }).pipe(
             catchError((e: unknown) => {
               const msg =
                 (e as { error?: { error?: string } })?.error?.error ??
-                this.prefs.translate('profile.notFound');
+                this.prefs.translate('PRACTITIONER.PROFILE.NOT_FOUND');
               return of<ProfileBundle>({
                 profile: null,
                 specialties: [],
-                loadError: typeof msg === 'string' ? msg : this.prefs.translate('profile.notFound'),
+                loadError: typeof msg === 'string' ? msg : this.prefs.translate('PRACTITIONER.PROFILE.NOT_FOUND'),
               });
             }),
           ),
@@ -105,17 +105,17 @@ export class PractitionerProfileComponent {
 
   deleteAct(id: number | undefined) {
     if (!id) return;
-    if (confirm('Voulez-vous vraiment supprimer cet acte médical ?')) {
+    if (confirm(this.prefs.translate('PRACTITIONER.ACTS.DELETE_CONFIRM'))) {
       this.practitionerService.deleteAct(id).subscribe({
         next: () => {
           if (this.profile) {
             this.loadActs(this.profile.id);
           }
-          this.successMessage = 'Acte supprimé avec succès';
+          this.successMessage = this.prefs.translate('PRACTITIONER.ACTS.DELETE_SUCCESS');
           setTimeout(() => (this.successMessage = ''), 3000);
         },
         error: (e) => {
-          this.errorMessage = e.error?.error || 'Erreur lors de la suppression de l\'acte';
+          this.errorMessage = e.error?.error || this.prefs.translate('PRACTITIONER.ACTS.DELETE_ERROR');
           setTimeout(() => (this.errorMessage = ''), 3000);
         }
       });
@@ -130,7 +130,7 @@ export class PractitionerProfileComponent {
   saveAct() {
     if (!this.editingAct || !this.profile) return;
     if (!this.editingAct.name.trim()) {
-      this.errorMessage = 'Le nom de l\'acte est requis';
+      this.errorMessage = this.prefs.translate('PRACTITIONER.ACTS.REQUIRED_NAME');
       setTimeout(() => (this.errorMessage = ''), 3000);
       return;
     }
@@ -148,11 +148,11 @@ export class PractitionerProfileComponent {
       next: () => {
         this.loadActs(this.profile!.id);
         this.cancelActEdit();
-        this.successMessage = 'Acte enregistré avec succès';
+        this.successMessage = this.prefs.translate('PRACTITIONER.ACTS.SAVE_SUCCESS');
         setTimeout(() => (this.successMessage = ''), 3000);
       },
       error: (e) => {
-        this.errorMessage = e.error?.error || 'Erreur lors de l\'enregistrement de l\'acte';
+        this.errorMessage = e.error?.error || this.prefs.translate('PRACTITIONER.ACTS.SAVE_ERROR');
         setTimeout(() => (this.errorMessage = ''), 3000);
       }
     });
@@ -195,12 +195,12 @@ export class PractitionerProfileComponent {
         next: (p) => {
           this.profile = p;
           this.saving = false;
-          this.successMessage = this.prefs.translate('profile.saveSuccess');
+          this.successMessage = this.prefs.translate('PRACTITIONER.PROFILE.SAVE_SUCCESS');
           setTimeout(() => (this.successMessage = ''), 3000);
         },
         error: (e) => {
           this.saving = false;
-          this.errorMessage = e.error?.error || this.prefs.translate('profile.saveError');
+          this.errorMessage = e.error?.error || this.prefs.translate('PRACTITIONER.PROFILE.SAVE_ERROR');
         }
       });
     }
@@ -222,12 +222,12 @@ export class PractitionerProfileComponent {
       next: (p) => {
         this.profile = p;
         this.saving = false;
-        this.successMessage = this.prefs.translate('profile.saveSuccess');
+        this.successMessage = this.prefs.translate('PRACTITIONER.PROFILE.SAVE_SUCCESS');
         setTimeout(() => (this.successMessage = ''), 3000);
       },
       error: (e) => {
         this.saving = false;
-        this.errorMessage = e.error?.error || this.prefs.translate('profile.saveError');
+        this.errorMessage = e.error?.error || this.prefs.translate('PRACTITIONER.PROFILE.SAVE_ERROR');
       },
     });
   }

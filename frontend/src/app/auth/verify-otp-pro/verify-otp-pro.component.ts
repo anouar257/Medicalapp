@@ -4,11 +4,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthProService } from '../../services/auth-pro.service';
+import { PreferencesService } from '../../services/preferences.service';
 import { AppNavbarComponent } from '../../shared/app-navbar.component';
 
-/**
- * Vérification OTP côté pro (email + SMS via Twilio Verify).
- */
 @Component({
   selector: 'app-verify-otp-pro',
   standalone: true,
@@ -17,6 +15,7 @@ import { AppNavbarComponent } from '../../shared/app-navbar.component';
   styleUrls: ['./verify-otp-pro.component.scss'],
 })
 export class VerifyOtpProComponent implements OnInit {
+  readonly prefs = inject(PreferencesService);
   email = '';
   telephone = '';
   emailCode = '';
@@ -57,7 +56,7 @@ export class VerifyOtpProComponent implements OnInit {
       },
       error: (e) => {
         this.loadingEmail = false;
-        this.err = e.error?.error || 'Code invalide';
+        this.err = e.error?.error || this.prefs.translate('AUTH.OTP.INVALID_CODE');
       },
     });
   }
@@ -73,7 +72,7 @@ export class VerifyOtpProComponent implements OnInit {
       },
       error: (e) => {
         this.loadingSms = false;
-        this.err = e.error?.error || 'Code invalide';
+        this.err = e.error?.error || this.prefs.translate('AUTH.OTP.INVALID_CODE');
       },
     });
   }

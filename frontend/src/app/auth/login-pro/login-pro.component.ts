@@ -48,7 +48,7 @@ export class LoginProComponent implements OnInit, OnDestroy {
   onSubmit() {
     this.err = '';
     if (!this.loginData.email || !this.loginData.motDePasse) {
-      this.err = this.prefs.translate('auth.pro.fillAll');
+      this.err = this.prefs.translate('AUTH.PRO.FILL_ALL');
       return;
     }
 
@@ -61,7 +61,7 @@ export class LoginProComponent implements OnInit, OnDestroy {
       },
       error: (e) => {
         this.loading = false;
-        this.err = e.error?.error || this.prefs.translate('auth.pro.badCredentials');
+        this.err = e.error?.error || this.prefs.translate('AUTH.PRO.BAD_CREDENTIALS');
       },
     });
   }

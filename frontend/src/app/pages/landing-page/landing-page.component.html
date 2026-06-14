@@ -15,11 +15,11 @@
           <div class="absolute inset-0 z-0 bg-gradient-to-b from-slate-50/10 via-slate-50/30 to-slate-50 dark:from-slate-950/10 dark:via-slate-950/30 dark:to-slate-950 pointer-events-none"></div>
 
           <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight fade-in relative z-10">
-            {{ translate('Trouvez votre médecin') }} <br class="hidden sm:block" />
-            <span class="text-blue-600 dark:text-blue-400">{{ translate('Prenez rendez-vous en ligne.') }}</span>
+            {{ translate('LANDING.HERO.TITLE') }} <br class="hidden sm:block" />
+            <span class="text-blue-600 dark:text-blue-400">{{ translate('LANDING.HERO.TITLE_EMPHASIS') }}</span>
           </h1>
           <p class="mt-6 text-lg text-slate-600 dark:text-slate-400 fade-in max-w-2xl relative z-10">
-            {{ translate('Simple, rapide et sécurisé. Votre santé à portée de clic.') }}
+            {{ translate('LANDING.HERO.SUBTITLE') }}
           </p>
 
           <!-- 🔍 Moteur de recherche avancé et Résultats -->
@@ -32,7 +32,7 @@
                 [value]="practitionerName"
                 (input)="onPractitionerNameInput($event)"
                 (focus)="openSearchPanel()"
-                [placeholder]="translate('Nom du praticien...')"
+                [placeholder]="translate('LANDING.SEARCH.DOCTOR_PLACEHOLDER')"
                 class="w-full bg-transparent border-none focus:outline-none dark:text-white placeholder-slate-400 font-medium"
               />
             </div>
@@ -41,7 +41,7 @@
               <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
               <div class="w-full relative">
                 <button type="button" (click)="isSpecialtyDropdownOpen = !isSpecialtyDropdownOpen" class="w-full text-left bg-transparent border-none focus:outline-none dark:text-white text-slate-700 dark:text-slate-200 cursor-pointer flex items-center justify-between gap-2 font-medium">
-                  <span class="truncate pr-2">{{ selectedSpecialtyLabel || translate('Spécialité') }}</span>
+                  <span class="truncate pr-2">{{ selectedSpecialtyLabel || translate('LANDING.SEARCH.SPECIALTY_LABEL') }}</span>
                   <svg class="w-4 h-4 text-slate-400 shrink-0 transition-transform duration-300" [class.rotate-180]="isSpecialtyDropdownOpen" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
                 
@@ -51,7 +51,7 @@
                      [class.scale-100]="isSpecialtyDropdownOpen">
                   <div class="p-2">
                     <button type="button" (click)="selectSpecialty(null)" class="w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-sm text-slate-400 italic">
-                      {{ prefs.translate('patient.booking.specialtyAll') }}
+                      {{ prefs.translate('LANDING.SEARCH.ALL_SPECIALTIES') }}
                     </button>
                     @for (spec of specialtyCatalog; track spec.id) {
                       <button type="button" (click)="selectSpecialty(spec)" class="w-full text-left px-4 py-3 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-all text-sm font-bold">
@@ -67,7 +67,7 @@
               <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
               <div class="w-full relative">
                 <button type="button" (click)="openCityDropdown()" class="w-full text-left bg-transparent border-none focus:outline-none dark:text-white text-slate-700 dark:text-slate-200 cursor-pointer flex items-center justify-between gap-2 font-medium">
-                  <span class="truncate pr-2">{{ city || translate('Où ? (Ville)') }}</span>
+                  <span class="truncate pr-2">{{ city || translate('LANDING.SEARCH.CITY_LABEL') }}</span>
                   <svg class="w-4 h-4 text-slate-400 shrink-0 transition-transform duration-300" [class.rotate-180]="isCityDropdownOpen" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
                 
@@ -84,12 +84,12 @@
                         type="text"
                         [value]="cityFilterText"
                         (input)="onCityInput($event)"
-                        [placeholder]="translate('Choisir une ville')"
+                        [placeholder]="translate('LANDING.SEARCH.CITY_PLACEHOLDER')"
                         class="w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400 dark:text-white"
                       />
                     </div>
                     <button type="button" (click)="selectCity(null)" class="w-full text-left px-4 py-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-sm text-slate-400 italic">
-                      {{ translate('Toutes les villes') }}
+                      {{ translate('LANDING.SEARCH.ALL_CITIES') }}
                     </button>
                     @for (cityOption of filteredCities; track cityOption) {
                       <button type="button" (click)="selectCity(cityOption)" class="w-full text-left px-4 py-3 rounded-xl hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-all text-sm font-bold"
@@ -98,7 +98,7 @@
                       </button>
                     }
                     @if (filteredCities.length === 0) {
-                      <div class="px-4 py-3 text-sm text-slate-400">{{ translate('Aucune ville trouvée') }}</div>
+                      <div class="px-4 py-3 text-sm text-slate-400">{{ translate('LANDING.SEARCH.NO_CITY') }}</div>
                     }
                   </div>
                 </div>
@@ -107,7 +107,7 @@
 
             <button (click)="triggerSearch()" class="bg-blue-600 hover:bg-blue-700 text-white rounded-xl sm:rounded-full px-8 py-3 font-bold transition transform hover:scale-105 flex items-center justify-center gap-2 w-full sm:w-auto mt-2 sm:mt-0 shadow-lg shadow-blue-600/20">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-              <span>{{ translate('Rechercher') }}</span>
+              <span>{{ translate('LANDING.SEARCH.SEARCH') }}</span>
             </button>
           </div>
 
@@ -167,7 +167,7 @@
                                     </span>
                                   </div>
                                   <p class="mt-1 text-sm font-semibold text-blue-600 dark:text-blue-400">
-                                    {{ r.specialty || translate('Médecine Générale') }}
+                                    {{ r.specialty || translate('LANDING.RESULTS.GENERAL_MEDICINE') }}
                                   </p>
                                 </div>
                               </div>
@@ -213,15 +213,15 @@
                             <span class="font-bold text-slate-900 dark:text-white">
                               {{ (r.globalRating || 0).toFixed(1) }}
                             </span>
-                            <span class="text-slate-500 dark:text-slate-400">({{ r.reviewCount || 0 }} {{ translate('avis') }})</span>
+                            <span class="text-slate-500 dark:text-slate-400">({{ r.reviewCount || 0 }} {{ translate('LANDING.RESULTS.REVIEWS') }})</span>
                           </div>
 
                           <!-- Tarif Consultation & Bouton d'action -->
                           <div class="mt-5 flex items-center justify-between gap-3 border-t border-slate-100 pt-4 dark:border-slate-800">
                             <div class="text-sm text-slate-600 dark:text-slate-300 text-left">
-                              <span class="block text-xs uppercase tracking-wide text-slate-400 dark:text-slate-500">{{ translate('Consultation') }}</span>
+                              <span class="block text-xs uppercase tracking-wide text-slate-400 dark:text-slate-500">{{ translate('LANDING.RESULTS.CONSULTATION') }}</span>
                               <span class="font-semibold text-slate-900 dark:text-white">
-                                {{ r.consultationFee != null ? (r.consultationFee | number:'1.0-0') + ' DH' : translate('Tarif à confirmer') }}
+                                {{ r.consultationFee != null ? (r.consultationFee | number:'1.0-0') + ' DH' : translate('LANDING.RESULTS.FEE_TBC') }}
                               </span>
                             </div>
 
@@ -230,7 +230,7 @@
                               [queryParams]="bookingLoginQuery(r)"
                               class="shrink-0 inline-flex items-center justify-center rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-2.5 transition shadow-lg shadow-blue-600/20 active:scale-95"
                             >
-                              {{ translate('Prendre RDV') }}
+                              {{ translate('LANDING.RESULTS.BOOK_APPOINTMENT') }}
                             </a>
                           </div>
                         </div>
@@ -243,10 +243,10 @@
                       🔍
                     </div>
                     <p class="font-bold text-slate-800 dark:text-white">
-                      {{ translate('Aucun praticien trouvé.') }}
+                      {{ translate('LANDING.RESULTS.NO_PRACTITIONER') }}
                     </p>
                     <p class="text-sm text-slate-500 mt-1">
-                      {{ translate('Essayez avec d\'autres critères.') }}
+                      {{ translate('LANDING.RESULTS.TRY_OTHER_CRITERIA') }}
                     </p>
                   </div>
                 }
@@ -257,8 +257,8 @@
 
           <!-- Mobile login buttons -->
           <div class="mt-8 flex flex-col w-full gap-3 md:hidden fade-in relative z-10">
-            <a routerLink="/auth/login" class="w-full py-3 text-center font-semibold text-blue-600 border border-blue-600 dark:border-blue-500 rounded-xl">Espace Patient</a>
-            <a routerLink="/auth/login-pro" class="w-full py-3 text-center font-semibold text-white bg-blue-600 rounded-xl">Espace Pro</a>
+            <a routerLink="/auth/login" class="w-full py-3 text-center font-semibold text-blue-600 border border-blue-600 dark:border-blue-500 rounded-xl">{{ prefs.translate('COMMON.PATIENT_PORTAL') }}</a>
+            <a routerLink="/auth/login-pro" class="w-full py-3 text-center font-semibold text-white bg-blue-600 rounded-xl">{{ prefs.translate('COMMON.PRO_PORTAL') }}</a>
           </div>
         </section>
 
@@ -271,7 +271,7 @@
           <div class="max-w-7xl mx-auto px-4 relative">
             <div class="text-center mb-16">
               <h3 class="text-blue-600 dark:text-blue-400 font-black text-sm uppercase tracking-[0.3em] mb-3">
-                {{ translate('Actualités & Prévention') }}
+                {{ translate('LANDING.NEWS.TITLE') }}
               </h3>
               <div class="h-1 w-12 bg-blue-600 mx-auto rounded-full"></div>
             </div>
@@ -281,9 +281,9 @@
               <div class="flex items-center justify-center w-full relative">
                 
                 @for (item of [
-                  { id: 0, tag: 'PRÉVENTION', title: 'Campagne de vaccination', text: 'Protégez-vous et vos proches dès maintenant.', color: 'from-blue-600 to-blue-400', icon: '💉' },
-                  { id: 1, tag: 'NOUVEAU', title: 'Centre Médical Lumière', text: 'Ouverture de notre nouveau centre de radiologie.', color: 'from-indigo-600 to-purple-500', icon: '🏥' },
-                  { id: 2, tag: 'INFO', title: 'Mise à jour App', text: 'Découvrez votre nouvel espace patient optimisé.', color: 'from-emerald-600 to-teal-500', icon: '📱' }
+                  { id: 0, tag: 'LANDING.NEWS.PREVENTION.TAG', title: 'LANDING.NEWS.PREVENTION.TITLE', text: 'LANDING.NEWS.PREVENTION.TEXT', color: 'from-blue-600 to-blue-400', icon: '💉' },
+                  { id: 1, tag: 'LANDING.NEWS.NEW.TAG', title: 'LANDING.NEWS.NEW.TITLE', text: 'LANDING.NEWS.NEW.TEXT', color: 'from-indigo-600 to-purple-500', icon: '🏥' },
+                  { id: 2, tag: 'LANDING.NEWS.INFO.TAG', title: 'LANDING.NEWS.INFO.TITLE', text: 'LANDING.NEWS.INFO.TEXT', color: 'from-emerald-600 to-teal-500', icon: '📱' }
                 ]; track item.id) {
                   
                   <div class="absolute transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]"
@@ -354,20 +354,20 @@
                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                 <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
               </span>
-              {{ translate('Vous êtes professionnel ?') }}
+              {{ translate('LANDING.B2B.BADGE') }}
             </div>
             <h2 class="text-3xl md:text-5xl font-extrabold text-white mb-6 leading-tight">
-              {{ translate('Réduisez vos appels') }}
+              {{ translate('LANDING.B2B.TITLE') }}
             </h2>
             <p class="text-slate-400 text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
-              {{ translate('Vous êtes professionnel de santé ? Équipez votre cabinet avec notre solution.') }}
+              {{ translate('LANDING.B2B.TEXT') }}
             </p>
             <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
               <a routerLink="/auth/register-cabinet" class="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl shadow-xl shadow-blue-500/20 transition transform hover:-translate-y-1">
-                {{ translate('Inscrire mon cabinet') }}
+                {{ translate('LANDING.B2B.CTA_PRIMARY') }}
               </a>
               <a href="#" class="px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-2xl border border-slate-700 transition">
-                {{ translate('Découvrir la solution') }}
+                {{ translate('LANDING.B2B.CTA_SECONDARY') }}
               </a>
             </div>
           </div>
@@ -376,7 +376,7 @@
         <!-- 4. Section "Comment ça marche ?" -->
         <section class="py-24 bg-slate-50 dark:bg-slate-950">
           <div class="max-w-7xl mx-auto px-4">
-            <h2 class="text-3xl font-bold mb-16 text-center">{{ translate('Comment utiliser MedConnect ?') }}</h2>
+            <h2 class="text-3xl font-bold mb-16 text-center">{{ translate('LANDING.STEPS.TITLE') }}</h2>
             
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
               <!-- Left Column: Image with glow effect -->
@@ -393,24 +393,24 @@
                 <div class="flex gap-6 p-6 rounded-3xl bg-white dark:bg-slate-900 shadow-sm border border-slate-100 dark:border-slate-800/80 hover:shadow-md transition">
                   <div class="w-14 h-14 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center text-2xl shrink-0">🔍</div>
                   <div>
-                    <h3 class="font-bold text-lg mb-2">{{ translate('1. Recherchez') }}</h3>
-                    <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{{ translate('Trouvez un praticien par nom ou spécialité près de chez vous en quelques clics.') }}</p>
+                    <h3 class="font-bold text-lg mb-2">{{ translate('LANDING.STEPS.STEP_1_TITLE') }}</h3>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{{ translate('LANDING.STEPS.STEP_1_TEXT') }}</p>
                   </div>
                 </div>
 
                 <div class="flex gap-6 p-6 rounded-3xl bg-white dark:bg-slate-900 shadow-sm border border-slate-100 dark:border-slate-800/80 hover:shadow-md transition">
                   <div class="w-14 h-14 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center text-2xl shrink-0">📅</div>
                   <div>
-                    <h3 class="font-bold text-lg mb-2">{{ translate('2. Choisissez') }}</h3>
-                    <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{{ translate('Consultez les disponibilités en temps réel et choisissez le créneau qui vous convient.') }}</p>
+                    <h3 class="font-bold text-lg mb-2">{{ translate('LANDING.STEPS.STEP_2_TITLE') }}</h3>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{{ translate('LANDING.STEPS.STEP_2_TEXT') }}</p>
                   </div>
                 </div>
 
                 <div class="flex gap-6 p-6 rounded-3xl bg-white dark:bg-slate-900 shadow-sm border border-slate-100 dark:border-slate-800/80 hover:shadow-md transition">
                   <div class="w-14 h-14 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center text-2xl shrink-0">✅</div>
                   <div>
-                    <h3 class="font-bold text-lg mb-2">{{ translate('3. Réservez') }}</h3>
-                    <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{{ translate('Confirmez votre RDV en toute sécurité et recevez vos rappels automatiques.') }}</p>
+                    <h3 class="font-bold text-lg mb-2">{{ translate('LANDING.STEPS.STEP_3_TITLE') }}</h3>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">{{ translate('LANDING.STEPS.STEP_3_TEXT') }}</p>
                   </div>
                 </div>
 
@@ -429,44 +429,44 @@
               <span class="text-2xl">🩺</span>
               <span class="font-bold text-xl text-white">MedConnect</span>
             </div>
-            <p class="text-sm text-slate-400 leading-relaxed">{{ translate('La plateforme de prise de rendez-vous médicaux de nouvelle génération.') }}</p>
+            <p class="text-sm text-slate-400 leading-relaxed">{{ translate('LANDING.FOOTER.DESCRIPTION') }}</p>
           </div>
 
           <div>
-            <h4 class="text-white font-bold mb-6 uppercase text-xs tracking-wider">{{ translate('À propos') }}</h4>
+            <h4 class="text-white font-bold mb-6 uppercase text-xs tracking-wider">{{ translate('LANDING.FOOTER.ABOUT') }}</h4>
             <ul class="space-y-3 text-sm text-slate-400">
-              <li><a href="#" class="hover:text-white transition">{{ translate('Qui sommes-nous ?') }}</a></li>
+              <li><a href="#" class="hover:text-white transition">{{ translate('LANDING.FOOTER.WHO') }}</a></li>
               <li>
                 <a href="#" class="hover:text-white transition flex items-center gap-2">
-                  {{ translate('Recrutement') }} 
-                  <span class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded uppercase font-bold">{{ translate('On embauche') }}</span>
+                  {{ translate('LANDING.FOOTER.CAREERS') }} 
+                  <span class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded uppercase font-bold">{{ translate('LANDING.FOOTER.HIRING') }}</span>
                 </a>
               </li>
-              <li><a href="#" class="hover:text-white transition">{{ translate('Presse') }}</a></li>
+              <li><a href="#" class="hover:text-white transition">{{ translate('LANDING.FOOTER.PRESS') }}</a></li>
             </ul>
           </div>
 
           <div>
-            <h4 class="text-white font-bold mb-6 uppercase text-xs tracking-wider">{{ translate('Légal & Aide') }}</h4>
+            <h4 class="text-white font-bold mb-6 uppercase text-xs tracking-wider">{{ translate('LANDING.FOOTER.LEGAL') }}</h4>
             <ul class="space-y-3 text-sm text-slate-400">
-              <li><a href="#" class="hover:text-white transition">{{ translate('Aide et Contact') }}</a></li>
+              <li><a href="#" class="hover:text-white transition">{{ translate('LANDING.FOOTER.HELP_CONTACT') }}</a></li>
               <li><a href="#" class="hover:text-white transition">{{ translate('Note d\'engagement') }}</a></li>
-              <li><a href="#" class="hover:text-white transition">{{ translate('Confidentialité & RGPD') }}</a></li>
-              <li><a href="#" class="hover:text-white transition">{{ translate('Conditions Générales (CGU)') }}</a></li>
+              <li><a href="#" class="hover:text-white transition">{{ translate('LANDING.FOOTER.PRIVACY') }}</a></li>
+              <li><a href="#" class="hover:text-white transition">{{ translate('LANDING.FOOTER.TERMS') }}</a></li>
             </ul>
           </div>
 
           <div>
-            <h4 class="text-white font-bold mb-6 uppercase text-xs tracking-wider">{{ translate('Praticiens') }}</h4>
-            <p class="text-sm text-slate-400 mb-6 leading-relaxed">{{ translate('Vous êtes professionnel de santé ? Équipez votre cabinet avec notre solution.') }}</p>
+            <h4 class="text-white font-bold mb-6 uppercase text-xs tracking-wider">{{ translate('LANDING.FOOTER.PRACTITIONERS') }}</h4>
+            <p class="text-sm text-slate-400 mb-6 leading-relaxed">{{ translate('LANDING.B2B.TEXT') }}</p>
             <a routerLink="/auth/register-cabinet" class="inline-flex justify-center items-center bg-slate-800 text-white px-5 py-2.5 rounded-lg text-sm font-semibold border border-slate-700 hover:bg-slate-700 hover:border-slate-600 transition w-full sm:w-auto">
-              {{ translate('Inscrire mon cabinet') }}
+              {{ translate('LANDING.B2B.CTA_PRIMARY') }}
             </a>
           </div>
 
         </div>
         <div class="max-w-7xl mx-auto px-4 mt-16 pt-8 border-t border-slate-800 text-center text-sm text-slate-500">
-          &copy; {{ currentYear }} MedConnect. {{ translate('Tous droits réservés.') }}
+          &copy; {{ currentYear }} MedConnect. {{ translate('LANDING.FOOTER.COPYRIGHT') }}
         </div>
       </footer>
     </div>

@@ -21,8 +21,8 @@ spring:
 
 # Secrets alignés sur patient-service (patient) et practitioner-service (pro).
 jwt:
-  patient-secret: ${JWT_SECRET:MEDICAl-PATIENT-SERVICE-JWT-SECRET-KEY-256-BITS-CHANGE-IN-PROD-0123456789}
-  pro-secret: ${JWT_PRO_SECRET:MEDICAL-PRACTITIONER-SERVICE-JWT-SECRET-KEY-256-BITS-CHANGE-IN-PROD-9876543210}
+  patient-secret: ${JWT_SECRET}
+  pro-secret: ${JWT_PRO_SECRET}
 
 integration:
   agenda-base-url: ${AGENDA_BASE_URL:http://localhost:8081}

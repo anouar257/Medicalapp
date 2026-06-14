@@ -1,7 +1,9 @@
 package com.medical.practitioner.security;
 
+import com.medical.practitioner.entity.PractitionerProfile;
 import com.medical.practitioner.entity.ProUser;
 import com.medical.practitioner.entity.ProUserRole;
+import com.medical.practitioner.repository.PractitionerProfileRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -54,6 +56,39 @@ public final class AccessPolicies {
     if (mine == null || !mine.equals(organizationId)) {
       throw forbidden();
     }
+  }
+
+  /**
+   * Vérifie que l'acteur est soit admin plateforme, soit le propriétaire direct du profil praticien,
+   * soit un assistant du même cabinet.
+   */
+  public static void requireOwnerOrCabinetMember(ProUser actor, PractitionerProfile target) {
+    if (isPlatformAdmin(actor)) return;
+    if (actor == null || target == null || target.getProUser() == null) throw forbidden();
+
+    // Le praticien est le propriétaire direct
+    if (actor.getId().equals(target.getProUser().getId())) return;
+
+    // L'assistant peut agir sur les praticiens de son cabinet
+    if (actor.getRole() == ProUserRole.ASSISTANT) {
+      Long actorOrg = organizationIdOrNull(actor);
+      Long targetOrg = target.getProUser().getOrganization() != null
+          ? target.getProUser().getOrganization().getId() : null;
+      if (actorOrg != null && actorOrg.equals(targetOrg)) return;
+    }
+
+    throw forbidden();
+  }
+
+  /**
+   * Variante pour un practitionerId : charge le profil et vérifie.
+   */
+  public static void requireOwnerOrCabinetMember(ProUser actor, Long practitionerId,
+                                                 PractitionerProfileRepository repo) {
+    if (isPlatformAdmin(actor)) return;
+    PractitionerProfile target = repo.findById(practitionerId)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profil introuvable"));
+    requireOwnerOrCabinetMember(actor, target);
   }
 
   private static ResponseStatusException forbidden() {

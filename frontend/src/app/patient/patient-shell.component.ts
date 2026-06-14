@@ -20,14 +20,14 @@ import { AppPreferencesToolbarComponent } from '../shared/app-preferences-toolba
               MedConnect
             </h1>
             <span class="hidden sm:inline-block shrink-0 px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase tracking-wider">
-              {{ prefs.translate('Patient') }}
+              {{ prefs.translate('PATIENT.SHELL.PATIENT') }}
             </span>
           </a>
           <div class="flex items-center gap-2 sm:gap-3 shrink-0" [class.flex-row-reverse]="prefs.language() === 'ar'">
             <a routerLink="/patient/prendre-rendez-vous" 
                class="hidden md:flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black shadow-lg shadow-blue-500/20 transition-all duration-300 hover:scale-105 active:scale-95">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
-              {{ prefs.translate('Prendre RDV') }}
+              {{ prefs.translate('PATIENT.SHELL.BOOK_APPOINTMENT') }}
             </a>
             <app-preferences-toolbar />
             @if (patient) {
@@ -36,9 +36,9 @@ import { AppPreferencesToolbarComponent } from '../shared/app-preferences-toolba
                   <span class="text-sm font-bold text-slate-700 dark:text-slate-200">
                     {{ patient.prenom }} {{ patient.nom }}
                   </span>
-                  <span class="text-[10px] text-slate-400">{{ prefs.translate('Compte vérifié') }}</span>
+                  <span class="text-[10px] text-slate-400">{{ prefs.translate('PATIENT.SHELL.VERIFIED_ACCOUNT') }}</span>
                 </div>
-                <button (click)="logout()" type="button" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-colors duration-300" [attr.title]="prefs.translate('Déconnexion')">
+                <button (click)="logout()" type="button" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-colors duration-300" [attr.title]="prefs.translate('PATIENT.SHELL.LOGOUT')">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                 </button>
               </div>

@@ -88,13 +88,13 @@ export class CabinetPracticeComponent {
         if (r.kind === 'no-org') {
           this.cabinet = null;
           this.loading = false;
-          this.errorMessage = this.prefs.translate('cabinet.practice.noOrganization');
+          this.errorMessage = this.prefs.translate('PRACTITIONER.PRACTICE.NO_ORGANIZATION');
           return;
         }
         if (r.kind === 'error') {
           this.cabinet = null;
           this.loading = false;
-          this.errorMessage = this.prefs.translate('cabinet.practice.loadError');
+          this.errorMessage = this.prefs.translate('PRACTITIONER.PRACTICE.LOAD_ERROR');
           return;
         }
         this.cabinet = r.cabinet;
@@ -131,7 +131,7 @@ export class CabinetPracticeComponent {
       .listLocations(this.practitionerId)
       .subscribe({
         next: (l) => (this.locations = l),
-        error: (e) => (this.errorMessage = e.error?.error || 'Erreur de chargement des adresses'),
+        error: (e) => (this.errorMessage = e.error?.error || this.prefs.translate('PRACTITIONER.PRACTICE.LOAD_LOCATIONS_ERROR')),
       });
   }
 
@@ -201,7 +201,7 @@ export class CabinetPracticeComponent {
     if (!this.editing || !this.practitionerId) return;
     this.editingError = '';
     if (!this.editing.nomEtablissement?.trim() || !this.editing.adresse?.trim()) {
-      this.editingError = "Le nom de l'établissement et l'adresse sont obligatoires";
+      this.editingError = this.prefs.translate('PRACTITIONER.PRACTICE.REQUIRED_FIELDS');
       return;
     }
     this.editingSaving = true;
@@ -212,57 +212,58 @@ export class CabinetPracticeComponent {
       next: () => {
         this.editingSaving = false;
         this.editing = null;
-        this.successMessage = 'Adresse enregistrée avec succès';
+        this.successMessage = this.prefs.translate('PRACTITIONER.PRACTICE.SUCCESS_SAVED');
         this.refreshLocations();
         this.agendaState.refreshCabinetHoraires();
         setTimeout(() => (this.successMessage = ''), 3000);
       },
       error: (e) => {
         this.editingSaving = false;
-        this.editingError = e.error?.error || "Erreur d'enregistrement";
+        this.editingError = e.error?.error || this.prefs.translate('PRACTITIONER.PRACTICE.ERROR_SAVE');
       },
     });
   }
 
   removeLocation(loc: ConsultationLocationDTO) {
     if (!loc.id) return;
-    if (!confirm(`Supprimer l'adresse « ${loc.nomEtablissement} » ?`)) return;
+    if (!confirm(this.prefs.translate('PRACTITIONER.PRACTICE.DELETE_CONFIRM').replace('{name}', loc.nomEtablissement))) return;
     this.practitionerService.deleteLocation(loc.id).subscribe({
       next: () => {
-        this.successMessage = 'Adresse supprimée avec succès';
+        this.successMessage = this.prefs.translate('PRACTITIONER.PRACTICE.SUCCESS_DELETED');
         this.refreshLocations();
         this.agendaState.refreshCabinetHoraires();
         setTimeout(() => (this.successMessage = ''), 3000);
       },
-      error: (e) => (this.errorMessage = e.error?.error || 'Erreur de suppression'),
+      error: (e) => (this.errorMessage = e.error?.error || this.prefs.translate('PRACTITIONER.PRACTICE.ERROR_DELETE')),
     });
   }
 
   jourLabel(j: JourSemaine | string): string {
-    return j.charAt(0) + j.slice(1).toLowerCase();
+    const key = `COMMON.DAYS.${j}`;
+    return this.prefs.translate(key);
   }
 
   parkingLabel(p: string): string {
     switch (p) {
       case 'GRATUIT':
-        return 'Parking gratuit';
+        return this.prefs.translate('PRACTITIONER.PRACTICE.PARKING_FREE');
       case 'PAYANT':
-        return 'Parking payant';
+        return this.prefs.translate('PRACTITIONER.PRACTICE.PARKING_PAID');
       default:
-        return 'Aucun parking';
+        return this.prefs.translate('PRACTITIONER.PRACTICE.NO_PARKING');
     }
   }
 
   urgenceLabel(u: string): string {
     switch (u) {
       case 'SECRETARIAT':
-        return 'Secrétariat';
+        return this.prefs.translate('PRACTITIONER.PRACTICE.SECRETARIAT');
       case 'SOS_MEDECINS':
-        return 'SOS Médecins';
+        return this.prefs.translate('PRACTITIONER.PRACTICE.SOS_MEDECINS');
       case 'NUMERO_PERSONNEL':
-        return 'Numéro personnel';
+        return this.prefs.translate('PRACTITIONER.PRACTICE.PERSONAL_NUMBER');
       case 'NUMERO_DIRECT':
-        return 'Numéro direct';
+        return this.prefs.translate('PRACTITIONER.PRACTICE.DIRECT_NUMBER');
       default:
         return u;
     }
@@ -277,7 +278,7 @@ export class CabinetPracticeComponent {
       next: (c) => {
         this.cabinet = c;
         this.saving = false;
-        this.successMessage = this.prefs.translate('cabinet.practice.saveSuccess');
+        this.successMessage = this.prefs.translate('PRACTITIONER.PRACTICE.SUCCESS_SAVED');
         const u = this.authPro.getCurrentUser();
         if (u && c.nom) {
           this.authPro.patchCurrentUser({ organizationNom: c.nom });
@@ -291,7 +292,7 @@ export class CabinetPracticeComponent {
         this.errorMessage =
           typeof e.error?.error === 'string' && e.error.error
             ? e.error.error
-            : this.prefs.translate('cabinet.practice.saveError');
+            : this.prefs.translate('PRACTITIONER.PRACTICE.ERROR_SAVE');
       },
     });
   }

@@ -63,14 +63,14 @@ export class PlatformDashboardComponent implements OnInit {
     forkJoin({
       stats: this.agenda.getGlobalPlatformStats().pipe(
         catchError(() => {
-          this.loadError = this.prefs.translate('platformAdmin.statsError');
+          this.loadError = this.prefs.translate('ADMIN.ERRORS.STATS');
           return of(null);
         }),
       ),
       cabinets: this.practitioner.listPlatformCabinets().pipe(
         catchError(() => {
           if (!this.loadError) {
-            this.loadError = this.prefs.translate('platformAdmin.cabinetsError');
+            this.loadError = this.prefs.translate('ADMIN.ERRORS.CABINETS');
           }
           return of([] as MedicalOrganizationDTO[]);
         }),
@@ -92,7 +92,7 @@ export class PlatformDashboardComponent implements OnInit {
       },
       error: () => {
         this.patientsLoading = false;
-        this.loadError = this.prefs.translate('platformAdmin.patientsLoadError');
+        this.loadError = this.prefs.translate('ADMIN.ERRORS.PATIENTS_LOAD');
       },
     });
   }
@@ -108,7 +108,7 @@ export class PlatformDashboardComponent implements OnInit {
         );
       },
       error: () => {
-        this.loadError = this.prefs.translate('platformAdmin.patientToggleError');
+        this.loadError = this.prefs.translate('ADMIN.ERRORS.PATIENT_TOGGLE');
       },
     });
   }
@@ -131,7 +131,7 @@ export class PlatformDashboardComponent implements OnInit {
       },
       error: () => {
         this.staffLoadingId = null;
-        this.staffError = this.prefs.translate('platformAdmin.staffError');
+        this.staffError = this.prefs.translate('ADMIN.ERRORS.STAFF');
       },
     });
   }
@@ -151,7 +151,7 @@ export class PlatformDashboardComponent implements OnInit {
         );
       },
       error: () => {
-        this.staffError = this.prefs.translate('platformAdmin.userToggleError');
+        this.staffError = this.prefs.translate('ADMIN.ERRORS.USER_TOGGLE');
       },
     });
   }
@@ -176,7 +176,7 @@ export class PlatformDashboardComponent implements OnInit {
     if (!c?.id) return;
     const nom = this.cabinetEditNom.trim();
     if (!nom) {
-      this.cabinetEditError = this.prefs.translate('platformAdmin.cabinetNameRequired');
+      this.cabinetEditError = this.prefs.translate('ADMIN.ERRORS.CABINET_NAME_REQUIRED');
       return;
     }
     this.cabinetEditSaving = true;
@@ -189,7 +189,7 @@ export class PlatformDashboardComponent implements OnInit {
           this.closeCabinetModal();
         },
         error: () => {
-          this.cabinetEditError = this.prefs.translate('platformAdmin.cabinetSaveError');
+          this.cabinetEditError = this.prefs.translate('ADMIN.ERRORS.CABINET_SAVE');
           this.cabinetEditSaving = false;
         },
       });

@@ -1,0 +1,18 @@
+{
+  "ASSISTANT.DASHBOARD.TITLE": "Demandes de rendez-vous",
+  "ASSISTANT.DASHBOARD.SUBTITLE": "Traitez les demandes en attente pour votre cabinet.",
+  "ASSISTANT.PENDING.SECTION": "Demandes à traiter",
+  "ASSISTANT.PENDING.REFRESH": "Actualiser",
+  "ASSISTANT.PENDING.PROCESSING": "Traitement...",
+  "ASSISTANT.PENDING.LOAD_ERROR": "Impossible de charger les demandes en attente.",
+  "ASSISTANT.PENDING.EMPTY": "Aucune demande en attente",
+  "ASSISTANT.PENDING.EMPTY_HINT": "Les nouvelles demandes apparaîtront ici dès qu’elles seront déposées.",
+  "ASSISTANT.PENDING.DATE": "Date",
+  "ASSISTANT.PENDING.REASON": "Motif",
+  "ASSISTANT.PENDING.DOCTOR": "Médecin",
+  "ASSISTANT.PENDING.UNKNOWN_PATIENT": "Patient inconnu",
+  "ASSISTANT.PENDING.CONFIRM": "Confirmer",
+  "ASSISTANT.PENDING.CANCEL_MOVE": "Annuler / déplacer",
+  "ASSISTANT.PENDING.ERROR": "Impossible de mettre à jour la demande.",
+  "ASSISTANT.PENDING.REMOTE": "Téléconsultation"
+}

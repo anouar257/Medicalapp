@@ -1,118 +1,112 @@
-
 <div class="flex-1 flex flex-col min-h-0">
   <main class="max-w-5xl mx-auto w-full px-4 py-8">
-    <!-- Page title row -->
     <div class="flex items-center justify-between mb-8">
       <div class="flex items-center gap-3">
         <a routerLink="/patient/dashboard" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-colors">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
-        <h1 class="text-xl font-bold text-slate-800 dark:text-white">Mes Proches</h1>
+        <h1 class="text-xl font-bold text-slate-800 dark:text-white">{{ prefs.translate('PATIENT.RELATIVES.TITLE') }}</h1>
       </div>
       <button (click)="toggleForm()" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm transition shadow-lg shadow-blue-500/20">
-        @if (showForm) { <span>Annuler</span> }
-        @else { <span>+ Ajouter un proche</span> }
+        @if (showForm) { <span>{{ prefs.translate('PATIENT.RELATIVES.CANCEL') }}</span> }
+        @else { <span>{{ prefs.translate('PATIENT.RELATIVES.ADD') }}</span> }
       </button>
     </div>
-    
-    <!-- Formulaire d'ajout/modification -->
+
     @if (showForm) {
       <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-xl border border-slate-100 dark:border-slate-700 overflow-hidden mb-12 animate-in fade-in slide-in-from-top-4 duration-300">
         <div class="p-6 border-b border-slate-50 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/20">
           <h3 class="text-lg font-bold text-slate-800 dark:text-white">
-            {{ editingId ? 'Modifier le profil' : 'Ajouter un nouveau proche' }}
+            {{ editingId ? prefs.translate('PATIENT.RELATIVES.EDIT') : prefs.translate('PATIENT.RELATIVES.ADD') }}
           </h3>
-          <p class="text-sm text-slate-500 dark:text-slate-400">Remplissez les informations pour rattacher ce proche à votre compte.</p>
+          <p class="text-sm text-slate-500 dark:text-slate-400">{{ prefs.translate('PATIENT.RELATIVES.SUBTITLE') }}</p>
         </div>
 
         <form (ngSubmit)="onSubmit()" class="p-8 space-y-10">
-          <!-- Identité -->
           <section>
-            <h4 class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-6">Informations Personnelles</h4>
+            <h4 class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-6">{{ prefs.translate('PATIENT.RELATIVES.INFO_TITLE') }}</h4>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div class="md:col-span-1">
-                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase">Civilité</label>
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase">{{ prefs.translate('PATIENT.RELATIVES.CIVILITY') }}</label>
                 <select [(ngModel)]="formData.civilite" name="civilite" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition">
-                  <option value="">Choisir</option>
+                  <option value="">{{ prefs.translate('PATIENT.RELATIVES.CHOOSE') }}</option>
                   <option value="M">M.</option>
                   <option value="MME">Mme</option>
                   <option value="MLLE">Mlle</option>
                 </select>
               </div>
               <div class="md:col-span-1">
-                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase">Sexe *</label>
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase">{{ prefs.translate('PATIENT.RELATIVES.SEX') }} *</label>
                 <select [(ngModel)]="formData.sexe" name="sexe" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition">
-                  <option value="">Choisir</option>
-                  <option value="HOMME">Homme</option>
-                  <option value="FEMME">Femme</option>
+                  <option value="">{{ prefs.translate('PATIENT.RELATIVES.CHOOSE') }}</option>
+                  <option value="HOMME">{{ prefs.translate('PATIENT.RELATIVES.MALE') }}</option>
+                  <option value="FEMME">{{ prefs.translate('PATIENT.RELATIVES.FEMALE') }}</option>
                 </select>
               </div>
               <div class="md:col-span-1">
-                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase">Prénom *</label>
-                <input type="text" [(ngModel)]="formData.prenom" name="prenom" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="Prénom"/>
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase">{{ prefs.translate('PATIENT.RELATIVES.FIRSTNAME') }} *</label>
+                <input type="text" [(ngModel)]="formData.prenom" name="prenom" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="{{ prefs.translate('PATIENT.RELATIVES.FIRSTNAME') }}"/>
               </div>
               <div class="md:col-span-1">
-                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase">Nom *</label>
-                <input type="text" [(ngModel)]="formData.nom" name="nom" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="Nom"/>
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase">{{ prefs.translate('PATIENT.RELATIVES.LASTNAME') }} *</label>
+                <input type="text" [(ngModel)]="formData.nom" name="nom" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="{{ prefs.translate('PATIENT.RELATIVES.LASTNAME') }}"/>
               </div>
             </div>
 
             <div class="mt-6">
               <label class="flex items-center gap-3 cursor-pointer group">
                 <input type="checkbox" [(ngModel)]="formData.nomFamilleChange" name="nomFamilleChange" class="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 transition"/>
-                <span class="text-sm text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition">Le nom de famille a été changé</span>
+                <span class="text-sm text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition">{{ prefs.translate('PATIENT.RELATIVES.NAME_CHANGED') }}</span>
               </label>
               @if (formData.nomFamilleChange) {
                 <div class="mt-4 animate-in fade-in slide-in-from-left-2 duration-200">
-                  <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase">Ancien nom de famille</label>
-                  <input type="text" [(ngModel)]="formData.ancienNomFamille" name="ancienNomFamille" class="w-full max-w-md bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="Nom de naissance"/>
+                  <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase">{{ prefs.translate('PATIENT.RELATIVES.MAIDEN_NAME') }}</label>
+                  <input type="text" [(ngModel)]="formData.ancienNomFamille" name="ancienNomFamille" class="w-full max-w-md bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="{{ prefs.translate('PATIENT.RELATIVES.MAIDEN_NAME') }}"/>
                 </div>
               }
             </div>
           </section>
 
-          <!-- Naissance -->
           <section>
-            <h4 class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-6">Naissance & Localisation</h4>
+            <h4 class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-6">{{ prefs.translate('PATIENT.RELATIVES.BIRTH_AND_LOCATION') }}</h4>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase">Date de naissance *</label>
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase">{{ prefs.translate('PATIENT.RELATIVES.BIRTH_DATE') }} *</label>
                 <input type="date" [(ngModel)]="formData.dateNaissance" name="dateNaissance" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition"/>
               </div>
               <div>
-                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase">Pays de naissance</label>
-                <input type="text" [(ngModel)]="formData.paysNaissance" name="paysNaissance" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="France"/>
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase">{{ prefs.translate('PATIENT.RELATIVES.BIRTH_COUNTRY') }}</label>
+                <input type="text" [(ngModel)]="formData.paysNaissance" name="paysNaissance" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition" [placeholder]="prefs.translate('PATIENT.RELATIVES.BIRTH_COUNTRY_PH')"/>
               </div>
               <div>
-                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase">Ville de naissance</label>
-                <input type="text" [(ngModel)]="formData.villeNaissance" name="villeNaissance" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="Paris"/>
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase">{{ prefs.translate('PATIENT.RELATIVES.BIRTH_CITY') }}</label>
+                <input type="text" [(ngModel)]="formData.villeNaissance" name="villeNaissance" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition" [placeholder]="prefs.translate('PATIENT.RELATIVES.BIRTH_CITY_PH')"/>
               </div>
             </div>
           </section>
 
-          <!-- Contacts & adresse (adresse + code postal requis par l'API) -->
           <section>
-            <h4 class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-6">Coordonnées</h4>
+            <h4 class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-6">{{ prefs.translate('PATIENT.RELATIVES.CONTACTS') }}</h4>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase">Mobile</label>
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase">{{ prefs.translate('PATIENT.RELATIVES.MOBILE') }}</label>
                 <input type="tel" [(ngModel)]="formData.telephoneMobile" name="telephoneMobile" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="+33 6..."/>
               </div>
               <div>
-                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase">Email</label>
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase">{{ prefs.translate('PATIENT.RELATIVES.EMAIL') }}</label>
                 <input type="email" [(ngModel)]="formData.email" name="email" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="email@exemple.com"/>
               </div>
               <div class="md:col-span-2">
-                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase">Adresse</label>
-                <input type="text" [(ngModel)]="formData.adresse" name="adresse" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="N°, rue, bâtiment"/>
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase">{{ prefs.translate('PATIENT.RELATIVES.ADDRESS') }}</label>
+                <input type="text" [(ngModel)]="formData.adresse" name="adresse" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition" [placeholder]="prefs.translate('PATIENT.RELATIVES.ADDRESS_PH')"/>
               </div>
               <div>
-                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase">Code postal</label>
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase">{{ prefs.translate('PATIENT.RELATIVES.POSTAL_CODE') }}</label>
                 <input type="text" [(ngModel)]="formData.codePostal" name="codePostal" maxlength="10" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="75001"/>
               </div>
               <div>
-                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase">Ville de résidence</label>
-                <input type="text" [(ngModel)]="formData.ville" name="ville" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="Ville"/>
+                <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase">{{ prefs.translate('PATIENT.RELATIVES.RESIDENCE_CITY') }}</label>
+                <input type="text" [(ngModel)]="formData.ville" name="ville" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none transition" [placeholder]="prefs.translate('PATIENT.RELATIVES.RESIDENCE_CITY_PH')"/>
               </div>
             </div>
           </section>
@@ -121,26 +115,25 @@
           @if (successMessage) { <div class="p-4 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-2xl text-sm font-medium border border-emerald-100 dark:border-emerald-900/30">{{ successMessage }}</div> }
 
           <div class="pt-6 border-t border-slate-50 dark:border-slate-700 flex justify-end gap-4">
-            <button type="button" (click)="resetForm()" class="px-6 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 font-bold text-sm transition">Annuler</button>
+            <button type="button" (click)="resetForm()" class="px-6 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 font-bold text-sm transition">{{ prefs.translate('PATIENT.RELATIVES.CANCEL') }}</button>
             <button type="submit" [disabled]="loading" class="px-8 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm transition shadow-lg shadow-blue-500/20 disabled:opacity-50">
-              @if (loading) { <span class="flex items-center gap-2"><svg class="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Enregistrement...</span> }
-              @else { {{ editingId ? 'Mettre à jour' : 'Enregistrer' }} }
+              @if (loading) { <span class="flex items-center gap-2"><svg class="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> {{ prefs.translate('COMMON.SAVING') }}</span> }
+              @else { {{ editingId ? prefs.translate('PATIENT.RELATIVES.UPDATE') : prefs.translate('PATIENT.RELATIVES.SAVE') }} }
             </button>
           </div>
         </form>
       </div>
     }
 
-    <!-- Liste des proches -->
     <div class="space-y-6">
       <div class="flex items-center justify-between mb-2">
-        <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest">Profiles Rattachés ({{ proches.length }})</h3>
+        <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest">{{ prefs.translate('PATIENT.RELATIVES.PROFILES_TITLE') }} ({{ proches.length }})</h3>
       </div>
 
       @if (loadingList) {
         <div class="flex flex-col items-center justify-center py-20 gap-4">
           <svg class="animate-spin h-10 w-10 text-blue-600" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-          <span class="text-slate-400 font-medium">Chargement des données...</span>
+          <span class="text-slate-400 font-medium">{{ prefs.translate('PATIENT.RELATIVES.LOADING') }}</span>
         </div>
       }
 
@@ -158,7 +151,7 @@
                   </h4>
                   <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2">
                     <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                    Actif · Profil vérifié
+                    {{ prefs.translate('PATIENT.RELATIVES.ACTIVE_PROFILE') }}
                   </p>
                 </div>
               </div>
@@ -174,18 +167,18 @@
 
             <div class="mt-6 pt-6 border-t border-slate-50 dark:border-slate-700 grid grid-cols-2 gap-4">
               <div class="flex flex-col">
-                <span class="text-[10px] text-slate-400 uppercase font-bold tracking-tighter">Contact Mobile</span>
+                <span class="text-[10px] text-slate-400 uppercase font-bold tracking-tighter">{{ prefs.translate('PATIENT.RELATIVES.MOBILE') }}</span>
                 <span class="text-sm text-slate-600 dark:text-slate-300">{{ proche.telephoneMobile }}</span>
               </div>
               <div class="flex flex-col">
-                <span class="text-[10px] text-slate-400 uppercase font-bold tracking-tighter">Date de Naissance</span>
+                <span class="text-[10px] text-slate-400 uppercase font-bold tracking-tighter">{{ prefs.translate('PATIENT.RELATIVES.BIRTH_DATE') }}</span>
                 <span class="text-sm text-slate-600 dark:text-slate-300">{{ proche.dateNaissance }}</span>
               </div>
             </div>
 
             @if (proche.identiteDouteuse) {
               <div class="mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 text-[10px] font-bold rounded-xl flex items-center gap-2 border border-amber-100 dark:border-amber-900/30">
-                <span class="text-sm">⚠️</span> Identité douteuse signalée
+                <span class="text-sm">⚠️</span> {{ prefs.translate('PATIENT.RELATIVES.IDENTITY_DOUTEUSE') }}
               </div>
             }
           </div>
@@ -195,9 +188,9 @@
       @if (!loadingList && proches.length === 0) {
         <div class="flex flex-col items-center justify-center py-24 bg-white dark:bg-slate-800 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-700">
           <div class="text-5xl mb-6 grayscale opacity-30">👥</div>
-          <h4 class="font-bold text-slate-800 dark:text-white mb-2">Aucun proche enregistré</h4>
-          <p class="text-slate-500 dark:text-slate-400 text-sm max-w-xs text-center">Ajoutez les membres de votre famille pour faciliter la prise de rendez-vous groupée.</p>
-          <button (click)="showForm = true" class="mt-8 text-blue-600 font-bold hover:underline text-sm">Ajouter mon premier proche</button>
+          <h4 class="font-bold text-slate-800 dark:text-white mb-2">{{ prefs.translate('PATIENT.RELATIVES.NO_RELATIVE') }}</h4>
+          <p class="text-slate-500 dark:text-slate-400 text-sm max-w-xs text-center">{{ prefs.translate('PATIENT.RELATIVES.EMPTY_DESC') }}</p>
+          <button (click)="showForm = true" class="mt-8 text-blue-600 font-bold hover:underline text-sm">{{ prefs.translate('PATIENT.RELATIVES.ADD_FIRST') }}</button>
         </div>
       }
     </div>

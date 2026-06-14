@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { PreferencesService, AppLanguage } from '../services/preferences.service';
+import { PreferencesService } from '../services/preferences.service';
 import { ThemeService } from '../services/theme.service';
 
 @Component({
@@ -50,16 +50,16 @@ import { ThemeService } from '../services/theme.service';
 
           <!-- Zoom controls -->
           <div class="hidden sm:flex items-center bg-slate-100 dark:bg-slate-800 rounded-full p-1">
-            <button (click)="prefs.setZoom('faible')" [class.bg-white]="prefs.zoomLevel() === 'faible'" [class.dark:bg-slate-600]="prefs.zoomLevel() === 'faible'" [class.shadow-sm]="prefs.zoomLevel() === 'faible'" class="px-2 py-1 text-xs rounded-full transition-all" title="Zoom Faible">A</button>
-            <button (click)="prefs.setZoom('moyen')" [class.bg-white]="prefs.zoomLevel() === 'moyen'" [class.dark:bg-slate-600]="prefs.zoomLevel() === 'moyen'" [class.shadow-sm]="prefs.zoomLevel() === 'moyen'" class="px-2 py-1 text-sm rounded-full transition-all" title="Zoom Moyen">A</button>
-            <button (click)="prefs.setZoom('fort')" [class.bg-white]="prefs.zoomLevel() === 'fort'" [class.dark:bg-slate-600]="prefs.zoomLevel() === 'fort'" [class.shadow-sm]="prefs.zoomLevel() === 'fort'" class="px-2 py-1 text-base rounded-full transition-all" title="Zoom Fort">A</button>
+            <button (click)="prefs.setZoom('faible')" [class.bg-white]="prefs.zoomLevel() === 'faible'" [class.dark:bg-slate-600]="prefs.zoomLevel() === 'faible'" [class.shadow-sm]="prefs.zoomLevel() === 'faible'" class="px-2 py-1 text-xs rounded-full transition-all" [title]="prefs.translate('COMMON.ZOOM_LOW')">A</button>
+            <button (click)="prefs.setZoom('moyen')" [class.bg-white]="prefs.zoomLevel() === 'moyen'" [class.dark:bg-slate-600]="prefs.zoomLevel() === 'moyen'" [class.shadow-sm]="prefs.zoomLevel() === 'moyen'" class="px-2 py-1 text-sm rounded-full transition-all" [title]="prefs.translate('COMMON.ZOOM_MEDIUM')">A</button>
+            <button (click)="prefs.setZoom('fort')" [class.bg-white]="prefs.zoomLevel() === 'fort'" [class.dark:bg-slate-600]="prefs.zoomLevel() === 'fort'" [class.shadow-sm]="prefs.zoomLevel() === 'fort'" class="px-2 py-1 text-base rounded-full transition-all" [title]="prefs.translate('COMMON.ZOOM_HIGH')">A</button>
           </div>
 
           <!-- Dark Mode Button -->
           <button 
             (click)="theme.toggle()" 
             class="hover:bg-slate-100 dark:hover:bg-slate-800 p-2 rounded-full transition-colors flex items-center justify-center"
-            title="Mode Sombre/Clair"
+            [title]="prefs.translate('COMMON.TOGGLE_THEME')"
           >
             @if (theme.isDark()) {
               <svg class="w-5 h-5 text-amber-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -76,10 +76,10 @@ import { ThemeService } from '../services/theme.service';
           <!-- Navigation Links -->
           <div class="hidden md:flex gap-3 ml-2">
             <a routerLink="/auth/login" class="px-4 py-2 text-sm font-semibold text-blue-600 border border-blue-600 dark:border-blue-500 dark:text-blue-400 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/30 transition">
-              {{ translate('Espace Patient') }}
+              {{ prefs.translate('COMMON.PATIENT_PORTAL') }}
             </a>
             <a routerLink="/auth/login-pro" class="px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-full hover:bg-blue-700 shadow-md shadow-blue-500/20 transition transform hover:-translate-y-0.5">
-              {{ translate('Espace Pro') }}
+              {{ prefs.translate('COMMON.PRO_PORTAL') }}
             </a>
           </div>
         </div>
@@ -91,14 +91,7 @@ export class AppNavbarComponent {
   readonly prefs = inject(PreferencesService);
   readonly theme = inject(ThemeService);
 
-  private readonly dictionary: Record<string, Record<AppLanguage, string>> = {
-    'Espace Patient': { fr: 'Espace Patient', en: 'Patient Portal', ar: 'بوابة المريض' },
-    'Espace Pro': { fr: 'Espace Pro', en: 'Pro Portal', ar: 'بوابة الطبيب' }
-  };
-
   translate(key: string): string {
-    const lang = this.prefs.language();
-    const row = this.dictionary[key];
-    return row?.[lang] ?? key;
+    return this.prefs.translate(key);
   }
 }

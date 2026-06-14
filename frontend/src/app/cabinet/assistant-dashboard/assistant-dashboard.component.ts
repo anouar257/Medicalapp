@@ -41,7 +41,7 @@ export class AssistantDashboardComponent {
         this.loading = false;
       },
       error: () => {
-        this.loadError = this.prefs.translate('assistant.pending.loadError');
+        this.loadError = this.prefs.translate('ASSISTANT.PENDING.LOAD_ERROR');
         this.pending = [];
         this.loading = false;
       },
@@ -52,12 +52,12 @@ export class AssistantDashboardComponent {
     const n = `${row.patientPrenom ?? ''} ${row.patientNom ?? ''}`.trim();
     if (n) return n;
     if (row.patientId != null) return `#${row.patientId}`;
-    return this.prefs.translate('assistant.pending.unknownPatient');
+    return this.prefs.translate('ASSISTANT.PENDING.UNKNOWN_PATIENT');
   }
 
   reasonLabel(row: AppointmentCabinetPendingDTO): string {
     const code = row.visitReasonCode?.trim();
-    if (!code) return this.prefs.translate('common.emDash');
+    if (!code) return this.prefs.translate('COMMON.EM_DASH');
     const key = `booking.reason.${code}`;
     const t = this.prefs.translate(key);
     return t === key ? code : t;
@@ -90,7 +90,7 @@ export class AssistantDashboardComponent {
         this.busyId = null;
       },
       error: () => {
-        this.actionError = this.prefs.translate('assistant.pending.error');
+        this.actionError = this.prefs.translate('ASSISTANT.PENDING.ERROR');
         this.busyId = null;
       },
     });

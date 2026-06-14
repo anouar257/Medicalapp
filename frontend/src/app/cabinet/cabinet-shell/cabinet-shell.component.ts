@@ -40,7 +40,7 @@ export class CabinetShellComponent {
     this.prefs.language();
     const raw = this.authPro.currentUser()?.organizationNom?.trim();
     if (raw) return raw;
-    return this.prefs.translate('cabinet.defaultOrg');
+    return this.prefs.translate('PRACTITIONER.SHELL.DEFAULT_ORG');
   });
   readonly userName = computed(() => {
     const u = this.authPro.currentUser();
@@ -86,17 +86,17 @@ export class CabinetShellComponent {
   }
 
   private readonly NAV_ITEMS: NavItem[] = [
-    { path: 'dashboard', labelKey: 'nav.cabinetOverview', icon: '⚙️', exact: true, allowedRoles: ['PRATICIEN'] },
-    { path: '/agenda-cabinet', labelKey: 'nav.agenda', icon: '📅', exact: false, allowedRoles: ['PRATICIEN', 'ASSISTANT'] },
-    { path: 'demandes', labelKey: 'nav.assistantRequests', icon: '⏳', exact: false, allowedRoles: ['PRATICIEN', 'ASSISTANT'] },
-    { path: 'messages', labelKey: 'nav.messages', icon: '💬', exact: false, allowedRoles: ['PRATICIEN'] },
-    { path: 'payments', labelKey: 'docTitle.cabinetPayments', icon: '💳', exact: false, allowedRoles: ['PRATICIEN', 'ASSISTANT'] },
-    { path: 'profile', labelKey: 'nav.profile', icon: '👤', exact: false, allowedRoles: ['PRATICIEN'] },
-    { path: 'diplomas', labelKey: 'nav.diplomas', icon: '🎓', exact: false, allowedRoles: ['PRATICIEN'] },
-    { path: 'verifications', labelKey: 'nav.verifications', icon: '🛡️', exact: false, allowedRoles: ['PRATICIEN'] },
-    { path: 'staff', labelKey: 'nav.staff', icon: '👥', exact: false, allowedRoles: ['PRATICIEN'] },
-    { path: 'practice', labelKey: 'nav.cabinet', icon: '🏥', exact: false, allowedRoles: ['PRATICIEN'] },
-    { path: 'doctors', labelKey: 'docTitle.cabinetDoctors', icon: '🩺', exact: false, allowedRoles: ['PRATICIEN'] },
+    { path: 'dashboard', labelKey: 'PRACTITIONER.SHELL.DASHBOARD', icon: '⚙️', exact: true, allowedRoles: ['PRATICIEN'] },
+    { path: '/agenda-cabinet', labelKey: 'PRACTITIONER.SHELL.AGENDA', icon: '📅', exact: false, allowedRoles: ['PRATICIEN', 'ASSISTANT'] },
+    { path: 'demandes', labelKey: 'PRACTITIONER.SHELL.REQUESTS', icon: '⏳', exact: false, allowedRoles: ['PRATICIEN', 'ASSISTANT'] },
+    { path: 'messages', labelKey: 'PRACTITIONER.SHELL.MESSAGES', icon: '💬', exact: false, allowedRoles: ['PRATICIEN'] },
+    { path: 'payments', labelKey: 'PRACTITIONER.SHELL.PAYMENTS', icon: '💳', exact: false, allowedRoles: ['PRATICIEN', 'ASSISTANT'] },
+    { path: 'profile', labelKey: 'PRACTITIONER.SHELL.PROFILE', icon: '👤', exact: false, allowedRoles: ['PRATICIEN'] },
+    { path: 'diplomas', labelKey: 'PRACTITIONER.SHELL.DIPLOMAS', icon: '🎓', exact: false, allowedRoles: ['PRATICIEN'] },
+    { path: 'verifications', labelKey: 'PRACTITIONER.SHELL.VERIFICATIONS', icon: '🛡️', exact: false, allowedRoles: ['PRATICIEN'] },
+    { path: 'staff', labelKey: 'PRACTITIONER.SHELL.STAFF', icon: '👥', exact: false, allowedRoles: ['PRATICIEN'] },
+    { path: 'practice', labelKey: 'PRACTITIONER.SHELL.PRACTICE', icon: '🏥', exact: false, allowedRoles: ['PRATICIEN'] },
+    { path: 'doctors', labelKey: 'PRACTITIONER.SHELL.DOCTORS', icon: '🩺', exact: false, allowedRoles: ['PRATICIEN'] },
   ];
 
   readonly visibleNavItems = computed(() => {
