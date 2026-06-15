@@ -280,7 +280,7 @@ export class PatientBookingWizardComponent implements OnInit, OnDestroy {
       this.specialtyFilterText = '';
       this.selectedSpecialtyLabel = '';
     } else {
-      this.specialtyFilterText = s.libelle;
+      this.specialtyFilterText = s.code;
       this.selectedSpecialtyLabel = s.libelle;
     }
     this.isSpecialtyDropdownOpen = false;

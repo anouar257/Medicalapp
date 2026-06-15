@@ -18,6 +18,7 @@ import { PractitionerService } from '../../services/practitioner.service';
 import { AgendaService } from '../../services/agenda.service';
 import { PreferencesService, AppLanguage, ZoomLevel } from '../../services/preferences.service';
 import { AppNavbarComponent } from '../../shared/app-navbar.component';
+import { AiAssistantChatComponent } from '../../shared/ai-assistant-chat/ai-assistant-chat.component';
 import type { SpecialtyDTO } from '../../models/practitioner.model';
 import {
   type CombinedPractitionerOption,
@@ -29,7 +30,7 @@ import { resolveDoctorPhotoUrl, getDynamicAvatar } from '../../utils/media-url';
 @Component({
   selector: 'app-landing-page',
   standalone: true,
-  imports: [CommonModule, RouterLink, AppNavbarComponent],
+  imports: [CommonModule, RouterLink, AppNavbarComponent, AiAssistantChatComponent],
   templateUrl: './landing-page.component.html',
   styleUrls: ['./landing-page.component.scss'],
 })
@@ -178,11 +179,25 @@ export class LandingPageComponent implements OnInit, OnDestroy {
       this.specialtyFilterText = '';
       this.selectedSpecialtyLabel = '';
     } else {
-      this.specialtyFilterText = s.libelle;
+      this.specialtyFilterText = s.code;
       this.selectedSpecialtyLabel = s.libelle;
     }
     this.isSpecialtyDropdownOpen = false;
     this.triggerSearch();
+  }
+
+  onSpecialtySelected(specialtyCode: string): void {
+    const spec = this.specialtyCatalog.find(x => x.code === specialtyCode);
+    this.specialtyFilterText = specialtyCode;
+    this.selectedSpecialtyLabel = spec ? spec.libelle : specialtyCode;
+    this.showSearchResults = true;
+    this.triggerSearch();
+
+    // Scroll to search or results section
+    const searchCard = document.querySelector('.relative.w-full.max-w-5xl.mt-12');
+    if (searchCard) {
+      searchCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   }
 
   openSearchPanel(): void {

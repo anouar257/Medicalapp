@@ -51,5 +51,17 @@
   "LANDING.FOOTER.PRIVACY": "Privacy & GDPR",
   "LANDING.FOOTER.TERMS": "Terms of Service",
   "LANDING.FOOTER.PRACTITIONERS": "Practitioners",
-  "LANDING.FOOTER.COPYRIGHT": "All rights reserved."
+  "LANDING.FOOTER.COPYRIGHT": "All rights reserved.",
+  "LANDING.AI_CHAT.BUTTON": "🤖 Need help?",
+  "LANDING.AI_CHAT.TITLE": "Medical AI Assistant",
+  "LANDING.AI_CHAT.GREETING": "Hello 👋",
+  "LANDING.AI_CHAT.DESCRIPTION": "I can help you find the right specialist.",
+  "LANDING.AI_CHAT.PLACEHOLDER": "E.g., I have a sore throat and a fever...",
+  "LANDING.AI_CHAT.SEND": "Send",
+  "LANDING.AI_CHAT.LOADING": "Analyzing...",
+  "LANDING.AI_CHAT.VIEW_DOCTORS": "See practitioners",
+  "LANDING.AI_CHAT.DISCLAIMER": "This assistant does not replace a doctor. In case of emergency, contact emergency services.",
+  "LANDING.AI_CHAT.ERROR": "Sorry, an error occurred during orientation.",
+  "LANDING.AI_CHAT.SPECIALTIES": "Recommended specialties:",
+  "LANDING.AI_CHAT.URGENT_WARNING": "🚨 Urgent symptoms detected! Please call emergency services immediately (911/112)."
 }

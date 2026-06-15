@@ -51,5 +51,17 @@
   "LANDING.FOOTER.PRIVACY": "Confidentialité & RGPD",
   "LANDING.FOOTER.TERMS": "Conditions Générales (CGU)",
   "LANDING.FOOTER.PRACTITIONERS": "Praticiens",
-  "LANDING.FOOTER.COPYRIGHT": "Tous droits réservés."
+  "LANDING.FOOTER.COPYRIGHT": "Tous droits réservés.",
+  "LANDING.AI_CHAT.BUTTON": "🤖 Besoin d'aide ?",
+  "LANDING.AI_CHAT.TITLE": "Assistant IA Médical",
+  "LANDING.AI_CHAT.GREETING": "Bonjour 👋",
+  "LANDING.AI_CHAT.DESCRIPTION": "Je peux vous aider à trouver le bon spécialiste.",
+  "LANDING.AI_CHAT.PLACEHOLDER": "Ex : J'ai mal à la gorge et de la fièvre...",
+  "LANDING.AI_CHAT.SEND": "Envoyer",
+  "LANDING.AI_CHAT.LOADING": "Analyse en cours...",
+  "LANDING.AI_CHAT.VIEW_DOCTORS": "Voir les praticiens",
+  "LANDING.AI_CHAT.DISCLAIMER": "Cet assistant ne remplace pas un médecin. En cas d'urgence, contactez les urgences.",
+  "LANDING.AI_CHAT.ERROR": "Désolé, une erreur est survenue lors de l'orientation.",
+  "LANDING.AI_CHAT.SPECIALTIES": "Spécialités recommandées :",
+  "LANDING.AI_CHAT.URGENT_WARNING": "🚨 Symptômes urgents détectés ! Veuillez appeler immédiatement les secours (15/112)."
 }

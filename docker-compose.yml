@@ -169,6 +169,20 @@ services:
       - mediconnect-network
     restart: always
 
+  # Microservice IA (Python FastAPI)
+  ai-service:
+    build:
+      context: ./backend/ai-service
+      dockerfile: Dockerfile
+    container_name: ai-service
+    ports:
+      - "8001:8001"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    networks:
+      - mediconnect-network
+    restart: unless-stopped
+
   # Application Frontend Angular + Nginx (Reverse Proxy)
   frontend:
     build:

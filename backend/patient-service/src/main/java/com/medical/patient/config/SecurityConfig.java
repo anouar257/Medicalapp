@@ -34,6 +34,7 @@ public class SecurityConfig {
                 // Endpoints publics (inscription, login, OTP, reset password)
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/internal/**").permitAll()
+                .requestMatchers("/api/public/ai/**").permitAll()
                 // Tout le reste nécessite un JWT valide
                 .anyRequest().authenticated()
             )

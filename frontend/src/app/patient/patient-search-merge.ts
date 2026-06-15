@@ -120,7 +120,12 @@ export function filterCombinedOptions(
       if (!matchVille && !matchAdresse) return false;
     }
     
-    if (s && !r.specialty.toLowerCase().includes(s)) return false;
+    if (s) {
+      const matchLabel = r.specialty.toLowerCase().includes(s);
+      const matchCode = r.specialtyCode && r.specialtyCode.toLowerCase() === s;
+      const matchCodePartial = r.specialtyCode && r.specialtyCode.toLowerCase().includes(s);
+      if (!matchLabel && !matchCode && !matchCodePartial) return false;
+    }
     return true;
   });
 }

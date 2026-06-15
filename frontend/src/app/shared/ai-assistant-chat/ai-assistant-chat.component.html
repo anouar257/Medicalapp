@@ -1,0 +1,145 @@
+<!-- Main Widget Container -->
+<div class="fixed bottom-6 z-50 flex flex-col max-w-[90vw] md:max-w-md"
+     [ngClass]="prefs.language() === 'ar' ? 'left-6 items-start' : 'right-6 items-end'"
+     [dir]="prefs.language() === 'ar' ? 'rtl' : 'ltr'">
+
+  <!-- 💬 CHAT WINDOW -->
+  <div *ngIf="isOpen() && !isMinimized()"
+       class="mb-4 w-[360px] max-w-[90vw] bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col transition-all duration-300 ease-out origin-bottom-right scale-100">
+    
+    <!-- Title Bar / Header -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-5 py-4 flex items-center justify-between shadow-sm">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">🤖</span>
+        <div>
+          <h4 class="font-extrabold text-sm tracking-tight leading-tight">
+            {{ prefs.translate('LANDING.AI_CHAT.TITLE') }}
+          </h4>
+          <span class="text-[10px] text-blue-100 font-semibold uppercase tracking-wider flex items-center gap-1">
+            <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            En ligne
+          </span>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button (click)="minimizeChat($event)" class="text-white/80 hover:text-white p-1 hover:bg-white/10 rounded-lg transition-colors cursor-pointer" title="Minimiser">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 12H4" />
+          </svg>
+        </button>
+        <button (click)="closeChat($event)" class="text-white/80 hover:text-white p-1 hover:bg-white/10 rounded-lg transition-colors cursor-pointer" title="Fermer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Chat Messages Container -->
+    <div class="flex-1 p-4 overflow-y-auto min-h-[280px] max-h-[350px] space-y-4 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-800">
+      <div *ngFor="let msg of messages()" class="flex flex-col">
+        <!-- Message bubble -->
+        <div class="max-w-[85%] rounded-2xl px-4 py-3 text-sm shadow-sm"
+             [ngClass]="msg.sender === 'user' 
+                        ? 'self-end bg-blue-600 text-white font-medium rounded-br-none' 
+                        : 'self-start bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-normal rounded-bl-none border border-slate-100 dark:border-slate-700/50'">
+          
+          <div class="whitespace-pre-line leading-relaxed">{{ msg.text }}</div>
+
+          <!-- Recommended Specialties block -->
+          <div *ngIf="msg.specialties && msg.specialties.length > 0 && !msg.needMoreInfo" class="mt-4 pt-3 border-t border-slate-200/50 dark:border-slate-700/50">
+            <p class="font-bold text-xs uppercase tracking-wide opacity-90 mb-2">
+              {{ prefs.translate('LANDING.AI_CHAT.SPECIALTIES') }}
+            </p>
+            <div class="flex flex-wrap gap-1.5">
+              <span *ngFor="let spec of msg.specialties" class="px-2.5 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-extrabold rounded-lg text-xs border border-blue-100 dark:border-blue-800">
+                {{ spec.label }}
+              </span>
+            </div>
+            <!-- CTA Search Link -->
+            <button (click)="onViewDoctors(msg.specialties[0].code)" 
+                    class="mt-3 w-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-black py-2 px-3 rounded-xl transition transform hover:scale-102 flex items-center justify-center gap-1.5 shadow-md shadow-blue-500/10">
+              <span>🔍</span>
+              <span>{{ prefs.translate('LANDING.AI_CHAT.VIEW_DOCTORS') }}</span>
+            </button>
+          </div>
+
+          <!-- Warning text -->
+          <p *ngIf="msg.warning" class="mt-3 text-[10px] opacity-75 italic leading-tight">
+            {{ msg.warning }}
+          </p>
+
+          <!-- Urgent Alert -->
+          <div *ngIf="msg.urgency === 'urgent'" class="mt-3 p-2.5 bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-800 rounded-xl text-rose-700 dark:text-rose-400 font-bold text-xs flex items-start gap-2 animate-pulse">
+            <span class="text-base shrink-0">⚠️</span>
+            <span>{{ prefs.translate('LANDING.AI_CHAT.URGENT_WARNING') }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading Bubble -->
+      <div *ngIf="isLoading()" class="self-start bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-2xl rounded-bl-none px-4 py-3 text-xs flex items-center gap-2 border border-slate-100 dark:border-slate-700/50 shadow-sm max-w-[85%]">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+        </span>
+        <span class="font-semibold">{{ prefs.translate('LANDING.AI_CHAT.LOADING') }}</span>
+      </div>
+
+      <!-- Error bubble -->
+      <div *ngIf="errorMessage()" class="self-start bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-800 text-rose-700 dark:text-rose-400 rounded-2xl rounded-bl-none px-4 py-3 text-xs font-semibold shadow-sm max-w-[85%]">
+        {{ errorMessage() }}
+      </div>
+    </div>
+
+    <!-- Input Footer Area -->
+    <form (ngSubmit)="sendMessage()" class="p-3 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex items-center gap-2">
+      <input type="text"
+             name="userMessage"
+             [(ngModel)]="userMessage"
+             [placeholder]="prefs.translate('LANDING.AI_CHAT.PLACEHOLDER')"
+             class="flex-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 dark:text-white transition placeholder-slate-400"
+             [disabled]="isLoading()"
+             required
+             minlength="3"
+             maxlength="500" />
+      <button type="submit" 
+              [disabled]="!userMessage.trim() || userMessage.trim().length < 3 || isLoading()"
+              class="h-10 w-10 shrink-0 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 dark:disabled:bg-slate-800 text-white disabled:text-slate-400 dark:disabled:text-slate-600 rounded-2xl flex items-center justify-center transition shadow-lg shadow-blue-500/10 cursor-pointer">
+        <svg class="w-4 h-4 transform rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+        </svg>
+      </button>
+    </form>
+
+    <!-- Medical Disclaimer bottom -->
+    <div class="px-4 py-2.5 bg-slate-100 dark:bg-slate-950 text-[9px] text-slate-500 dark:text-slate-500 text-center leading-normal border-t border-slate-200/30 dark:border-slate-800/30">
+      {{ prefs.translate('LANDING.AI_CHAT.DISCLAIMER') }}
+    </div>
+  </div>
+
+  <!-- 🤖 FLOATING ACTION BUTTON (TRIGGER) -->
+  <div class="flex items-center gap-3 pointer-events-auto">
+    <!-- Bubble invitation -->
+    <div *ngIf="!isOpen() || isMinimized()"
+         (click)="toggleChat()"
+         class="bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs px-4 py-2.5 rounded-2xl shadow-xl shadow-blue-500/15 cursor-pointer transform hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-2">
+      <span class="relative flex h-2 w-2">
+        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+      </span>
+      <span>{{ prefs.translate('LANDING.AI_CHAT.BUTTON') }}</span>
+    </div>
+
+    <!-- Main button -->
+    <button (click)="toggleChat()"
+            class="h-14 w-14 rounded-full bg-gradient-to-tr from-blue-600 to-blue-500 text-white shadow-2xl hover:shadow-blue-600/30 cursor-pointer flex items-center justify-center transform hover:scale-108 active:scale-95 transition-all duration-300 relative border border-white/10">
+      <span class="text-3xl filter drop-shadow-md">🤖</span>
+      <!-- Notification badge -->
+      <span *ngIf="!isOpen()" class="absolute -top-1 -right-1 bg-rose-500 text-white font-bold text-[10px] h-5 w-5 rounded-full flex items-center justify-center border-2 border-white dark:border-slate-950 shadow-sm animate-bounce">
+        1
+      </span>
+    </button>
+  </div>
+
+</div>

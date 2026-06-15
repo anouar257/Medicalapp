@@ -53,9 +53,13 @@ app:
   platform-stats:
     secret: ${PLATFORM_STATS_SECRET:dev-platform-stats-key-change-me}
 
-# Inter-services (messagerie : titulaire / proche concerné).
+# AI Orientation Service URL
+ai-service:
+  url: ${AI_SERVICE_URL:http://ai-service:8001}
+
 integration:
   messaging-secret: ${MESSAGING_INTEGRATION_SECRET:dev-messaging-secret-change-me}
+  practitioner-service-url: ${PRACTITIONER_SERVICE_URL:http://practitioner-service:8083}
 
 eureka:
   client:

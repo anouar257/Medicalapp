@@ -25,7 +25,7 @@ spring:
         - id: patient_route
           uri: lb://PATIENT-SERVICE
           predicates:
-            - Path=/api/auth/**, /api/auth, /api/patients/**, /api/patients, /api/proches/**, /api/proches
+            - Path=/api/auth/**, /api/auth, /api/patients/**, /api/patients, /api/proches/**, /api/proches, /api/public/ai/**
 
         # Route for Practitioner Service
         - id: practitioner_route

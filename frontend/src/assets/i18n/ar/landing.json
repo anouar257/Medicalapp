@@ -51,5 +51,17 @@
   "LANDING.FOOTER.PRIVACY": "الخصوصية و GDPR",
   "LANDING.FOOTER.TERMS": "الشروط والأحكام",
   "LANDING.FOOTER.PRACTITIONERS": "الممارسون",
-  "LANDING.FOOTER.COPYRIGHT": "جميع الحقوق محفوظة."
+  "LANDING.FOOTER.COPYRIGHT": "جميع الحقوق محفوظة.",
+  "LANDING.AI_CHAT.BUTTON": "🤖 بحاجة لمساعدة؟",
+  "LANDING.AI_CHAT.TITLE": "مساعد طبي بالذكاء الاصطناعي",
+  "LANDING.AI_CHAT.GREETING": "مرحباً 👋",
+  "LANDING.AI_CHAT.DESCRIPTION": "يمكنني مساعدتك في العثور على التخصص المناسب.",
+  "LANDING.AI_CHAT.PLACEHOLDER": "مثال: لدي ألم في الحلق وحمى...",
+  "LANDING.AI_CHAT.SEND": "إرسال",
+  "LANDING.AI_CHAT.LOADING": "جاري التحليل...",
+  "LANDING.AI_CHAT.VIEW_DOCTORS": "عرض الأطباء",
+  "LANDING.AI_CHAT.DISCLAIMER": "هذا المساعد لا يغني عن الطبيب. في حالة الطوارئ، اتصل بالإسعاف.",
+  "LANDING.AI_CHAT.ERROR": "عذراً، حدث خطأ أثناء التوجيه.",
+  "LANDING.AI_CHAT.SPECIALTIES": "التخصصات الموصى بها:",
+  "LANDING.AI_CHAT.URGENT_WARNING": "🚨 تم الكشف عن أعراض طارئة! يرجى الاتصال بالإسعاف فوراً."
 }
