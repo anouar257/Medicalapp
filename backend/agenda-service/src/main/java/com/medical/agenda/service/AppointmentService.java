@@ -20,10 +20,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import com.medical.agenda.dto.AppointmentEvent;
 
 @Service
 public class AppointmentService {
@@ -37,16 +39,19 @@ public class AppointmentService {
   private final DoctorRepository doctorRepository;
   private final AppointmentTypeRepository appointmentTypeRepository;
   private final CabinetHoursClient medicalOrganizationHoursClient;
+  private final KafkaTemplate<String, Object> kafkaTemplate;
 
   public AppointmentService(
       AppointmentRepository appointmentRepository,
       DoctorRepository doctorRepository,
       AppointmentTypeRepository appointmentTypeRepository,
-      CabinetHoursClient medicalOrganizationHoursClient) {
+      CabinetHoursClient medicalOrganizationHoursClient,
+      KafkaTemplate<String, Object> kafkaTemplate) {
     this.appointmentRepository = appointmentRepository;
     this.doctorRepository = doctorRepository;
     this.appointmentTypeRepository = appointmentTypeRepository;
     this.medicalOrganizationHoursClient = medicalOrganizationHoursClient;
+    this.kafkaTemplate = kafkaTemplate;
   }
 
   /** Fenêtre calendrier : chevauchements avec [rangeStart, rangeEnd). */
@@ -151,7 +156,9 @@ public class AppointmentService {
     applyCommonFields(entity, input, doctor, type, start, end, duration);
     entity.setStatus(AppointmentStatus.CONFIRMED);
 
-    return AppointmentMapper.toDto(appointmentRepository.save(entity));
+    Appointment saved = appointmentRepository.save(entity);
+    publishAppointmentEvent(saved);
+    return AppointmentMapper.toDto(saved);
   }
 
   /**
@@ -209,7 +216,9 @@ public class AppointmentService {
     entity.setPatientNom(trimToNull(in.getPatientNom()));
     entity.setVisitReasonCode(trimToNull(in.getVisitReasonCode()));
     entity.setLocationMode(trimToNull(in.getLocationMode()));
-    return AppointmentMapper.toDto(appointmentRepository.save(entity));
+    Appointment saved = appointmentRepository.save(entity);
+    publishAppointmentEvent(saved);
+    return AppointmentMapper.toDto(saved);
   }
 
   @Transactional(readOnly = true)
@@ -406,7 +415,9 @@ public class AppointmentService {
       entity.setStatus(input.getStatus());
     }
 
-    return AppointmentMapper.toDto(appointmentRepository.save(entity));
+    Appointment saved = appointmentRepository.save(entity);
+    publishAppointmentEvent(saved);
+    return AppointmentMapper.toDto(saved);
   }
 
   @Transactional
@@ -450,7 +461,9 @@ public class AppointmentService {
     validateStatusTransition(entity.getStatus(), newStatus);
 
     entity.setStatus(newStatus);
-    return AppointmentMapper.toDto(appointmentRepository.save(entity));
+    Appointment saved = appointmentRepository.save(entity);
+    publishAppointmentEvent(saved);
+    return AppointmentMapper.toDto(saved);
   }
 
   private void validatePatchAuthorization(AgendaProPrincipal principal) {
@@ -731,6 +744,32 @@ public class AppointmentService {
     }
     if (organizationId == null || !organizationId.equals(principal.organizationId())) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, forbiddenMessage);
+    }
+  }
+
+  private void publishAppointmentEvent(Appointment appointment) {
+    try {
+      Long practitionerId = appointment.getDoctor() != null ? appointment.getDoctor().getExternalPractitionerId() : null;
+      Long organizationId = appointment.getDoctor() != null ? appointment.getDoctor().getOrganizationId() : null;
+      Double fee = (appointment.getAppointmentType() != null && appointment.getAppointmentType().getPrice() != null)
+          ? appointment.getAppointmentType().getPrice().doubleValue()
+          : null;
+      String dateTimeStr = appointment.getStartTime() != null ? appointment.getStartTime().toString() : null;
+      String statusStr = appointment.getStatus() != null ? appointment.getStatus().name() : null;
+
+      AppointmentEvent event = new AppointmentEvent(
+          appointment.getId(),
+          appointment.getPatientId(),
+          practitionerId,
+          organizationId,
+          dateTimeStr,
+          statusStr,
+          fee
+      );
+      kafkaTemplate.send("appointment-events", event.appointmentId().toString(), event);
+    } catch (Exception e) {
+      System.err.println("Failed to send Kafka appointment event: " + e.getMessage());
+      e.printStackTrace();
     }
   }
 }
