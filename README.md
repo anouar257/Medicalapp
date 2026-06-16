@@ -5,6 +5,7 @@ Mediconnect est une solution complète de gestion de cabinet médical et de pris
 ## 🛠️ Stack Technique
 
 - **Backend :** Java 21, Spring Boot 3.4.2, Spring Cloud (Eureka Discovery Server, Cloud Gateway), Spring Security (JWT), Hibernate/JPA, OpenFeign.
+- **Message Broker :** Apache Kafka 3.7.0 (mode KRaft - sans Zookeeper).
 - **Frontend :** Angular 18+, Tailwind CSS, RxJS, Signals (State Management).
 - **Base de données :** PostgreSQL.
 - **Gestion des fichiers :** Stockage local persistant pour les documents et photos médicales.
@@ -83,13 +84,26 @@ L'application sera accessible sur `http://localhost:4200` et passera par l'API G
 
 ## 🐳 Déploiement avec Docker
 
-Le projet contient une configuration complète pour déployer l'ensemble des services via **Docker Compose**.
+Le projet contient une configuration complète pour déployer l'ensemble des services (y compris le broker Kafka) via **Docker Compose**.
 
-Pour tout lancer (bases de données, Eureka, Gateway, microservices backend, frontend via Nginx) :
-
+### Lancement standard (Tous les services)
 ```bash
-docker-compose up --build -d
+docker compose up -d
 ```
-L'application complète sera alors disponible sur `http://localhost:4200`.
+*(Ajoutez `--build` si vous venez de modifier du code Java ou Angular pour forcer la recompilation dans Docker).*
+
+### Lancement partiel (Kafka et services concernés)
+Si vous souhaitez déployer ou reconstruire uniquement le broker Kafka et les services connectés :
+```bash
+docker compose up -d --build kafka agenda-service messaging-service payment-service
+```
+
+### 🛰️ Vérification et Inspection du trafic Kafka
+Pour vérifier en temps réel que les événements de rendez-vous transitent bien sur le topic `appointment-events`, exécutez le consommateur console à l'intérieur du conteneur Kafka :
+```bash
+docker exec -it kafka /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic appointment-events --from-beginning
+```
+
+Chaque réservation, modification ou mise à jour de statut de rendez-vous génère un événement JSON qui sera consommé en direct par `messaging-service` (notifications) et `payment-service` (facturation).
 
 ---
